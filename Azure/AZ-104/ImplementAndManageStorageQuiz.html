@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Implement & Manage Storage — AZ-104 Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inconsolata:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#FFD166;--gold2:#E6B84F;
+  --teal:#06D6A0;--teal2:#04B888;
+  --lavender:#B19CD9;--lav2:#9B84CC;
+  --rose:#FF6B9D;
+  --sky:#73C7FF;
+  --bg:#07090F;--bg2:#0B0E18;
+  --surf:#0F1520;--surf2:#131B28;--surf3:#182030;
+  --bdr:#1A2435;--bdr2:#22304A;--bdr3:#2A3D5C;
+  --txt:#DCE8FF;--txt2:#A8BED8;
+  --muted:#4E6480;--muted2:#6A84A8;
+  --ok:#06D6A0;--err:#FF5777;
+}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;}
+
+/* layered background */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 900px 700px at -5% 20%,rgba(255,209,102,0.03) 0%,transparent 55%),
+    radial-gradient(ellipse 700px 600px at 105% 80%,rgba(6,214,160,0.04) 0%,transparent 55%),
+    radial-gradient(ellipse 500px 400px at 50% 110%,rgba(177,156,217,0.03) 0%,transparent 55%);
+  pointer-events:none;
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(255,209,102,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,209,102,0.018) 1px,transparent 1px);
+  background-size:52px 52px;
+  pointer-events:none;
+}
+
+.wrap{max-width:930px;margin:0 auto;padding:0 22px 72px;position:relative;z-index:1;}
+
+/* ── HEADER ── */
+header{padding:54px 0 38px;border-bottom:1px solid var(--bdr);}
+.h-flex{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;}
+
+.h-icons{display:flex;flex-direction:column;gap:10px;flex-shrink:0;}
+.hic{
+  width:54px;height:54px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  border:1px solid rgba(255,209,102,0.15);
+  box-shadow:0 0 24px rgba(255,209,102,0.07),inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.hic1{background:linear-gradient(145deg,#100E02,#1E1800);}
+.hic2{background:linear-gradient(145deg,#020E10,#001A14);}
+.hic3{background:linear-gradient(145deg,#0D0218,#150830);}
+.hic4{background:linear-gradient(145deg,#0E1018,#192035);}
+
+.h-body{flex:1;}
+.htag{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:'Inconsolata',monospace;font-size:11px;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(255,209,102,0.25);
+  background:rgba(255,209,102,0.06);
+  border-radius:100px;padding:4px 14px;margin-bottom:16px;
+}
+.htag-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:glw 2s ease-in-out infinite;}
+@keyframes glw{0%,100%{box-shadow:0 0 4px var(--gold);}50%{box-shadow:0 0 10px var(--gold),0 0 20px rgba(255,209,102,0.4);}}
+h1{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(28px,4.8vw,50px);font-weight:700;
+  line-height:1.1;letter-spacing:-0.02em;
+  background:linear-gradient(140deg,#fff 0%,var(--gold) 45%,var(--teal) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;
+}
+.hsub{font-family:'Inconsolata',monospace;font-size:12px;color:var(--muted2);line-height:2;}
+
+/* module tabs */
+.modtabs{display:flex;gap:8px;margin-top:22px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.modtabs::-webkit-scrollbar{display:none;}
+.mt{
+  flex-shrink:0;padding:7px 15px;border-radius:9px;
+  border:1px solid var(--bdr2);background:var(--surf2);
+  font-family:'Inconsolata',monospace;font-size:12px;font-weight:500;
+  color:var(--muted2);cursor:pointer;transition:all 0.2s;white-space:nowrap;
+  display:flex;align-items:center;gap:7px;
+}
+.mt:hover{border-color:var(--gold);color:var(--gold);background:rgba(255,209,102,0.05);}
+.mt.active{background:rgba(255,209,102,0.1);border-color:var(--gold);color:var(--gold);box-shadow:0 0 14px rgba(255,209,102,0.1);}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:28px 0 20px;}
+.sc{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:13px;
+  padding:16px 10px;text-align:center;transition:all 0.25s;
+}
+.sc:hover{border-color:var(--bdr3);box-shadow:0 0 18px rgba(255,209,102,0.05);}
+.sn{display:block;font-family:'Inconsolata',monospace;font-size:27px;font-weight:600;color:var(--gold);}
+.sl{display:block;font-family:'Inconsolata',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-top:5px;}
+
+/* ── PROGRESS ── */
+.progcard{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:15px 20px;margin-bottom:22px;}
+.progtop{display:flex;justify-content:space-between;font-family:'Inconsolata',monospace;font-size:11px;color:var(--muted);margin-bottom:10px;}
+.progscore{color:var(--teal);font-weight:600;}
+.ptrack{height:7px;background:var(--surf3);border-radius:4px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--gold),var(--teal));border-radius:4px;width:0%;transition:width 0.55s cubic-bezier(0.34,1.56,0.64,1);}
+
+/* ── CONTROLS ── */
+.ctrl{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
+.flt{
+  padding:7px 14px;border-radius:8px;
+  border:1px solid var(--bdr2);background:var(--surf2);
+  font-family:'Inconsolata',monospace;font-size:11px;font-weight:600;
+  color:var(--muted2);cursor:pointer;transition:all 0.18s;
+  text-transform:uppercase;letter-spacing:0.05em;
+}
+.flt:hover{border-color:var(--muted2);color:var(--txt);}
+.flt.active{background:var(--surf3);border-color:var(--muted2);color:var(--txt);}
+.flt.active.fc{background:rgba(177,156,217,0.1);border-color:var(--lavender);color:var(--lavender);}
+.flt.active.ft{background:rgba(115,199,255,0.1);border-color:var(--sky);color:var(--sky);}
+.flt.active.fl{background:rgba(6,214,160,0.1);border-color:var(--teal);color:var(--teal);}
+.g1{flex:1;}
+.abtn{
+  padding:9px 20px;border-radius:9px;border:none;
+  font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.01em;
+}
+.ap{background:linear-gradient(135deg,var(--gold),#E6962A);color:#0A0800;box-shadow:0 4px 16px rgba(255,209,102,0.25);}
+.ap:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(255,209,102,0.35);}
+.ag{background:var(--surf2);color:var(--muted2);border:1px solid var(--bdr2);}
+.ag:hover{color:var(--txt);border-color:var(--muted2);}
+
+/* ── SECTION DIVIDER ── */
+.sdiv{display:flex;align-items:center;gap:14px;margin:30px 0 18px;}
+.sdiv-ln{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--bdr2),transparent);}
+.sdiv-badge{
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+  font-family:'Inconsolata',monospace;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--gold);background:var(--surf);
+  border:1px solid rgba(255,209,102,0.2);border-radius:100px;padding:6px 16px;
+  box-shadow:0 0 14px rgba(255,209,102,0.06);
+}
+
+/* ── QUESTION CARD ── */
+.qcard{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:16px;padding:26px 28px;margin-bottom:13px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);
+  animation:fadeup 0.35s ease both;transition:border-color 0.28s,box-shadow 0.28s;
+}
+@keyframes fadeup{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.qcard.qok{border-color:var(--ok);box-shadow:0 0 22px rgba(6,214,160,0.1);}
+.qcard.qng{border-color:var(--err);box-shadow:0 0 22px rgba(255,87,119,0.1);}
+
+.qmeta{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.qno{font-family:'Inconsolata',monospace;font-size:11px;color:var(--muted);background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:3px 9px;}
+.qtag{font-family:'Inconsolata',monospace;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:0.06em;}
+.qt-c{background:rgba(177,156,217,0.12);color:var(--lavender);border:1px solid rgba(177,156,217,0.25);}
+.qt-t{background:rgba(115,199,255,0.12);color:var(--sky);border:1px solid rgba(115,199,255,0.25);}
+.qt-l{background:rgba(6,214,160,0.12);color:var(--teal);border:1px solid rgba(6,214,160,0.25);}
+.qsec{margin-left:auto;font-family:'Inconsolata',monospace;font-size:10px;color:var(--muted);background:var(--surf2);border:1px solid var(--bdr);border-radius:100px;padding:3px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
+
+.qtxt{font-size:15.5px;font-weight:500;line-height:1.6;color:var(--txt);margin-bottom:18px;}
+
+/* code block */
+.cblk{
+  background:#04080F;border:1px solid rgba(255,209,102,0.1);border-radius:10px;
+  padding:14px 18px;margin:10px 0 18px;
+  font-family:'Inconsolata',monospace;font-size:12.5px;line-height:1.85;
+  color:#8BB8E8;overflow-x:auto;position:relative;
+}
+.cblk::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--gold),var(--teal));border-radius:10px 10px 0 0;
+}
+.cblk .cm{color:#2E5060;}.cblk .kw{color:#FFD166;}.cblk .st{color:var(--teal);}
+.cblk .nm{color:#FF9F4A;}.cblk .op{color:#8BB8E8;}.cblk .pm{color:var(--lavender);}
+.cblk .fn{color:var(--sky);}.cblk .pr{color:var(--rose);}
+
+/* options */
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:13px 16px;border-radius:11px;
+  border:1px solid var(--bdr);background:var(--surf2);
+  cursor:pointer;transition:all 0.18s;
+  font-size:14px;line-height:1.55;color:var(--txt2);font-weight:400;
+}
+.opt:hover:not(.lk){border-color:var(--gold);background:rgba(255,209,102,0.05);color:var(--txt);transform:translateX(4px);}
+.opt.lk{cursor:default;}
+.opt.oc{border-color:var(--ok)!important;background:rgba(6,214,160,0.07)!important;color:var(--ok)!important;font-weight:500;}
+.opt.ow{border-color:var(--err)!important;background:rgba(255,87,119,0.07)!important;color:var(--err)!important;}
+.oltr{
+  min-width:28px;height:28px;border-radius:8px;
+  border:1px solid var(--bdr2);background:var(--surf3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Inconsolata',monospace;font-size:11px;font-weight:600;
+  color:var(--muted);flex-shrink:0;transition:all 0.18s;
+}
+.opt:hover:not(.lk) .oltr{border-color:var(--gold);background:var(--gold);color:#0A0800;}
+.opt.oc .oltr{border-color:var(--ok);background:var(--ok);color:#030E0A;}
+.opt.ow .oltr{border-color:var(--err);background:var(--err);color:#fff;}
+
+/* explanation */
+.expl{
+  margin-top:14px;padding:14px 18px;border-radius:10px;
+  background:rgba(255,209,102,0.04);border:1px solid rgba(255,209,102,0.14);
+  font-size:13px;line-height:1.75;color:var(--txt2);display:none;
+}
+.expl.vis{display:block;animation:fadeup 0.25s ease;}
+.expl strong{color:var(--gold);}
+.expl code{font-family:'Inconsolata',monospace;font-size:12px;background:var(--surf3);border:1px solid var(--bdr2);border-radius:4px;padding:1px 6px;color:var(--sky);}
+
+/* ── RESULT ── */
+.rpanel{
+  background:var(--surf);border:1px solid var(--bdr2);border-radius:20px;
+  padding:48px 40px;text-align:center;margin:32px 0;
+  box-shadow:0 8px 48px rgba(0,0,0,0.5);display:none;
+  position:relative;overflow:hidden;
+}
+.rpanel::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 600px 300px at 50% 0%,rgba(255,209,102,0.05) 0%,transparent 60%);
+  pointer-events:none;
+}
+.rpanel::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--teal),var(--lavender),var(--rose));}
+.rpanel.vis{display:block;animation:fadeup 0.5s ease;}
+
+.r-ico{font-size:56px;margin-bottom:14px;}
+.r-pct{font-family:'Space Grotesk',sans-serif;font-size:80px;font-weight:700;line-height:1;background:linear-gradient(135deg,var(--gold),#E6962A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.r-pct.hi{background:linear-gradient(135deg,var(--teal),var(--sky));-webkit-background-clip:text;background-clip:text;}
+.r-sublbl{font-family:'Inconsolata',monospace;font-size:12px;color:var(--muted);margin-top:6px;}
+.r-vrd{font-size:16px;font-weight:500;color:var(--txt2);margin:16px 0 30px;}
+
+.r-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.rcell{padding:18px 10px;border-radius:12px;background:var(--surf2);border:1px solid var(--bdr);}
+.rcell .rn{font-size:32px;font-weight:700;font-family:'Inconsolata',monospace;}
+.rcell .rl{font-size:10px;font-family:'Inconsolata',monospace;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-top:4px;}
+.rc-r .rn{color:var(--ok);}
+.rc-w .rn{color:var(--err);}
+.rc-p .rn{color:var(--gold);}
+
+.mbkd{margin:20px 0 28px;text-align:left;}
+.mbkd-ttl{font-family:'Inconsolata',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;}
+.mbrow{margin-bottom:13px;}
+.mbhead{display:flex;justify-content:space-between;font-family:'Inconsolata',monospace;font-size:11px;color:var(--txt2);margin-bottom:5px;font-weight:500;}
+.mbtrack{height:7px;background:var(--surf3);border-radius:4px;overflow:hidden;}
+.mbbar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--teal));transition:width 0.7s cubic-bezier(0.34,1.56,0.64,1);}
+.mbbar.lo{background:linear-gradient(90deg,#E6962A,var(--rose));}
+
+.r-acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+footer{text-align:center;padding:36px 0;border-top:1px solid var(--bdr);margin-top:20px;}
+footer p{font-family:'Inconsolata',monospace;font-size:11px;color:var(--muted);line-height:2;}
+
+@media(max-width:640px){
+  .stats{grid-template-columns:repeat(3,1fr);}
+  .r-grid{grid-template-columns:1fr;}
+  .qsec{display:none;}
+  .h-flex{flex-direction:column;}
+  .h-icons{flex-direction:row;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="h-flex">
+    <div class="h-icons">
+      <div class="hic hic1">🗄️</div>
+      <div class="hic hic2">🪣</div>
+      <div class="hic hic3">🔐</div>
+      <div class="hic hic4">📁</div>
+    </div>
+    <div class="h-body">
+      <div class="htag"><span class="htag-dot"></span>AZ-104 · Implement &amp; Manage Storage</div>
+      <h1>Azure Storage<br/>Quiz Portal</h1>
+      <p class="hsub">Storage Accounts · Blob Storage · Storage Security · Azure Files</p>
+      <div class="modtabs">
+        <button class="mt active" onclick="setSec('all',this)">📦 All Topics</button>
+        <button class="mt" onclick="setSec('Storage Accounts',this)">🗄️ Storage Accounts</button>
+        <button class="mt" onclick="setSec('Blob Storage',this)">🪣 Blob Storage</button>
+        <button class="mt" onclick="setSec('Storage Security',this)">🔐 Storage Security</button>
+        <button class="mt" onclick="setSec('Azure Files',this)">📁 Azure Files</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="sc"><span class="sn" id="sT">0</span><span class="sl">Questions</span></div>
+  <div class="sc"><span class="sn" id="sA">0</span><span class="sl">Answered</span></div>
+  <div class="sc"><span class="sn" id="sC">0</span><span class="sl">Correct</span></div>
+  <div class="sc"><span class="sn" id="sW">0</span><span class="sl">Wrong</span></div>
+  <div class="sc"><span class="sn" id="sP">—</span><span class="sl">Score</span></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progcard">
+  <div class="progtop"><span id="pLbl">0 of 0 answered</span><span class="progscore" id="pScore">Score: 0%</span></div>
+  <div class="ptrack"><div class="pfill" id="pBar"></div></div>
+</div>
+
+<!-- CONTROLS -->
+<div class="ctrl">
+  <button class="flt active" onclick="setType('all',this)">All</button>
+  <button class="flt fc" onclick="setType('conceptual',this)">💡 Conceptual</button>
+  <button class="flt ft" onclick="setType('technical',this)">⚙️ Technical</button>
+  <button class="flt fl" onclick="setType('logical',this)">🧩 Logical</button>
+  <div class="g1"></div>
+  <button class="abtn ap" onclick="doShuffle()">🔀 Shuffle &amp; Restart</button>
+  <button class="abtn ag" onclick="doReset()">↺ Reset</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quizBox"></div>
+
+<!-- RESULT -->
+<div class="rpanel" id="rPanel">
+  <div class="r-ico" id="rIco">🗄️</div>
+  <div class="r-pct" id="rPct">0%</div>
+  <div class="r-sublbl">Final Score</div>
+  <div class="r-vrd" id="rVrd">Keep going!</div>
+  <div class="r-grid">
+    <div class="rcell rc-r"><div class="rn" id="rR">0</div><div class="rl">Correct</div></div>
+    <div class="rcell rc-w"><div class="rn" id="rW">0</div><div class="rl">Wrong</div></div>
+    <div class="rcell rc-p"><div class="rn" id="rP">0%</div><div class="rl">Accuracy</div></div>
+  </div>
+  <div class="mbkd" id="mBkd"></div>
+  <div class="r-acts">
+    <button class="abtn ap" onclick="doShuffle()">🔀 Try Again (Shuffled)</button>
+    <button class="abtn ag" onclick="doReset()">↺ Review Answers</button>
+  </div>
+</div>
+
+<footer><p>AZ-104 · Implement and Manage Storage<br/>Storage Accounts · Blob Storage · Storage Security · Azure Files</p></footer>
+</div>
+
+<script>
+const Q=[
+
+// ════════════════════════════════════════════
+// SECTION 1 — CONFIGURE STORAGE ACCOUNTS
+// ════════════════════════════════════════════
+
+{s:"Storage Accounts",t:"conceptual",
+q:"What is an Azure Storage Account?",
+o:["A billing account for Azure subscriptions","A top-level namespace that provides a unique endpoint for all Azure Storage services — Blobs, Files, Queues, Tables — and contains all your storage data objects","A virtual machine used to store files","A dedicated server in Azure for file storage"],
+c:1,e:"An Azure Storage Account is the container for all Azure storage services. It provides a globally unique namespace (accountname.blob.core.windows.net etc.), sets the replication and access tier defaults, and groups storage for billing. Every storage resource must belong to a storage account."},
+
+{s:"Storage Accounts",t:"conceptual",
+q:"What are the four main storage services available inside an Azure Storage Account?",
+o:["VMs, Databases, Containers, Queues","Blob Storage (objects), Azure Files (file shares), Queue Storage (messages), Table Storage (NoSQL key-value)","Block Storage, Object Storage, File Storage, Archive Storage","Page Blobs, Block Blobs, Append Blobs, File Blobs"],
+c:1,e:"A single storage account hosts four services: (1) Blob Storage — unstructured objects (images, videos, backups). (2) Azure Files — SMB/NFS file shares. (3) Queue Storage — async message queuing. (4) Table Storage — NoSQL key-value pairs. Each is accessible via its own REST endpoint."},
+
+{s:"Storage Accounts",t:"conceptual",
+q:"What are the main Azure Storage Account kinds and which is recommended for most use cases?",
+o:["Classic and Modern — Classic is recommended","StorageV1, StorageV2, BlobStorage, FileStorage — StorageV2 (General Purpose v2) is the recommended default for most scenarios","StandardHDD and PremiumSSD only","Local and Global — depends on region"],
+c:1,e:"Account kinds: (1) StorageV2 (GPv2) — recommended, all services, all tiers, latest features. (2) StorageV1 — legacy, migrate to GPv2. (3) BlobStorage — Blob-only, hot/cool/archive tiers. (4) BlockBlobStorage — premium performance for block/append blobs. (5) FileStorage — premium NFS/SMB shares. For new deployments, always choose GPv2."},
+
+{s:"Storage Accounts",t:"conceptual",
+q:"What is Redundancy in Azure Storage and what does LRS mean?",
+o:["Redundancy means keeping extra copies of the account metadata","Redundancy defines how many copies of data Azure keeps and where — LRS (Locally Redundant Storage) keeps 3 synchronous copies within a single datacenter","Redundancy is optional and disabled by default","LRS means data is replicated to a different country"],
+c:1,e:"Azure Storage redundancy options: LRS — 3 copies in one datacenter (lowest cost, no zone/region protection). ZRS — 3 copies across 3 Availability Zones in one region. GRS — LRS + async replication to a paired region. GZRS — ZRS + async replication to a paired region (highest durability). Choose based on your RTO/RPO requirements."},
+
+{s:"Storage Accounts",t:"conceptual",
+q:"What is the difference between Hot, Cool, and Archive access tiers in Azure Blob Storage?",
+o:["Hot is faster hardware, Cool uses slower disks, Archive uses tape","Hot = frequent access (highest storage cost, lowest access cost); Cool = infrequent access, min 30 days (lower storage cost, higher access cost); Archive = rare access, min 180 days (lowest storage cost, highest latency and access cost — hours to retrieve)","Hot stores VMs, Cool stores databases, Archive stores logs only","They differ only in price, not in any other way"],
+c:1,e:"Tier economics: Hot — pay more to store, pay less to read (great for frequently accessed data). Cool — pay less to store, pay more to read (infrequent access, at least 30 days). Archive — cheapest storage, most expensive to read, data is offline (retrieval takes 1-15 hours). Lifecycle Management automates tier transitions."},
+
+{s:"Storage Accounts",t:"conceptual",
+q:"What is Azure Storage Lifecycle Management?",
+o:["A tool for tracking storage account age","A policy-based feature that automatically moves blobs between tiers (Hot→Cool→Archive) or deletes them based on rules like age, last modified date, or last access time","A backup solution for storage accounts","A way to migrate storage between regions"],
+c:1,e:"Lifecycle Management reduces storage costs automatically. Example rule: 'Move to Cool after 30 days of no access, move to Archive after 90 days, delete after 365 days.' Rules apply to containers or blobs matching name prefixes. Set-and-forget cost optimization without writing custom scripts."},
+
+{s:"Storage Accounts",t:"conceptual",
+q:"What is the purpose of a Storage Account's 'Replication' setting and which offers the highest durability?",
+o:["Replication controls backup frequency — GZRS is most frequent","Replication controls data redundancy — GZRS (Geo-Zone Redundant Storage) offers the highest durability by combining ZRS across 3 zones in the primary region plus async replication to a secondary region","Replication only affects performance, not durability","All replication options offer the same level of durability"],
+c:1,e:"Durability ranking (highest → lowest): GZRS (16 nines durability) → GRS → ZRS → LRS. GZRS survives datacenter failures, zone failures, AND regional disasters. LRS only survives individual disk/server failures. For critical data with compliance requirements, GZRS or GRS is mandatory."},
+
+{s:"Storage Accounts",t:"technical",
+q:"Which Azure CLI command creates a GPv2 storage account with ZRS replication in East US?",
+code:`<span class="pr">$</span> <span class="kw">az storage account create</span> \\
+  <span class="pm">--name</span> mystorageacct2024 \\
+  <span class="pm">--resource-group</span> StorageRG \\
+  <span class="pm">--location</span> eastus \\
+  <span class="pm">--sku</span> <span class="st">Standard_ZRS</span> \\
+  <span class="pm">--kind</span> <span class="st">StorageV2</span>`,
+o:["az storage create --type GPv2 --redundancy ZRS","az storage account create --name mystorageacct2024 --resource-group StorageRG --location eastus --sku Standard_ZRS --kind StorageV2","az account storage create --sku ZRS --kind StorageV2","az storage new --name mystorageacct2024 --replication ZRS"],
+c:1,e:"Key parameters: <code>--sku</code> sets replication (Standard_LRS, Standard_ZRS, Standard_GRS, Standard_GZRS, Premium_LRS). <code>--kind</code> sets account type (StorageV2 recommended). Storage account names must be 3-24 chars, lowercase letters and numbers only, globally unique across all Azure."},
+
+{s:"Storage Accounts",t:"technical",
+q:"What is the Azure Storage account naming constraint?",
+o:["3-63 characters, uppercase and lowercase allowed","3-24 characters, only lowercase letters and numbers, globally unique across all of Azure","5-50 characters, alphanumeric and hyphens allowed","1-255 characters, any characters allowed"],
+c:1,e:"Storage account names: 3-24 chars, lowercase letters and numbers only (no hyphens, underscores, or uppercase), GLOBALLY unique across all Azure customers. The name becomes part of the endpoint URL (e.g. mystorageacct.blob.core.windows.net), which is why global uniqueness is required."},
+
+{s:"Storage Accounts",t:"technical",
+q:"What are 'storage account endpoints' and how are they structured?",
+code:`Blob:  https://<span class="st">{account}</span>.blob.core.windows.net
+File:  https://<span class="st">{account}</span>.file.core.windows.net
+Queue: https://<span class="st">{account}</span>.queue.core.windows.net
+Table: https://<span class="st">{account}</span>.table.core.windows.net`,
+o:["All services share one endpoint with a path prefix","Each storage service has its own unique DNS endpoint based on the account name — blobs use .blob.core.windows.net, files use .file.core.windows.net, etc.","Endpoints are IP addresses assigned at creation","Endpoints are configured manually after account creation"],
+c:1,e:"Each storage service has a dedicated subdomain endpoint. This allows you to point custom domains (e.g. assets.contoso.com → myaccount.blob.core.windows.net) via CNAME records. Custom domain mapping works for blob endpoints. HTTPS custom domain requires Azure CDN."},
+
+{s:"Storage Accounts",t:"logical",
+q:"A company wants to minimize storage costs for compliance logs that must be retained for 7 years but are almost never accessed after 90 days. What is the optimal storage configuration?",
+o:["Store all logs in Hot tier for fastest access if ever needed","Use Lifecycle Management policy: Hot tier for first 30 days → Cool after 30 days → Archive after 90 days — keep in Archive for the remaining 6+ years at minimal cost","Store everything in Cool tier from the start","Use LRS replication with Manual tier management"],
+c:1,e:"Lifecycle Management automates this perfectly. Logs are hot when recently written (queries for recent incidents), cool after a month (occasional access), archive after 90 days (almost never accessed). Archive tier is up to 90% cheaper than hot. The automated policy eliminates manual work and ensures cost efficiency over 7 years."},
+
+{s:"Storage Accounts",t:"logical",
+q:"Your team needs to store business-critical financial records. A regional disaster must not cause data loss. Which replication option should you choose?",
+o:["LRS — three copies in one datacenter is sufficient","GRS or GZRS — geo-redundant storage replicates data asynchronously to a paired Azure region hundreds of miles away, surviving regional disasters","ZRS — copies across three availability zones protects against datacenter failures","Standard_LRS with daily backups to a different region"],
+c:1,e:"For regional disaster protection, you need geo-redundancy. GRS = LRS in primary + LRS in secondary region (paired). GZRS = ZRS in primary + LRS in secondary (best of both: zone + geo protection). If the primary region fails, you can initiate a failover to the secondary. For financial records, GZRS is the gold standard."},
+
+// ════════════════════════════════════════════
+// SECTION 2 — CONFIGURE AZURE BLOB STORAGE
+// ════════════════════════════════════════════
+
+{s:"Blob Storage",t:"conceptual",
+q:"What is Azure Blob Storage and what types of data is it best suited for?",
+o:["A relational database service for structured data","An object storage service optimized for unstructured data — images, videos, audio, documents, backups, log files, static website files, and big data workloads","A file share service that supports SMB protocol","A message queue for application data"],
+c:1,e:"Blob Storage is Azure's massively scalable object store. 'Blob' = Binary Large Object. Perfect for: static website assets, backup and restore, media streaming, data archiving, big data analytics staging, and any file you'd store in a file system. Not for transactional databases or frequently updated file records."},
+
+{s:"Blob Storage",t:"conceptual",
+q:"What are the three Blob types in Azure Blob Storage?",
+o:["Hot, Cool, and Archive","Block Blob (general files), Append Blob (logs — append-only), Page Blob (random read/write — used for VM disks)","Public, Private, and Anonymous blobs","Small, Medium, and Large blobs"],
+c:1,e:"Blob types determine write behavior: (1) Block Blob — composed of blocks (up to 4.75TB), best for files uploaded once. (2) Append Blob — optimized for append operations only, perfect for log files, audit trails. (3) Page Blob — 512-byte page random access (up to 8TB), used exclusively for Azure VM unmanaged disks. Can't change type after creation."},
+
+{s:"Blob Storage",t:"conceptual",
+q:"What is a Blob Container in Azure Storage?",
+o:["A virtual machine that hosts blob data","A logical grouping of blobs within a storage account — similar to a folder, but flat (no true hierarchy). Container names must be lowercase, 3-63 chars","A separate storage account for blob-only use","A compressed archive of multiple blobs"],
+c:1,e:"Containers organize blobs within a storage account. The hierarchy is: Storage Account → Container → Blob. Containers have their own access level (private, blob, container). The URL structure: https://account.blob.core.windows.net/containername/blobname. Virtual directories use '/' in blob names (simulating folders)."},
+
+{s:"Blob Storage",t:"conceptual",
+q:"What are the three container public access levels in Azure Blob Storage?",
+o:["Read, Write, and Admin","Private (no anonymous access), Blob (anonymous read for blobs only), Container (anonymous read/list for container and blobs)","Public, Protected, and Private","Open, Restricted, and Closed"],
+c:1,e:"Access levels: Private — requires authentication for everything (default, most secure). Blob — anyone can read individual blobs if they know the URL, but can't list what's in the container. Container — anyone can read AND list all blobs in the container (full anonymous access). Use Private + SAS for controlled sharing."},
+
+{s:"Blob Storage",t:"conceptual",
+q:"What is Azure Blob Storage 'versioning'?",
+o:["Tracking changes to the storage account configuration","Automatically maintaining previous versions of a blob whenever it is overwritten or deleted — allowing you to restore any earlier version","Numbering containers sequentially","A feature that creates daily snapshots of all blobs"],
+c:1,e:"Blob Versioning saves a copy of a blob automatically every time it's modified or deleted. Each version has a unique version ID. You can restore a previous version by copying it back as the current blob. Enables recovery from accidental overwrites and deletions. Note: versioning increases storage usage (you're charged for all versions)."},
+
+{s:"Blob Storage",t:"conceptual",
+q:"What is Azure Blob Storage 'soft delete'?",
+o:["A way to mark blobs as low priority","A data protection feature that retains deleted blobs for a configurable period (1-365 days) before permanent deletion — acting as a recycle bin","Encrypting blobs before deletion","Compressing blobs to reduce storage space"],
+c:1,e:"Soft delete protects against accidental deletion. When enabled, 'deleted' blobs move to a soft-deleted state and remain accessible for the retention period you configure. You can restore them at any time during that window. After the retention period, they're permanently purged. Applies to blobs and containers."},
+
+{s:"Blob Storage",t:"conceptual",
+q:"What is Azure Blob Storage 'immutability' / WORM policy?",
+o:["Making blobs read-only for internal users only","Write Once, Read Many (WORM) policies that prevent blobs from being modified or deleted for a specified retention period — enforced even against storage account owners — used for compliance","Encrypting blobs so they can't be read without a key","A backup policy that copies blobs daily"],
+c:1,e:"Immutability policies come in two forms: (1) Time-based retention — blobs can't be modified/deleted for a set period (e.g. 7 years). (2) Legal hold — blobs locked indefinitely until the hold is removed. Even account owners and admins can't override WORM. Critical for SEC 17a-4, FINRA, HIPAA, and GDPR compliance."},
+
+{s:"Blob Storage",t:"technical",
+q:"Which Azure CLI command uploads a local file to a blob container?",
+code:`<span class="pr">$</span> <span class="kw">az storage blob upload</span> \\
+  <span class="pm">--account-name</span> mystorageacct \\
+  <span class="pm">--container-name</span> mycontainer \\
+  <span class="pm">--name</span> <span class="st">backup-2024.tar.gz</span> \\
+  <span class="pm">--file</span> <span class="st">./backup-2024.tar.gz</span> \\
+  <span class="pm">--tier</span> <span class="st">Cool</span>`,
+o:["az blob upload --storage mystorageacct --file backup.tar.gz","az storage blob upload --account-name mystorageacct --container-name mycontainer --name backup-2024.tar.gz --file ./backup-2024.tar.gz --tier Cool","az storage upload --container mycontainer --blob backup.tar.gz","az blob put --account mystorageacct --container mycontainer --file backup.tar.gz"],
+c:1,e:"<code>az storage blob upload</code> uploads to a specific container. <code>--name</code> is the blob name in storage (can include '/' for virtual directories). <code>--tier</code> sets the access tier at upload time. For batch uploads: <code>az storage blob upload-batch</code>. Authenticate via <code>--account-key</code>, <code>--sas-token</code>, or <code>--auth-mode login</code>."},
+
+{s:"Blob Storage",t:"technical",
+q:"What is AzCopy and when would you use it over Azure CLI for blob operations?",
+o:["AzCopy is a GUI tool for managing blobs","AzCopy is a command-line utility optimized for high-performance data transfers to/from Azure Storage — better than CLI for large files, bulk transfers, and copying between storage accounts","AzCopy is used for blob encryption only","AzCopy is an older, deprecated tool replaced by Azure CLI"],
+c:1,e:"AzCopy excels at: bulk data migration (terabytes), copying blobs between storage accounts (server-side copy — no data leaves Azure), resumable transfers, and benchmark performance. Azure CLI is better for scripting management tasks. AzCopy supports Azure Blob, Files, and S3-compatible sources. Use <code>azcopy login</code> with Entra ID or SAS tokens."},
+
+{s:"Blob Storage",t:"technical",
+q:"What is the purpose of the 'leasing' feature on Azure Blobs?",
+code:`<span class="cm"># Acquire exclusive write lock on a blob</span>
+<span class="kw">az storage blob lease acquire</span> \\
+  <span class="pm">--blob-name</span> critical-config.json \\
+  <span class="pm">--container-name</span> configs \\
+  <span class="pm">--account-name</span> mystorageacct`,
+o:["Leasing controls who can read a blob","Blob leasing acquires an exclusive write lock on a blob for a period (15-60 seconds or infinite) — prevents other clients from modifying or deleting the blob while the lease is held, enabling distributed coordination","Leasing controls billing for blob access","Leasing is used for blob tier management"],
+c:1,e:"Blob leases enable distributed locking. When a client holds a lease, any write/delete operation from another client fails unless they also provide the lease ID. Use cases: (1) Ensure only one process writes to a config file at a time. (2) Implement leader election in distributed applications. (3) Prevent deletion of blobs being processed."},
+
+{s:"Blob Storage",t:"logical",
+q:"A media company stores 500TB of video files. Recent videos (last 30 days) are streamed frequently. Older videos are rarely accessed but must be kept for 5 years. What Blob storage configuration minimizes cost?",
+o:["Store everything in Hot tier for simplicity","Use Lifecycle Management: Hot tier for 0-30 days, automatically transition to Cool at 30 days, transition to Archive at 180 days — add minimum retention hold to comply with the 5-year requirement","Use Archive tier for all videos from day 1","Use ZRS replication for all videos to reduce cost"],
+c:1,e:"Lifecycle Management is the key. Hot for new content (frequent streams), Cool after a month (occasional access, ~50% cheaper storage), Archive after 6 months (~90% cheaper than Hot). 500TB in Archive costs roughly $1/TB/month vs $18/TB in Hot — massive savings. Retrieval of archived videos takes 1-15 hours (acceptable for rarely accessed content)."},
+
+{s:"Blob Storage",t:"logical",
+q:"A financial audit requires that transaction records stored in Blob Storage cannot be modified or deleted for 7 years, and even the storage account owner must not be able to bypass this. What feature enforces this?",
+o:["Strong NSG rules blocking delete operations","Blob immutability with time-based retention policy set to 7 years in locked state — even the subscription owner cannot delete or modify these blobs during the retention period","Role-Based Access Control removing delete permissions","Soft delete with 7-year retention period"],
+c:1,e:"WORM immutability is the ONLY solution here. Soft delete can be disabled by an admin. RBAC permissions can be changed. Resource locks can be removed. A LOCKED immutability policy (time-based or legal hold) is tamper-proof — even account owners, subscription admins, and Microsoft cannot override it. Required for SEC 17a-4 and similar compliance frameworks."},
+
+// ════════════════════════════════════════════
+// SECTION 3 — CONFIGURE AZURE STORAGE SECURITY
+// ════════════════════════════════════════════
+
+{s:"Storage Security",t:"conceptual",
+q:"What is a Shared Access Signature (SAS) in Azure Storage?",
+o:["The storage account's master password","A URI that grants restricted, time-limited access to specific storage resources (blobs, containers, tables, queues) without sharing the account key — specifying allowed operations, time window, and IP restrictions","A network security rule for storage accounts","An encryption key for storage data"],
+c:1,e:"SAS tokens are parameterized URLs granting delegated access. You control: (1) Which resource (specific blob, container, or entire account). (2) What permissions (read, write, delete, list, add). (3) When (start/expiry time). (4) From where (IP range restriction). (5) Which protocol (HTTPS only recommended). Never share account keys — use SAS instead."},
+
+{s:"Storage Security",t:"conceptual",
+q:"What are the three types of SAS tokens in Azure Storage?",
+o:["Read SAS, Write SAS, and Delete SAS","Service SAS (one service/resource), Account SAS (multiple services/resources), User Delegation SAS (Entra ID identity-based — most secure)","Personal SAS, Shared SAS, and Group SAS","Short SAS, Long SAS, and Permanent SAS"],
+c:1,e:"SAS types: (1) Account SAS — signed with account key, grants access to multiple services and resource types. (2) Service SAS — signed with account key, scoped to one storage service. (3) User Delegation SAS — signed with Entra ID credentials (NOT account key), most secure because it doesn't expose account keys and can be revoked by revoking the user's permissions."},
+
+{s:"Storage Security",t:"conceptual",
+q:"What is a Stored Access Policy in Azure Storage and why is it important for SAS tokens?",
+o:["A policy that sets the storage account's access tier","A server-side definition of SAS permissions and expiry that SAS tokens can reference — allowing you to revoke access by modifying or deleting the policy without changing the SAS URI itself","A firewall policy for the storage account","An Azure Policy definition for storage compliance"],
+c:1,e:"Without Stored Access Policy, revoking a SAS token is impossible (you'd have to rotate the account key). With a Stored Access Policy, you create the policy with permissions/expiry on the container, reference it in the SAS token, and can revoke access instantly by deleting the policy. This solves the 'how do I revoke a SAS?' problem."},
+
+{s:"Storage Security",t:"conceptual",
+q:"What is Azure Storage encryption and is it optional?",
+o:["Optional — you enable it for sensitive data only","Mandatory and automatic — all data written to Azure Storage is automatically encrypted at rest using AES-256 with Microsoft-managed keys (by default). Customer-managed keys (CMK) in Azure Key Vault are available for additional control","Only available for Premium storage accounts","Only encrypts data in transit, not at rest"],
+c:1,e:"Azure Storage Service Encryption (SSE) is always on, cannot be disabled. All data is encrypted at rest using AES-256 before being written to disk. By default, Microsoft manages encryption keys. Optionally, use Customer-Managed Keys (CMK) in Azure Key Vault for key control and rotation. In-transit encryption uses TLS 1.2+ (enforce by setting 'Require Secure Transfer')."},
+
+{s:"Storage Security",t:"conceptual",
+q:"What does 'Require Secure Transfer' setting do on a Storage Account?",
+o:["Encrypts data at rest with a customer-managed key","Enforces that all requests to the storage account must use HTTPS (TLS) — any unencrypted HTTP request is rejected with a 400 error","Requires MFA for all access to storage","Requires VNet integration before access is granted"],
+c:1,e:"'Require Secure Transfer' (enabled by default on new accounts) rejects any HTTP request — only HTTPS is accepted. This ensures all data in transit is encrypted via TLS. For Azure Files, it means SMB 3.0 with encryption is required. This is a baseline security requirement — never disable it in production."},
+
+{s:"Storage Security",t:"conceptual",
+q:"What is Azure Storage 'Shared Key' authentication and what are its risks?",
+o:["A key shared between two Azure subscriptions","The storage account's master keys (Key1 and Key2) that grant FULL unrestricted access to all data and operations in the account — if leaked, an attacker has complete control","A password for individual blob containers","A symmetric encryption key used for data encryption"],
+c:1,e:"Shared Keys are the account's master credentials — unrestricted access to everything. Risks: (1) Impossible to scope to specific resources or time. (2) Impossible to revoke without rotating the key (breaking all applications using it). (3) If leaked in code/logs, full account exposure. Best practice: Disable shared key auth, use Entra ID (RBAC) or SAS tokens instead."},
+
+{s:"Storage Security",t:"conceptual",
+q:"What is the Azure Storage Firewall and what does it control?",
+o:["A Web Application Firewall for blob requests","A network-level access control that restricts which IP addresses, CIDR ranges, and Azure VNets can reach the storage account — by default, all networks are allowed, which you should restrict","A tool for blocking specific blob types","An NSG applied to the storage account's NIC"],
+c:1,e:"Storage Firewall defaults to 'Allow all networks' — change this to 'Selected networks' for production. Add allowed IP ranges, specific VNets/Subnets (Service Endpoints or Private Endpoints), and trusted Microsoft services. Exception: Azure Backup, Azure Site Recovery, and other first-party services can be allowed via 'trusted services' bypass."},
+
+{s:"Storage Security",t:"technical",
+q:"What is a User Delegation SAS and how do you generate one with Azure CLI?",
+code:`<span class="cm"># Get user delegation key (valid max 7 days)</span>
+<span class="kw">az storage account generate-sas</span> \\
+  <span class="pm">--account-name</span> mystorageacct \\
+  <span class="pm">--permissions</span> <span class="st">r</span> \\
+  <span class="pm">--resource-types</span> <span class="st">o</span> \\
+  <span class="pm">--services</span> <span class="st">b</span> \\
+  <span class="pm">--expiry</span> <span class="nm">2024-12-31</span> \\
+  <span class="pm">--auth-mode</span> <span class="st">login</span>`,
+o:["Generate using the account key — this is the only method","User Delegation SAS is signed using an Entra ID user/service principal credential (not account key) — generated via 'az storage blob generate-sas' with '--auth-mode login', valid max 7 days, most secure SAS type","User Delegation SAS uses a certificate instead of a key","User Delegation SAS is the same as Account SAS"],
+c:1,e:"User Delegation SAS: signed with an Entra ID token (not account keys). Benefits: (1) No account key exposure. (2) Revoke by revoking the user's RBAC permissions. (3) Audit trail via Entra ID sign-in logs. (4) Valid for max 7 days. Requires the user to have at minimum the 'Storage Blob Delegator' role. Prefer this over account-key-based SAS."},
+
+{s:"Storage Security",t:"technical",
+q:"Which RBAC role gives a user permission to READ blob data but NOT manage the storage account or its settings?",
+o:["Storage Account Contributor","Storage Blob Data Reader — grants read-only access to blob data but no control plane access (can't manage account settings, keys, or containers)","Reader — standard Azure read role","Owner — full access including data and management"],
+c:1,e:"Storage data plane roles are separate from control plane roles: Storage Blob Data Reader — read blobs. Storage Blob Data Contributor — read/write/delete blobs. Storage Blob Data Owner — full access including POSIX ACLs for ADLS Gen2. Storage Account Contributor (control plane) can manage the account but cannot read blob data. Use data-plane roles for user data access."},
+
+{s:"Storage Security",t:"technical",
+q:"How do you configure a Storage Account to only accept connections from a specific VNet subnet?",
+code:`<span class="cm"># Enable service endpoint on subnet first</span>
+<span class="kw">az network vnet subnet update</span> \\
+  <span class="pm">--vnet-name</span> MyVNet <span class="pm">--name</span> AppSubnet \\
+  <span class="pm">--service-endpoints</span> <span class="st">Microsoft.Storage</span>
+<span class="cm"># Then restrict storage to that subnet</span>
+<span class="kw">az storage account network-rule add</span> \\
+  <span class="pm">--account-name</span> mystorageacct \\
+  <span class="pm">--vnet-name</span> MyVNet <span class="pm">--subnet</span> AppSubnet`,
+o:["Add an NSG rule on the storage account","Enable Service Endpoint for Microsoft.Storage on the subnet, then add the subnet as a network rule on the storage account, and set the default action to Deny","Configure a Private Endpoint only — service endpoints don't work","Set the storage firewall to allow only the VNet's address range"],
+c:1,e:"Service Endpoint approach: (1) Enable Microsoft.Storage service endpoint on the subnet — this routes storage traffic over Azure backbone. (2) Add the subnet as an allowed network rule on the storage account. (3) Set default action to 'Deny' to block all other traffic. Alternative: Private Endpoint gives the storage account a private IP in your VNet — more secure but more complex to configure."},
+
+{s:"Storage Security",t:"logical",
+q:"A developer needs to give a partner company temporary read access to a specific blob (contract.pdf) for exactly 48 hours, without giving them any Azure credentials. What is the BEST approach?",
+o:["Create a temporary Azure user account for the partner","Generate a Service SAS token for contract.pdf with Read permission and 48-hour expiry — share the SAS URL. After 48 hours, the token automatically expires and access is revoked","Make the container public for 48 hours then revert","Share the storage account access key and ask them to be responsible"],
+c:1,e:"SAS is purpose-built for this. Generate a blob-level Service SAS with: permissions=r (read only), expiry=now+48h, IP restriction if you know the partner's IP range, HTTPS only. The SAS URL looks like: https://acct.blob.core.windows.net/container/contract.pdf?sv=2023&se=...&sig=... Partner uses the URL directly — no Azure account needed. It self-destructs at expiry."},
+
+{s:"Storage Security",t:"logical",
+q:"Your security team discovers that a SAS token was accidentally published in a public GitHub repository. The SAS doesn't reference a Stored Access Policy. What must you do to revoke access immediately?",
+o:["Delete the blob that the SAS points to","Rotate (regenerate) the storage account key that was used to sign the SAS token — this invalidates ALL SAS tokens signed with that key. Then update all applications using the old key","Change the container's public access level","Create a new storage account"],
+c:1,e:"Without a Stored Access Policy, a SAS token can ONLY be revoked by rotating the account key used to sign it. This breaks all applications using SAS tokens signed with that key — emergency key rotation disrupts services. This is why Stored Access Policies are critical: they allow revoking specific SAS tokens by deleting the policy, without touching the account key."},
+
+{s:"Storage Security",t:"logical",
+q:"A storage account currently allows access from all networks. A security audit flags this as a risk. What is the recommended hardening approach?",
+o:["Change replication from LRS to GRS for better security","Set the storage firewall default action to 'Deny', add only required IP ranges and trusted VNet subnets as allowed networks, enable logging, and use Private Endpoints for internal Azure workloads","Add NSG rules on all VMs accessing the storage","Enable soft delete and versioning"],
+c:1,e:"Network hardening steps: (1) Set default action → Deny (blocks all by default). (2) Add explicit allow rules: specific IP ranges, trusted VNet subnets via Service Endpoints, or trusted Azure services. (3) For internal workloads: Private Endpoints eliminate public internet exposure entirely. (4) Enable diagnostic logging to detect unauthorized access attempts."},
+
+// ════════════════════════════════════════════
+// SECTION 4 — CONFIGURE AZURE FILES
+// ════════════════════════════════════════════
+
+{s:"Azure Files",t:"conceptual",
+q:"What is Azure Files and what protocols does it support?",
+o:["A blob container optimized for text files","A fully managed cloud file share that supports SMB (Server Message Block) 2.1/3.x and NFS (Network File System) 4.1 protocols — mountable on Windows, Linux, and macOS like a network drive","A FTP service for Azure","An object storage service that uses file-system semantics"],
+c:1,e:"Azure Files delivers managed SMB/NFS file shares in the cloud. SMB 3.x on Windows (drive letter mapping), Linux (mount as cifs), macOS. NFS 4.1 for Linux/macOS (requires Premium FileStorage account). Use cases: lift-and-shift applications using file shares, replace on-premises file servers, shared configuration/data for cloud apps, home directories."},
+
+{s:"Azure Files",t:"conceptual",
+q:"What is the difference between Standard and Premium Azure Files tiers?",
+o:["Premium is just a marketing name with no technical difference","Standard uses HDD-backed storage (transaction-optimized, hot, cool) — lower cost, suitable for general file sharing. Premium uses SSD-backed storage — single-digit millisecond latency, IOPS-intensive workloads like databases and dev environments","Standard supports SMB only; Premium supports NFS only","Premium allows larger file share sizes than Standard"],
+c:1,e:"Standard (GPv2 StorageV2): HDD-backed, 3 tiers (transaction-optimized, hot, cool), up to 100TB per share, lower cost per GB. Premium (FileStorage account): SSD-backed, guaranteed IOPS/throughput, <1ms latency, provisioned pricing model (pay for capacity reserved). Premium required for NFS 4.1, persistent volumes in AKS, and latency-sensitive workloads."},
+
+{s:"Azure Files",t:"conceptual",
+q:"What is Azure File Sync?",
+o:["A tool to sync files between two Azure File Shares","A hybrid service that synchronizes on-premises Windows Server file shares with Azure Files — enabling cloud tiering (keeping hot files local, cold files in cloud) and multi-site file access","A backup service for Azure Files","A tool that synchronizes file metadata only"],
+c:1,e:"Azure File Sync turns your on-premises Windows Server into a cache for Azure Files. Benefits: (1) Cloud tiering — frequently accessed files stay on local SSD, rarely accessed files are stored only in Azure (cached as stubs). (2) Multi-site sync — multiple offices share the same files via Azure. (3) Disaster recovery — rebuild local cache from Azure if server fails. Requires File Sync agent on Windows Server."},
+
+{s:"Azure Files",t:"conceptual",
+q:"What is the maximum file share size for Azure Files?",
+o:["1TB per share","5TB for Standard, 100TB for Premium","100TB per share for both Standard and Premium — large file share feature must be enabled on Standard","50TB per share with no option to increase"],
+c:2,e:"File share limits: Standard (StorageV2 GPv2) — up to 100TB per share (requires 'large file shares' enabled, only LRS/ZRS replication). Premium (FileStorage) — up to 100TB per share provisioned. Individual file size limit: 4TB. Both support up to 2000 IOPS baseline on Standard (more on Premium). Plan capacity and IOPS requirements before choosing tier."},
+
+{s:"Azure Files",t:"conceptual",
+q:"What is 'cloud tiering' in Azure File Sync?",
+o:["Automatically archiving files to Blob Storage","A feature where frequently accessed files are kept on the local server SSD while rarely accessed files are transparently tiered (moved) to Azure Files, replacing them with pointer files (reparse points) on the local disk — but appearing as if still present","Moving all files to the cloud immediately","Encrypting cold files in cloud storage"],
+c:1,e:"Cloud tiering is Azure File Sync's killer feature. The local server appears to have all files but its physical disk may only contain hot files. When a user opens a tiered file, File Sync streams it from Azure — transparently. Configure by setting a 'volume free space' percentage (e.g. always keep 20% free) or date-based tiering (tier files older than 30 days)."},
+
+{s:"Azure Files",t:"conceptual",
+q:"How does Azure Files authentication work for SMB shares in a domain environment?",
+o:["Azure Files only supports anonymous access or access keys","Azure Files supports identity-based authentication via Active Directory Domain Services (on-premises AD DS, Microsoft Entra Domain Services, or Microsoft Entra Kerberos) — allowing domain users to access shares with their existing credentials","Azure Files uses only SSH key authentication","Azure Files requires a VPN for all access"],
+c:1,e:"Identity-based auth for SMB: (1) On-premises AD DS — join the storage account to your on-prem AD domain (most common for hybrid). (2) Microsoft Entra Domain Services — for cloud-only environments. (3) Microsoft Entra Kerberos — for hybrid Azure AD joined devices. This enables per-user/group NTFS permissions on share and directory levels, replacing on-premises file servers."},
+
+{s:"Azure Files",t:"technical",
+q:"How do you mount an Azure File Share on a Windows Server using PowerShell?",
+code:`<span class="cm"># Get storage account key</span>
+<span class="kw">$key</span> = (<span class="fn">az storage account keys list</span> \\
+  <span class="pm">--account-name</span> mystorageacct | <span class="fn">ConvertFrom-Json</span>)[0].value
+
+<span class="cm"># Mount the share as drive Z:</span>
+<span class="kw">net use</span> <span class="st">Z:</span> <span class="nm">\\\\mystorageacct.file.core.windows.net\\myshare</span> \\
+  /user:<span class="st">Azure\\mystorageacct</span> <span class="kw">$key</span> /persistent:yes`,
+o:["Use Azure CLI 'az files mount' command","Use net use command with the UNC path (\\\\accountname.file.core.windows.net\\sharename), providing the storage account name as username and account key as password — or use identity-based auth if AD-joined","Use RDP to connect to Azure Files directly","Use Windows Explorer 'Map Network Drive' only"],
+c:1,e:"Windows mounting: <code>net use Z: \\\\account.file.core.windows.net\\share /user:Azure\\accountname accountkey</code>. For persistent mount, add <code>/persistent:yes</code>. Azure Portal provides the exact PowerShell/Bash mount script for every file share — copy from portal for accuracy. Port 445 (SMB) must be open outbound from the client — blocked by some ISPs."},
+
+{s:"Azure Files",t:"technical",
+q:"How do you mount an Azure NFS file share on Linux?",
+code:`<span class="cm"># Mount NFS share (Premium FileStorage account required)</span>
+<span class="kw">sudo mount</span> <span class="pm">-t</span> nfs \\
+  <span class="st">mystorageacct.file.core.windows.net:/mystorageacct/mynfsshare</span> \\
+  <span class="nm">/mnt/mynfsshare</span> \\
+  <span class="pm">-o</span> <span class="st">vers=4,minorversion=1,sec=sys</span>`,
+o:["NFS shares are mounted using the same net use command as SMB","sudo mount -t nfs with the NFS endpoint (accountname.file.core.windows.net:/accountname/sharename), requires Premium FileStorage account, NFS 4.1, and the storage account must disable 'Require Secure Transfer'","Mount via Azure CLI using 'az storage files mount'","NFS is not supported — use SMB only"],
+c:1,e:"NFS 4.1 requirements: (1) Premium FileStorage account (not GPv2). (2) 'Require Secure Transfer' must be DISABLED (NFS doesn't support TLS encryption in transit). (3) Virtual network restriction must be configured — NFS shares only work from Azure VNets (no public internet). (4) Secure the NFS share using storage firewall VNet rules to compensate for no in-transit encryption."},
+
+{s:"Azure Files",t:"technical",
+q:"What Azure Files feature sets quotas and what happens when the quota is reached?",
+code:`<span class="cm"># Set 100GB quota on a file share</span>
+<span class="kw">az storage share-rm update</span> \\
+  <span class="pm">--storage-account</span> mystorageacct \\
+  <span class="pm">--name</span> myshare \\
+  <span class="pm">--quota</span> <span class="nm">100</span>`,
+o:["Quotas automatically expand when reached","File share quota limits the maximum size of the share — when reached, write operations fail with a storage-full error (quota enforced, not advisory)","Quotas only trigger alerts, not blocks","Quota applies only to the number of files, not total size"],
+c:1,e:"File share quotas are hard limits. When a share hits its quota, write operations fail — applications trying to write new data get errors. For Premium shares, quota = provisioned capacity (you pay for it whether used or not). For Standard shares, quota caps maximum growth but you pay for actual used storage. Monitor share usage via Azure Monitor metrics."},
+
+{s:"Azure Files",t:"logical",
+q:"A company wants to migrate their on-premises Windows file server (8TB of data, 300 users accessing it) to the cloud, while keeping latency low for frequently accessed files and reducing WAN costs. What is the recommended Azure Files solution?",
+o:["Move all files to Azure Blob Storage and train users to use the Azure portal","Deploy Azure File Sync on the on-premises server — sync all data to Azure Files, enable cloud tiering. The server becomes a high-speed local cache. Users keep accessing the local server at LAN speed; Azure Files becomes the source of truth for DR and multi-site access","Replace the file server with Azure Virtual Desktop","Use Azure Site Recovery to replicate the file server VM to Azure"],
+c:1,e:"Azure File Sync is the perfect solution. After sync: (1) Users access files from the local server at LAN speed (no WAN latency for hot files). (2) Cloud tiering frees up local disk — only hot files stay local. (3) Azure Files is the backend — full 8TB accessible from anywhere. (4) If the server fails, any Windows Server can be a new sync endpoint and rebuild from Azure. No disruption to users."},
+
+{s:"Azure Files",t:"logical",
+q:"An application running on Azure VMs needs a shared file system accessible by 10 VMs simultaneously for reading and writing configuration files. Azure Blob Storage is not suitable because the app uses POSIX file system calls. What is the right Azure storage service?",
+o:["Azure Blob Storage with NFS emulation","Azure Files (SMB or NFS share) — mount the same share on all 10 VMs simultaneously. All VMs see the same file system, changes are immediately visible to all VMs, and standard file system calls (open, read, write, stat) work natively","Azure Managed Disks with shared disk feature","Azure Table Storage"],
+c:1,e:"Azure Files is the answer for shared file system access. Mount the SMB share on all 10 VMs — they all see the same namespace. For Linux VMs needing POSIX semantics: NFS 4.1 on Premium Azure Files with full POSIX ACL support. Azure Blob Storage doesn't support concurrent writes or POSIX calls natively. Azure Disks (even shared) don't provide a shared file namespace."},
+
+{s:"Azure Files",t:"logical",
+q:"Your company is migrating from on-premises AD-joined file servers. Users currently access shares using Windows credentials (username/password) and have per-folder NTFS permissions. How can you replicate this in Azure Files?",
+o:["Azure Files doesn't support per-user permissions — use SAS tokens instead","Enable identity-based SMB authentication by joining the storage account to your on-premises Active Directory Domain Services (AD DS). Users authenticate with their domain credentials via Kerberos. Apply NTFS permissions on directories/files using icacls or Windows Explorer","Use Azure RBAC storage roles for all users","Create individual SAS tokens per user"],
+c:1,e:"AD DS integration for Azure Files mirrors on-premises file server behavior. Steps: (1) Enable the feature on the storage account. (2) Run the AzFilesHybrid PowerShell module to join storage account to AD DS. (3) Assign share-level RBAC role (Storage File Data SMB Share Contributor). (4) Set directory/file NTFS permissions from a joined Windows machine. Users experience no change — same login, same permissions model."}
+
+];
+
+// ── ENGINE ──
+const MODS=["Storage Accounts","Blob Storage","Storage Security","Azure Files"];
+const ICONS={"Storage Accounts":"🗄️","Blob Storage":"🪣","Storage Security":"🔐","Azure Files":"📁"};
+const LTR=['A','B','C','D'];
+let filtered=[...Q],answers={},answered=0,correct=0;
+let activeSec='all',activeType='all';
+
+function shuf(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function applyF(ds){let q=Q;if(activeSec!=='all')q=q.filter(x=>x.s===activeSec);if(activeType!=='all')q=q.filter(x=>x.t===activeType);filtered=ds?shuf(q):[...q];}
+function setSec(s,b){activeSec=s;document.querySelectorAll('.mt').forEach(x=>x.classList.remove('active'));b.classList.add('active');resetS();}
+function setType(t,b){activeType=t;document.querySelectorAll('.flt').forEach(x=>x.classList.remove('active'));b.classList.add('active');resetS();}
+function resetS(){answers={};answered=0;correct=0;document.getElementById('rPanel').classList.remove('vis');applyF(false);render();}
+function doShuffle(){answers={};answered=0;correct=0;document.getElementById('rPanel').classList.remove('vis');applyF(true);render();window.scrollTo({top:0,behavior:'smooth'});}
+function doReset(){answers={};answered=0;correct=0;document.getElementById('rPanel').classList.remove('vis');applyF(false);render();window.scrollTo({top:0,behavior:'smooth'});}
+
+function answer(qi,oi){
+  if(answers[qi]!==undefined)return;
+  const ok=oi===filtered[qi].c;
+  answers[qi]={chosen:oi,ok};answered++;if(ok)correct++;
+  upStats();refreshCard(qi);
+  if(answered===filtered.length)setTimeout(showResult,500);
+}
+
+function upStats(){
+  const tot=filtered.length,pct=answered>0?Math.round(correct/answered*100):0,prg=tot>0?answered/tot*100:0;
+  document.getElementById('sT').textContent=tot;
+  document.getElementById('sA').textContent=answered;
+  document.getElementById('sC').textContent=correct;
+  document.getElementById('sW').textContent=answered-correct;
+  document.getElementById('sP').textContent=answered>0?pct+'%':'—';
+  document.getElementById('pBar').style.width=prg+'%';
+  document.getElementById('pLbl').textContent=`${answered} of ${tot} answered`;
+  document.getElementById('pScore').textContent=`Score: ${answered>0?pct+'%':'0%'}`;
+}
+
+function showResult(){
+  const tot=filtered.length,pct=Math.round(correct/tot*100);
+  let ico='😤',vrd='Keep going — Azure Storage takes practice!';
+  if(pct>=90){ico='🏆';vrd='Outstanding! You\'ve mastered Azure Storage!';}
+  else if(pct>=75){ico='🎓';vrd='Great work! Almost exam-ready!';}
+  else if(pct>=60){ico='📈';vrd='Good progress — review the harder topics.';}
+  document.getElementById('rIco').textContent=ico;
+  document.getElementById('rPct').textContent=pct+'%';
+  document.getElementById('rPct').className='r-pct'+(pct>=70?' hi':'');
+  document.getElementById('rVrd').textContent=vrd;
+  document.getElementById('rR').textContent=correct;
+  document.getElementById('rW').textContent=tot-correct;
+  document.getElementById('rP').textContent=pct+'%';
+  const bHtml=MODS.map(m=>{
+    const mqs=filtered.filter(q=>q.s===m);if(!mqs.length)return'';
+    const idx=mqs.map(q=>filtered.indexOf(q));
+    const done=idx.filter(i=>answers[i]!==undefined).length;
+    const right=idx.filter(i=>answers[i]?.ok).length;
+    const sp=done>0?Math.round(right/done*100):0;
+    const ico=ICONS[m]||'📦';
+    return`<div class="mbrow"><div class="mbhead"><span>${ico} ${m}</span><span>${right}/${done} · ${sp}%</span></div>
+    <div class="mbtrack"><div class="mbbar${sp<60?' lo':''}" style="width:${sp}%"></div></div></div>`;
+  }).join('');
+  document.getElementById('mBkd').innerHTML=`<div class="mbkd-ttl">Score by Module</div>${bHtml}`;
+  document.getElementById('rPanel').classList.add('vis');
+  document.getElementById('rPanel').scrollIntoView({behavior:'smooth'});
+}
+
+function tIcon(t){return t==='conceptual'?'💡':t==='technical'?'⚙️':'🧩';}
+
+function refreshCard(qi){
+  const card=document.getElementById(`qc${qi}`);if(!card)return;
+  const q=filtered[qi],ans=answers[qi];
+  card.classList.toggle('qok',ans.ok);card.classList.toggle('qng',!ans.ok);
+  const oH=q.o.map((o,i)=>{
+    let cls='opt lk';
+    if(i===q.c)cls+=' oc';else if(i===ans.chosen&&!ans.ok)cls+=' ow';
+    return`<div class="${cls}"><div class="oltr">${LTR[i]}</div><span>${o}</span></div>`;
+  }).join('');
+  card.querySelector('.opts').innerHTML=oH;
+  let ex=card.querySelector('.expl');
+  if(!ex){ex=document.createElement('div');ex.className='expl';card.appendChild(ex);}
+  ex.innerHTML=`<strong>💡 Explanation:</strong> ${q.e}`;ex.classList.add('vis');
+}
+
+function render(){
+  applyF(false);upStats();
+  document.getElementById('rPanel').classList.remove('vis');
+  let prevSec='';
+  const html=filtered.map((q,i)=>{
+    let div='';
+    if(activeSec==='all'&&q.s!==prevSec){
+      prevSec=q.s;
+      const ico=ICONS[q.s]||'📦';
+      div=`<div class="sdiv"><div class="sdiv-ln"></div><div class="sdiv-badge">${ico} ${q.s}</div><div class="sdiv-ln"></div></div>`;
+    }
+    const cb=q.code?`<div class="cblk">${q.code}</div>`:'';
+    const oH=q.o.map((o,j)=>`<div class="opt" onclick="answer(${i},${j})"><div class="oltr">${LTR[j]}</div><span>${o}</span></div>`).join('');
+    const tCls=q.t==='conceptual'?'qt-c':q.t==='technical'?'qt-t':'qt-l';
+    const ico=ICONS[q.s]||'📦';
+    return`${div}<div class="qcard" id="qc${i}" style="animation-delay:${Math.min(i,30)*0.025}s">
+      <div class="qmeta">
+        <span class="qno">Q${i+1}</span>
+        <span class="qtag ${tCls}">${tIcon(q.t)} ${q.t}</span>
+        <span class="qsec">${ico} ${q.s}</span>
+      </div>
+      <div class="qtxt">${q.q}</div>
+      ${cb}
+      <div class="opts">${oH}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('quizBox').innerHTML=html;
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AZ-104 — Monitor & Back Up Azure Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Epilogue:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --cr:#C0392B;
+  --cr-dark:#922B21;
+  --cr-light:#E74C3C;
+  --cr-glow:rgba(192,57,43,0.18);
+  --gold:#D4AC0D;
+  --gold-light:#F4D03F;
+  --gold-dim:rgba(212,172,13,0.12);
+  --amber:#E67E22;
+  --bg:#070405;
+  --bg2:#0C0607;
+  --s1:#110809;
+  --s2:#160B0A;
+  --s3:#1C0E0D;
+  --bdr:#2D1210;
+  --bdr2:#3D1A18;
+  --txt:#F5E6E0;
+  --muted:#7A4A42;
+  --dim:#2A1210;
+  --correct:#27AE60;
+  --clight:#2ECC71;
+  --wrong:#E74C3C;
+  --warn:#F39C12;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:'Epilogue',sans-serif;
+  background:var(--bg);
+  color:var(--txt);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── VAULT PATTERN BACKGROUND ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    repeating-conic-gradient(from 0deg at 50% 50%, rgba(192,57,43,0.015) 0deg 1deg, transparent 1deg 30deg);
+  background-size:120px 120px;
+}
+
+/* ── RADAR CANVAS ── */
+#radarCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.3}
+
+/* ── GLOWS ── */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(110px)}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(192,57,43,0.08) 0%,transparent 70%);top:-250px;left:-200px}
+.o2{width:500px;height:500px;background:radial-gradient(circle,rgba(212,172,13,0.05) 0%,transparent 70%);bottom:-200px;right:-150px}
+.o3{width:350px;height:350px;background:radial-gradient(circle,rgba(230,126,34,0.04) 0%,transparent 70%);top:40%;right:10%}
+
+.wrap{max-width:960px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+/* ── HEADER ── */
+header{padding:56px 0 28px;text-align:center}
+
+.vault-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--s2),var(--s3));
+  border:1px solid var(--bdr2);
+  border-bottom:2px solid var(--gold);
+  padding:8px 24px;
+  font-family:'Roboto Mono',monospace;font-size:11px;
+  color:var(--gold-light);letter-spacing:0.1em;text-transform:uppercase;
+  margin-bottom:26px;
+  border-radius:2px;
+}
+
+.shield-pulse{
+  width:14px;height:14px;
+  background:var(--gold);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  animation:shield-glow 2s ease-in-out infinite;
+}
+@keyframes shield-glow{
+  0%,100%{opacity:1;filter:drop-shadow(0 0 4px var(--gold))}
+  50%{opacity:0.6;filter:drop-shadow(0 0 8px var(--gold-light))}
+}
+
+h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(26px,5.5vw,54px);
+  font-weight:900;
+  letter-spacing:-0.02em;
+  line-height:1.05;
+  margin-bottom:14px;
+}
+.h1a{display:block;color:var(--txt)}
+.h1b{
+  display:block;
+  background:linear-gradient(90deg,var(--cr-light) 0%,var(--gold) 45%,var(--amber) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.tagline{
+  font-family:'Roboto Mono',monospace;font-size:11px;color:var(--muted);
+  letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;
+  gap:10px;flex-wrap:wrap;
+}
+.tsep{color:var(--dim)}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:32px 0 0}
+
+.sc{
+  background:var(--s1);
+  border:1px solid var(--bdr);
+  border-radius:4px;
+  padding:18px 12px;
+  text-align:center;
+  position:relative;overflow:hidden;
+  transition:border-color 0.3s,transform 0.25s;
+}
+.sc::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transform:scaleX(0);transition:transform 0.4s ease;
+}
+.sc:hover{border-color:var(--bdr2);transform:translateY(-3px)}
+.sc:hover::after{transform:scaleX(1)}
+.sc-corner{
+  position:absolute;top:0;right:0;width:0;height:0;
+  border-style:solid;border-width:0 14px 14px 0;
+  border-color:transparent var(--bdr2) transparent transparent;
+}
+
+.snum{display:block;font-size:34px;font-weight:800;font-family:'Roboto Mono',monospace;color:var(--gold-light);line-height:1}
+.slbl{display:block;font-size:10px;color:var(--muted);font-family:'Roboto Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;margin-top:6px}
+
+/* ── PROGRESS ── */
+.prog-wrap{
+  position:sticky;top:0;z-index:20;
+  background:rgba(7,4,5,0.95);backdrop-filter:blur(16px);
+  padding:13px 0;border-bottom:1px solid var(--bdr);margin:24px 0;
+}
+
+.prog-track{
+  background:var(--s2);border:1px solid var(--bdr);height:8px;
+  border-radius:2px;overflow:hidden;margin-bottom:9px;
+}
+.prog-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--cr-dark),var(--cr-light),var(--gold));
+  width:0%;transition:width 0.55s cubic-bezier(0.22,1,0.36,1);
+  position:relative;border-radius:2px;
+}
+.prog-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:20px;background:linear-gradient(90deg,transparent,rgba(244,208,63,0.4))}
+
+.prog-row{display:flex;justify-content:space-between;font-family:'Roboto Mono',monospace;font-size:11px;color:var(--muted)}
+.live{color:var(--gold-light);font-weight:700;font-size:12px}
+
+/* ── CONTROLS ── */
+.controls{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;align-items:center}
+
+.fb{
+  padding:8px 16px;border:1px solid var(--bdr2);background:var(--s1);
+  color:var(--muted);font-family:'Roboto Mono',monospace;font-size:11px;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;white-space:nowrap;
+  border-radius:3px;
+}
+.fb:hover{border-color:var(--gold);color:var(--gold-light)}
+.fb.active{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.fb.active.fc{background:var(--cr-light);border-color:var(--cr-light);color:#fff}
+.fb.active.ft{background:var(--amber);border-color:var(--amber);color:#fff}
+.fb.active.fl{background:var(--correct);border-color:var(--correct);color:#fff}
+
+.sp{flex:1;min-width:8px}
+
+.btn-main{
+  padding:10px 24px;border:none;
+  background:linear-gradient(135deg,var(--cr-dark),var(--cr-light));
+  color:#fff;font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all 0.22s;white-space:nowrap;
+  border-radius:3px;
+  box-shadow:0 4px 20px rgba(192,57,43,0.25);
+}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(192,57,43,0.4)}
+
+.btn-sec{
+  padding:10px 20px;border:1px solid var(--bdr2);background:transparent;
+  color:var(--muted);font-family:'Epilogue',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;border-radius:3px;
+}
+.btn-sec:hover{border-color:var(--gold);color:var(--gold-light)}
+
+/* ── PART DIVIDER ── */
+.pdiv{display:flex;align-items:center;gap:14px;margin:38px 0 18px}
+.pline{flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent)}
+.pline.r{background:linear-gradient(270deg,var(--bdr),transparent)}
+
+.ppill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 20px;border:1px solid var(--bdr2);
+  background:var(--s1);white-space:nowrap;border-radius:3px;
+  border-left:3px solid var(--cr);
+}
+.pico{font-size:14px}
+.ptxt{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted)}
+.pcnt{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--gold);background:var(--gold-dim);padding:1px 7px;border-radius:2px}
+
+/* ── QUESTION CARD ── */
+.qcard{
+  background:var(--s1);border:1px solid var(--bdr);
+  border-radius:4px;padding:26px 28px 22px;
+  margin-bottom:12px;
+  transition:border-color 0.35s,background 0.35s,box-shadow 0.35s;
+  animation:risein 0.38s ease both;
+  position:relative;overflow:hidden;
+}
+.qcard::before{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--cr),var(--gold));
+  opacity:0;transition:opacity 0.3s;
+}
+.qcard:hover::before{opacity:0.6}
+.qcard.ok::before{opacity:1;background:var(--correct)}
+.qcard.err::before{opacity:1;background:var(--wrong)}
+
+/* top-right corner decoration */
+.qcard::after{
+  content:'';position:absolute;top:0;right:0;
+  width:0;height:0;border-style:solid;
+  border-width:0 20px 20px 0;
+  border-color:transparent var(--bdr2) transparent transparent;
+}
+
+@keyframes risein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.qcard.ok{border-color:rgba(39,174,96,0.4);background:linear-gradient(135deg,var(--s1),rgba(39,174,96,0.04));box-shadow:0 0 28px rgba(39,174,96,0.06)}
+.qcard.err{border-color:rgba(231,76,60,0.4);background:linear-gradient(135deg,var(--s1),rgba(231,76,60,0.04));box-shadow:0 0 28px rgba(231,76,60,0.05)}
+
+.qmeta{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+
+.qnum{
+  font-family:'Roboto Mono',monospace;font-size:11px;
+  color:var(--muted);background:var(--s2);border:1px solid var(--bdr);
+  padding:2px 9px;border-radius:2px;letter-spacing:0.04em;
+}
+
+.qtag{font-family:'Roboto Mono',monospace;font-size:9px;font-weight:700;padding:3px 10px;text-transform:uppercase;letter-spacing:0.08em;border-radius:2px}
+.ttc{background:rgba(231,76,60,0.14);color:#F1948A;border:1px solid rgba(231,76,60,0.3)}
+.ttt{background:rgba(243,156,18,0.14);color:var(--gold-light);border:1px solid rgba(243,156,18,0.3)}
+.ttl{background:rgba(39,174,96,0.14);color:#82E0AA;border:1px solid rgba(39,174,96,0.3)}
+.tte{background:rgba(212,172,13,0.14);color:var(--gold-light);border:1px solid rgba(212,172,13,0.3)}
+
+.qstat{font-size:15px;margin-left:auto;display:none}
+
+.qtext{
+  font-size:16px;font-weight:600;line-height:1.6;
+  color:var(--txt);margin-bottom:18px;letter-spacing:-0.01em;
+}
+
+/* ── OPTIONS ── */
+.opts{display:flex;flex-direction:column;gap:8px}
+
+.opt{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 16px;
+  border:1px solid var(--bdr);background:var(--s2);
+  cursor:pointer;transition:all 0.18s cubic-bezier(0.22,1,0.36,1);
+  font-size:14px;line-height:1.55;text-align:left;width:100%;
+  color:#BF9C94;font-family:'Epilogue',sans-serif;border-radius:3px;
+}
+.opt:hover:not(.dis){border-color:var(--gold);background:rgba(212,172,13,0.07);color:var(--txt);transform:translateX(5px)}
+.opt.cor{border-color:var(--correct)!important;background:rgba(39,174,96,0.1)!important;color:var(--clight)!important}
+.opt.wrn{border-color:var(--wrong)!important;background:rgba(231,76,60,0.1)!important;color:#F1948A!important}
+.opt.dis{cursor:default}
+
+.okey{
+  min-width:28px;height:28px;border-radius:3px;
+  background:var(--s3);border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;
+  color:var(--muted);flex-shrink:0;transition:all 0.18s;
+}
+.opt.cor .okey{background:var(--correct);color:#fff;border-color:var(--correct)}
+.opt.wrn .okey{background:var(--wrong);color:#fff;border-color:var(--wrong)}
+.opt:hover:not(.dis) .okey{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* ── EXPLANATION ── */
+.expl{
+  display:none;margin-top:14px;padding:14px 18px;
+  background:linear-gradient(135deg,rgba(192,57,43,0.07),rgba(212,172,13,0.04));
+  border:1px solid rgba(212,172,13,0.2);border-left:3px solid var(--gold);
+  font-size:12.5px;line-height:1.75;color:#C9956A;
+  font-family:'Roboto Mono',monospace;border-radius:2px;
+}
+.expl.vis{display:block;animation:risein 0.3s ease}
+.expl-hd{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+
+/* ── RESULT PANEL ── */
+.result{
+  background:var(--s1);border:1px solid var(--bdr2);
+  padding:56px 44px;text-align:center;margin:36px 0;
+  display:none;position:relative;overflow:hidden;border-radius:6px;
+}
+.result::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -5%,rgba(192,57,43,0.1) 0%,transparent 55%);pointer-events:none}
+.result::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.result.vis{display:block;animation:risein 0.55s ease}
+
+.rtrophy{font-size:58px;display:block;margin-bottom:16px}
+.rscore{font-size:90px;font-weight:900;font-family:'Playfair Display',serif;line-height:1;letter-spacing:-0.03em;margin-bottom:10px}
+.rse{background:linear-gradient(135deg,var(--gold),var(--clight));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rsg{background:linear-gradient(135deg,var(--gold-light),var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rsa{background:linear-gradient(135deg,var(--amber),var(--cr-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rsp{background:linear-gradient(135deg,var(--cr-light),#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.rverdict{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px;letter-spacing:-0.01em}
+.rmsg{font-size:13px;color:var(--muted);font-family:'Roboto Mono',monospace;margin-bottom:36px}
+
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.rgc{padding:20px 12px;border:1px solid var(--bdr);background:var(--s2);border-radius:4px}
+.rgc .rnum{font-size:38px;font-weight:900;font-family:'Roboto Mono',monospace}
+.rgc .rlbl{font-size:10px;color:var(--muted);font-family:'Roboto Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+.rgc.rc .rnum{color:var(--clight)}
+.rgc.rw .rnum{color:var(--wrong)}
+.rgc.rp .rnum{color:var(--gold-light)}
+
+.tbgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:32px}
+.tbc{padding:14px 10px;border:1px solid var(--bdr);background:var(--s2);border-radius:4px}
+.tbc-ico{font-size:18px;margin-bottom:6px}
+.tbc-lbl{font-size:9px;font-family:'Roboto Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em}
+.tbc-val{font-size:22px;font-weight:800;font-family:'Roboto Mono',monospace;color:var(--txt);margin:4px 0 8px}
+.tbc-bar{height:4px;background:var(--bdr);border-radius:2px;overflow:hidden}
+.tbc-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(0.22,1,0.36,1)}
+
+.ract{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+footer{padding:44px 0;text-align:center;border-top:1px solid var(--bdr);margin-top:16px}
+footer p{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--dim)}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+
+@media(max-width:620px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .rgrid,.tbgrid{grid-template-columns:1fr}
+  .qcard{padding:20px 16px}
+  .result{padding:36px 20px}
+  .rscore{font-size:66px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="radarCanvas"></canvas>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="orb o3"></div>
+
+<div class="wrap">
+
+  <header>
+    <div class="vault-badge"><div class="shield-pulse"></div>AZ-104 Module · Backup &amp; Recovery</div>
+    <h1>
+      <span class="h1a">Monitor &amp; Back Up</span>
+      <span class="h1b">Azure Resources</span>
+    </h1>
+    <p class="tagline">
+      Azure Backup <span class="tsep">·</span>
+      Recovery Services Vault <span class="tsep">·</span>
+      VM Backup &amp; Restore <span class="tsep">·</span>
+      Azure Monitor <span class="tsep">·</span>
+      Retention &amp; Policies
+    </p>
+  </header>
+
+  <div class="stats">
+    <div class="sc"><div class="sc-corner"></div><span class="snum" id="totalQ">60</span><span class="slbl">Total Qs</span></div>
+    <div class="sc"><div class="sc-corner"></div><span class="snum" id="answeredQ">0</span><span class="slbl">Answered</span></div>
+    <div class="sc"><div class="sc-corner"></div><span class="snum" id="correctQ">0</span><span class="slbl">Correct</span></div>
+    <div class="sc"><div class="sc-corner"></div><span class="snum" id="pctQ">—</span><span class="slbl">Score %</span></div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-track"><div class="prog-fill" id="progBar"></div></div>
+    <div class="prog-row">
+      <span id="progLabel">0 of 60 answered</span>
+      <span class="live" id="scoreLabel">Score: —</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="fb active" onclick="setFilter('all',this)">All</button>
+    <button class="fb fc" onclick="setFilter('conceptual',this)">🛡️ Conceptual</button>
+    <button class="fb ft" onclick="setFilter('technical',this)">⚙️ Technical</button>
+    <button class="fb fl" onclick="setFilter('logical',this)">🧩 Scenario</button>
+    <div class="sp"></div>
+    <button class="btn-main" onclick="shuffleReset()">🔀 Shuffle</button>
+    <button class="btn-sec"  onclick="resetAll()">↺ Reset</button>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <div class="result" id="resultPanel">
+    <span class="rtrophy" id="rtrophy">🏆</span>
+    <div class="rscore"   id="rscore">0%</div>
+    <div class="rverdict" id="rverdict">—</div>
+    <div class="rmsg"     id="rmsg">Keep going!</div>
+    <div class="rgrid">
+      <div class="rgc rc"><div class="rnum" id="rCorrect">0</div><div class="rlbl">Correct</div></div>
+      <div class="rgc rw"><div class="rnum" id="rWrong">0</div><div class="rlbl">Wrong</div></div>
+      <div class="rgc rp"><div class="rnum" id="rPct">0%</div><div class="rlbl">Accuracy</div></div>
+    </div>
+    <div class="tbgrid" id="tbgrid"></div>
+    <div class="ract">
+      <button class="btn-main" onclick="shuffleReset()">🔀 Retake Shuffled</button>
+      <button class="btn-sec"  onclick="resetAll()">↺ Review All</button>
+    </div>
+  </div>
+
+  <footer><p>AZ-104 Exam Prep · Monitor &amp; Back Up Azure Resources · 60 Questions</p></footer>
+</div>
+
+<script>
+/* ── RADAR / SHIELD CANVAS ─────────────────────── */
+(function(){
+  const cv = document.getElementById('radarCanvas');
+  const cx = cv.getContext('2d');
+  let W, H, t = 0;
+
+  function resize(){ W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+
+  function frame(){
+    cx.clearRect(0,0,W,H);
+    t += 0.006;
+
+    const cx0 = W * 0.82, cy0 = H * 0.18;
+    const maxR = Math.min(W, H) * 0.32;
+
+    // Concentric rings
+    for(let r = maxR * 0.25; r <= maxR; r += maxR * 0.25){
+      cx.beginPath();
+      cx.arc(cx0, cy0, r, 0, Math.PI * 2);
+      cx.strokeStyle = `rgba(192,57,43,${0.06 * (1 - r/maxR) + 0.02})`;
+      cx.lineWidth = 0.8;
+      cx.stroke();
+    }
+
+    // Cross-hairs
+    cx.beginPath();
+    cx.moveTo(cx0 - maxR, cy0); cx.lineTo(cx0 + maxR, cy0);
+    cx.moveTo(cx0, cy0 - maxR); cx.lineTo(cx0, cy0 + maxR);
+    cx.strokeStyle = 'rgba(192,57,43,0.05)';
+    cx.lineWidth = 0.8;
+    cx.stroke();
+
+    // Sweep arm
+    const sweep = t % (Math.PI * 2);
+    const grad = cx.createConicalGradient ? null : null;
+    cx.beginPath();
+    cx.moveTo(cx0, cy0);
+    cx.arc(cx0, cy0, maxR, sweep - 0.8, sweep);
+    cx.closePath();
+    cx.fillStyle = 'rgba(212,172,13,0.04)';
+    cx.fill();
+
+    // Sweep line
+    cx.beginPath();
+    cx.moveTo(cx0, cy0);
+    cx.lineTo(cx0 + Math.cos(sweep) * maxR, cy0 + Math.sin(sweep) * maxR);
+    cx.strokeStyle = `rgba(212,172,13,0.25)`;
+    cx.lineWidth = 1.2;
+    cx.stroke();
+
+    // Blips that appear near the sweep
+    const blips = [
+      {angle: 1.1, r: 0.45}, {angle: 2.4, r: 0.7}, {angle: 3.8, r: 0.55},
+      {angle: 4.9, r: 0.3},  {angle: 0.3, r: 0.8},  {angle: 5.5, r: 0.6}
+    ];
+    blips.forEach(b => {
+      const diff = ((sweep - b.angle) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+      if(diff < 1.2){
+        const fade = 1 - diff / 1.2;
+        const bx = cx0 + Math.cos(b.angle) * b.r * maxR;
+        const by = cy0 + Math.sin(b.angle) * b.r * maxR;
+        cx.beginPath();
+        cx.arc(bx, by, 2.5, 0, Math.PI * 2);
+        cx.fillStyle = `rgba(212,172,13,${0.7 * fade})`;
+        cx.fill();
+        cx.beginPath();
+        cx.arc(bx, by, 5, 0, Math.PI * 2);
+        cx.strokeStyle = `rgba(212,172,13,${0.3 * fade})`;
+        cx.lineWidth = 0.8;
+        cx.stroke();
+      }
+    });
+
+    requestAnimationFrame(frame);
+  }
+  resize(); frame();
+  window.addEventListener('resize', resize);
+})();
+
+/* ── QUESTION DATA ───────────────────────────── */
+const QS = [
+
+  // ═══════════════════════════════════════════
+  // PART 1 — Introduction to Azure Backup
+  // ═══════════════════════════════════════════
+  {id:1, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is Azure Backup and what problem does it solve?",
+   ex:"Azure Backup is Microsoft's cloud-based backup service that protects your data from accidental deletion, corruption, and ransomware. It eliminates the need to manage on-premises backup infrastructure (tapes, servers) — backups go directly to Azure at scale, with centralised management.",
+   opts:["A disaster recovery service for replicating VMs to another region","A cloud-native backup service that protects Azure and on-premises data against deletion, corruption, and ransomware — replacing traditional tape/server backup infrastructure","A network monitoring tool","An archiving service for cold storage"],
+   ans:1},
+
+  {id:2, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is a Recovery Services Vault?",
+   ex:"A Recovery Services Vault is the management container for Azure Backup and Azure Site Recovery. It stores backup data, backup policies, and recovery points. All protected items (VMs, SQL databases, files) are registered to a vault. Each vault lives in a specific region.",
+   opts:["A secure Azure Key Vault for storing encryption keys","A management container that stores backup data, policies, and recovery points for Azure Backup and Azure Site Recovery — all protected items register to this vault","A storage account for backup files","A virtual network for isolated backup traffic"],
+   ans:1},
+
+  {id:3, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What workloads can Azure Backup protect?",
+   ex:"Azure Backup protects: Azure VMs, SQL Server in Azure VMs, SAP HANA in Azure VMs, Azure Files (file shares), Azure Blobs, Azure Disks, on-premises VMs (via MARS/MABS agent), on-premises SQL Server, Windows Server files and folders. It's a broad backup platform, not just for VMs.",
+   opts:["Azure VMs only","Azure VMs, SQL in VMs, SAP HANA, Azure Files, Azure Blobs, Azure Disks, and on-premises workloads via MARS/MABS agents — a comprehensive backup platform","Azure Databases only","Network configurations and firewall rules"],
+   ans:1},
+
+  {id:4, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is a Backup Policy in Azure Backup?",
+   ex:"A Backup Policy defines: when backups run (schedule — daily at 2am), how long each recovery point is kept (retention — daily 30 days, weekly 12 weeks, monthly 12 months, yearly 5 years), and the backup tier (snapshot vs vault). One policy applies to multiple protected items.",
+   opts:["A security policy for restricting who can delete backups","A configuration defining backup schedule (when to back up) and retention rules (how long to keep recovery points) — applied to one or more protected items","A network policy for backup traffic","A billing plan for backup storage"],
+   ans:1},
+
+  {id:5, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What are the two storage replication options for a Recovery Services Vault?",
+   ex:"Locally Redundant Storage (LRS): 3 copies in ONE data centre — cheaper, good if you have another DR strategy. Geo-Redundant Storage (GRS): copies in PRIMARY and SECONDARY region — survives regional outage. Zone-Redundant Storage (ZRS): copies across availability zones. Default is GRS — don't change before protecting any items.",
+   opts:["Hot and Cold storage tiers","Locally Redundant (LRS — copies in one data centre), Geo-Redundant (GRS — copies in paired region), or Zone-Redundant (ZRS — copies across zones). GRS is the default and recommended for most scenarios","Public and Private storage tiers","Standard and Premium storage tiers"],
+   ans:1},
+
+  {id:6, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is the MARS Agent (Microsoft Azure Recovery Services Agent)?",
+   ex:"MARS Agent is installed on on-premises Windows servers or Azure VMs to back up FILES, FOLDERS, and SYSTEM STATE directly to a Recovery Services Vault in Azure. It does NOT back up full VMs — it backs up individual files. Useful for selective file-level backup from on-prem machines.",
+   opts:["An agent that installs on Linux VMs for container backups","A lightweight agent installed on Windows machines to back up files, folders, and system state directly to a Recovery Services Vault — file-level backup, not full VM backup","An agent for monitoring Azure VM performance","An agent that syncs on-premises AD to Entra ID"],
+   ans:1},
+
+  {id:7, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is Microsoft Azure Backup Server (MABS) and how does it differ from MARS?",
+   ex:"MABS is a full backup server (like DPM) that runs on-premises and backs up entire workloads: VMs (Hyper-V, VMware), SQL Server, SharePoint, Exchange — then ships data to Azure. MARS only backs up files/folders from individual Windows machines. MABS = workload-aware, application-consistent backup for complex on-prem environments.",
+   opts:["MABS and MARS are the same product","MABS is an on-premises backup server protecting entire workloads (VMs, SQL, SharePoint) then replicating to Azure. MARS is a lightweight agent for file/folder backup from individual Windows machines","MABS is for Azure VMs only","MARS is for Linux; MABS is for Windows"],
+   ans:1},
+
+  {id:8, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"technical", cat:"Technical",
+   q:"What is Soft Delete in Azure Backup and how long does it protect deleted backup data?",
+   ex:"Soft Delete retains deleted backup data for 14 additional days after deletion at no extra charge. If you accidentally delete a VM's backup or stop protection and delete data, you can recover it within 14 days. After 14 days, the data is permanently gone. Soft Delete is enabled by default for VMs.",
+   opts:["Soft Delete sends data to archive tier for 30 days","Soft Delete retains deleted backup data for 14 days after deletion at no extra cost — you can undelete and recover accidentally deleted backups within this window","Soft Delete keeps data for 7 days then compresses it","Soft Delete requires a Premium tier vault"],
+   ans:1},
+
+  {id:9, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"technical", cat:"Technical",
+   q:"What is Cross-Region Restore (CRR) in Azure Backup?",
+   ex:"Cross-Region Restore allows you to restore a backed-up VM (or database) to the secondary Azure region — the paired region from GRS. Use case: if the primary region has a complete outage, you can restore workloads in the secondary region. Requires the vault to use GRS replication.",
+   opts:["Restoring a VM to a different resource group in the same region","Restoring backup data to the GRS secondary/paired region — enables recovery in the secondary region if the primary region experiences a complete outage. Requires GRS vault replication","Moving backup data between vaults","Restoring files from cloud to an on-premises server"],
+   ans:1},
+
+  {id:10, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"technical", cat:"Technical",
+   q:"What is the difference between a Snapshot recovery point and a Vault recovery point?",
+   ex:"Snapshot: stored locally on the disk/storage account — very fast restore (minutes) because data doesn't need to be downloaded from vault. Vault: copied to the Recovery Services Vault — slower restore (hours for large VMs) but survives if the source disks are deleted. Both are created during backup. Snapshots are retained for 1-5 days (instant restore).",
+   opts:["They are identical — snapshots are stored in the vault","Snapshot: stored locally near source disks, very fast restore. Vault: stored in Recovery Services Vault, slower restore but survives disk deletion. Snapshots kept 1-5 days (Instant Restore); vault for long-term retention","Snapshots are encrypted; vault copies are not","Vault copies are stored on-premises; snapshots are in Azure"],
+   ans:1},
+
+  {id:11, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"technical", cat:"Technical",
+   q:"What is Azure Backup's Instant Restore capability?",
+   ex:"Instant Restore uses the locally stored snapshots (before they're transferred to the vault) to restore a VM or files within minutes — no need to wait for data to transfer from the vault. The snapshot phase retains data for 1-5 days (configurable). After the snapshot expires, you must restore from the vault (slower).",
+   opts:["A feature that backs up VMs in under 1 minute","A restore capability that uses the local snapshot tier (kept 1-5 days) to restore data within minutes, without waiting for data transfer from the Recovery Services Vault","An SLA guarantee for 1-hour RTO","An emergency backup that runs immediately on demand"],
+   ans:1},
+
+  {id:12, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"technical", cat:"Technical",
+   q:"What is the difference between RPO and RTO in backup context?",
+   ex:"RPO (Recovery Point Objective): Maximum acceptable data loss — how old can the backup be when you restore? Daily backup = up to 24 hours of data loss. RTO (Recovery Time Objective): Maximum acceptable downtime — how long can you tolerate the system being offline during recovery? These drive backup frequency and restore method decisions.",
+   opts:["RPO and RTO are the same metric","RPO: maximum acceptable data loss (how recent must the backup be). RTO: maximum acceptable recovery time (how fast must restore complete). These define your backup frequency and restore strategy requirements","RPO is for databases; RTO is for VMs","RTO is measured in data volume; RPO in time"],
+   ans:1},
+
+  {id:13, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"logical", cat:"Logical/Scenario",
+   q:"A junior admin accidentally stops VM backup and selects 'Delete backup data'. The backup was stopped 5 days ago. Can the data be recovered?",
+   ex:"YES — Soft Delete is enabled by default and retains deleted backup data for 14 days. Since only 5 days have passed, the data is still in soft-deleted state. Go to the vault, find the soft-deleted item, and click 'Undelete' to recover it and re-enable protection.",
+   opts:["No — once backup data is deleted it cannot be recovered","Yes — Soft Delete retains deleted backup data for 14 days. Since only 5 days have passed, the data is still in soft-deleted state and can be undeleted from the vault","Only if the VM still exists","Only if Cross-Region Restore is enabled"],
+   ans:1},
+
+  {id:14, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"logical", cat:"Logical/Scenario",
+   q:"Your Recovery Services Vault uses LRS replication. The entire Azure UK South region goes down. Can you restore your VMs?",
+   ex:"NO — LRS stores data only within ONE data centre in UK South. A regional outage means your backup data is inaccessible (or gone). You should have used GRS (Geo-Redundant Storage) which replicates to the paired secondary region (UK West). Change the replication setting to GRS BEFORE protecting any items.",
+   opts:["Yes — LRS has built-in regional failover","No — LRS only stores data in one data centre within the region. A regional outage makes LRS backup data inaccessible. You should have used GRS which replicates to the paired region","Yes — Azure Backup automatically fails over","It depends on the VM size"],
+   ans:1},
+
+  {id:15, part:"Part 1: Introduction to Azure Backup", icon:"🛡️",
+   type:"logical", cat:"Logical/Scenario",
+   q:"You need to back up files from 50 on-premises Windows servers directly to Azure without deploying any additional backup servers. What is the most appropriate solution?",
+   ex:"MARS Agent — install it on each of the 50 Windows servers. It backs up files, folders, and system state directly to a Recovery Services Vault in Azure. No additional server required. Simple, lightweight, and scales to any number of machines.",
+   opts:["Deploy Azure Site Recovery on each server","Install MABS on a new on-premises server to manage all 50 machines","Install the MARS Agent on each Windows server to back up files and folders directly to a Recovery Services Vault in Azure","Create Azure File Shares and manually copy files"],
+   ans:2},
+
+  // ═══════════════════════════════════════════
+  // PART 2 — Protect VMs with Azure Backup
+  // ═══════════════════════════════════════════
+  {id:16, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"conceptual", cat:"Conceptual",
+   q:"How does Azure Backup work for Azure Virtual Machines at a high level?",
+   ex:"Azure VM Backup: (1) Azure Backup extension is installed on the VM (automatically). (2) Snapshot of VM disks is taken (application-consistent or crash-consistent). (3) Snapshot data is transferred to the Recovery Services Vault. (4) Recovery point created. No backup server or agents needed for Azure VMs — it's agentless and managed by the vault.",
+   opts:["Requires you to install a backup agent on each VM manually","Azure VM backup is agentless: a backup extension is automatically installed, disk snapshots are taken, transferred to the Recovery Services Vault, and recovery points are created — no manual agent setup needed","Backup only works on VMs with Premium SSD","Azure VM backup requires stopping the VM first"],
+   ans:1},
+
+  {id:17, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is the difference between Application-Consistent and Crash-Consistent backups for VMs?",
+   ex:"Application-Consistent: the backup uses VSS (Windows) or pre/post scripts (Linux) to quiesce applications and flush memory to disk before snapshotting — guarantees a clean backup for databases (SQL, Exchange). Crash-Consistent: snapshot taken without quiescing — like pulling the power cord. Faster but may need recovery steps on restore for databases.",
+   opts:["They are the same — Azure always takes application-consistent backups","Application-Consistent: quiesces apps/databases (VSS/scripts) before snapshot — cleanest backup for databases. Crash-Consistent: snapshot without quiescing — faster but may need recovery for databases on restore","Application-Consistent only works on Windows VMs","Crash-Consistent is more reliable for databases"],
+   ans:1},
+
+  {id:18, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What recovery options are available when restoring an Azure VM from backup?",
+   ex:"Four restore options: (1) Create new VM — spins up a new VM from the recovery point (doesn't touch original). (2) Restore disks — restores managed disks only, you attach them manually. (3) Replace existing disk — replaces a specific disk on the existing VM. (4) File/Folder recovery — mount recovery point as network drive to browse and recover individual files without restoring whole VM.",
+   opts:["Only full VM restore is supported","Restore options: Create new VM, Restore disks (then attach manually), Replace existing disk, or File/Folder recovery (mount recovery point to browse individual files) — matching what you need to recover","Restore only works to the same region","Restore requires the original VM to be deleted first"],
+   ans:1},
+
+  {id:19, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is File-Level Recovery (Item-Level Recovery) in Azure VM Backup?",
+   ex:"File Recovery lets you mount the recovery point snapshot as a network drive on any Windows or Linux machine. You browse the snapshot like a file explorer and copy out individual files — without restoring the entire VM. Ideal for recovering a single accidentally deleted file from a VM. The mount script is downloadable from the Azure portal.",
+   opts:["Restoring individual database tables from a VM backup","Mounting a VM backup recovery point as a drive to browse and copy out individual files without restoring the entire VM — much faster for single-file recovery","A feature exclusive to Premium VMs","A method for restoring files to a different subscription"],
+   ans:1},
+
+  {id:20, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"conceptual", cat:"Conceptual",
+   q:"Can you back up Azure VMs to a Recovery Services Vault in a DIFFERENT region?",
+   ex:"NO — the Recovery Services Vault must be in the SAME region as the VM. You cannot protect a UK South VM with a vault in West Europe. If you need geo-redundant backup data, use GRS replication on the vault — this copies the data to the secondary region but you still manage from the primary vault.",
+   opts:["Yes — any vault in any region can protect any VM","No — the Recovery Services Vault must be in the SAME region as the VM. For off-site copies, use GRS vault replication which replicates data to the paired region","Yes — but only if both regions are in the same country","Yes — but only for Premium VMs"],
+   ans:1},
+
+  {id:21, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"technical", cat:"Technical",
+   q:"What is Enhanced Policy vs Standard Policy for Azure VM Backup?",
+   ex:"Standard Policy: backup frequency maximum once per day, supports Basic/Standard storage accounts. Enhanced Policy: supports multiple backups per day (hourly — every 4, 6, 8, 12 hours), supports Trusted Azure VM launch (trusted launch VMs), supports Ultra SSD/Premium SSD v2. Enhanced required for hourly backups and newer VM types.",
+   opts:["Enhanced Policy just means more storage for the same backup frequency","Enhanced Policy enables multiple backups per day (hourly), supports newer VM types (Trusted Launch, Ultra SSD) vs Standard Policy which supports one backup per day — choose Enhanced for low RPO requirements","Standard Policy has more retention options","Enhanced Policy is only for Linux VMs"],
+   ans:1},
+
+  {id:22, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"technical", cat:"Technical",
+   q:"What does 'Stop Protection' with 'Retain Backup Data' vs 'Delete Backup Data' mean?",
+   ex:"Stop Protection + Retain Data: pauses backups, but all existing recovery points and data are kept in the vault (you keep paying for storage). You can re-enable protection later without losing history. Stop Protection + Delete Data: deletes all recovery points and backup data (with Soft Delete 14-day window). Common exam question — retaining data incurs ongoing storage cost.",
+   opts:["Both options immediately delete all backup data","Stop + Retain Data: pauses new backups but preserves all existing recovery points (costs storage). Stop + Delete Data: removes all backup data (Soft Delete gives 14-day recovery window). Retaining data means ongoing storage charges","Retain Data saves data for 7 days then deletes","Both options stop charges immediately"],
+   ans:1},
+
+  {id:23, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"technical", cat:"Technical",
+   q:"How does Azure Backup handle VM encryption (Azure Disk Encryption / ADE)?",
+   ex:"Azure Backup fully supports VMs encrypted with Azure Disk Encryption (ADE using BitLocker/DM-Crypt + Azure Key Vault). The vault needs appropriate permissions to access the Key Vault for encryption keys. Backup is application-consistent. On restore, the keys from Key Vault are used to decrypt — Key Vault must still be accessible.",
+   opts:["Azure Backup cannot back up encrypted VMs","Azure Backup supports ADE-encrypted VMs — the vault accesses Key Vault for encryption keys. On restore, keys from Key Vault are used. The Key Vault must be accessible and the vault must have appropriate Key Vault permissions","Encrypted VMs must be decrypted before backup","Backup of encrypted VMs stores decrypted data in the vault"],
+   ans:1},
+
+  {id:24, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"technical", cat:"Technical",
+   q:"What is the Azure Backup Center?",
+   ex:"Backup Center is a centralised management experience for Azure Backup across subscriptions, resource groups, regions, and vault types. From one pane: view all protected items, initiate backups/restores, manage policies, monitor backup jobs, view compliance — no need to go into each vault separately.",
+   opts:["A storage account where backup data is stored","A centralised management dashboard for Azure Backup across multiple vaults, subscriptions, and regions — view all protected items, jobs, policies, and compliance in one place","A monitoring tool exclusive to VM backups","An Azure Cost Management tool for backup spending"],
+   ans:1},
+
+  {id:25, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"technical", cat:"Technical",
+   q:"What is the maximum retention period for Azure VM backup recovery points?",
+   ex:"Azure VM Backup retention: Daily recovery points up to 9999 days (~27 years). Weekly: up to 9999 weeks. Monthly: up to 9999 months. Yearly: up to 9999 years. These are configurable in the backup policy. Long-term retention replaces the need for tape-based archives. Default is 30 days daily, 12 weekly, 12 monthly, 5 yearly.",
+   opts:["Maximum 1 year for all recovery points","Maximum 30 days daily, 12 months monthly — cannot be extended","Up to 9999 days/weeks/months/years — configurable in the backup policy, replacing traditional tape archives for long-term retention","Maximum 7 years for compliance purposes only"],
+   ans:2},
+
+  {id:26, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"logical", cat:"Logical/Scenario",
+   q:"A SQL Server VM has a database that needs to be backed up every hour to meet a 1-hour RPO. Standard daily VM backup is not sufficient. What should you configure?",
+   ex:"Two options: (1) Enhanced Policy with hourly VM backup (every 4, 6, 8, or 12 hours — not 1 hour). (2) Better: Azure Backup for SQL Server in Azure VMs — backs up transaction logs every 15-60 minutes for near-zero RPO, plus full/differential backups. SQL-aware backup is the right choice for databases.",
+   opts:["Enable Enhanced Policy with 4-hour intervals","Use Azure Backup for SQL Server in VMs which supports transaction log backups every 15-60 minutes — meeting a 1-hour RPO properly for databases, unlike VM-level backup which captures the whole disk","Take manual snapshots every hour using scripts","Use Azure Site Recovery instead of Azure Backup"],
+   ans:1},
+
+  {id:27, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"logical", cat:"Logical/Scenario",
+   q:"An admin deleted a single configuration file from a production VM 2 hours ago. The last backup was taken at midnight. How should you recover just that file?",
+   ex:"Use File Recovery (Item-Level Recovery): download the recovery script from the Azure portal for the midnight recovery point, run it on a machine, it mounts the backup as a network drive, browse to find the deleted file, copy it back. No need to restore the entire VM — much faster and avoids downtime.",
+   opts:["Restore the entire VM from the midnight backup","Create a new VM from the backup and copy the file","Use File Recovery — mount the midnight recovery point as a drive, browse to the file location, copy the single file out. No full VM restore needed","Redeploy the VM from a VM image"],
+   ans:2},
+
+  {id:28, part:"Part 2: Protect Virtual Machines with Azure Backup", icon:"🖥️",
+   type:"logical", cat:"Logical/Scenario",
+   q:"You restore a VM from a backup taken 3 days ago. The VM had Azure Disk Encryption enabled. The Key Vault with the encryption keys was accidentally deleted yesterday. What happens during restore?",
+   ex:"The restore FAILS or the restored VM cannot be decrypted. Azure Backup needs access to the Key Vault to get encryption keys during restore. If Key Vault is deleted (even with soft-delete recovery possible), restore to an encrypted VM will fail. Key Vault must be accessible — protect it with a Resource Lock.",
+   opts:["Restore succeeds — Azure Backup stores its own copy of encryption keys","Restore fails — Azure Backup requires access to the Key Vault containing the encryption keys during restore. If Key Vault is deleted, the restored VM cannot be decrypted. Always protect your Key Vault with a Resource Lock","Restore succeeds but the VM runs unencrypted","Restore automatically uses a new encryption key"],
+   ans:1},
+
+  // ═══════════════════════════════════════════
+  // PART 3 — Azure Monitor
+  // ═══════════════════════════════════════════
+  {id:29, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is Azure Monitor and what does it collect?",
+   ex:"Azure Monitor is the central monitoring platform for Azure. It collects: Metrics (numerical values — CPU%, disk IOPS, sampled frequently), Logs (structured/unstructured event data stored in Log Analytics Workspace — queried with KQL), and Activity Logs (management plane operations — who created/deleted/changed what).",
+   opts:["A billing and cost analysis tool","Azure Monitor's central monitoring platform collecting: Metrics (numerical performance data), Logs (event/diagnostic data in Log Analytics queried with KQL), and Activity Logs (management operations) — providing full observability of Azure resources","A network traffic analyser","A configuration management tool for Azure resources"],
+   ans:1},
+
+  {id:30, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is a Log Analytics Workspace?",
+   ex:"A Log Analytics Workspace is the storage and query environment for log data in Azure Monitor. You connect resources (VMs, App Services, etc.) to a workspace. Logs are stored here and queried using KQL (Kusto Query Language). Multiple resources across subscriptions can send logs to one workspace for centralised analysis.",
+   opts:["A storage account for Azure Backup data","A centralised repository for log data from Azure resources — you query logs using KQL (Kusto Query Language) and multiple resources can feed into one workspace for unified analysis","A monitoring dashboard tool","A virtual machine for running monitoring agents"],
+   ans:1},
+
+  {id:31, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is the Azure Activity Log and what does it record?",
+   ex:"Activity Log records MANAGEMENT PLANE operations at the subscription level: who created a VM, who deleted a resource group, who changed an RBAC assignment, Azure Policy compliance events. NOT operational logs from inside resources. Retained for 90 days by default. Send to Log Analytics for longer retention.",
+   opts:["Performance metrics for all VMs in a subscription","Management plane operations at subscription level: resource creation/deletion, RBAC changes, Policy compliance — who did what to which Azure resource. Retained 90 days by default","Network traffic logs for all resources","Application error logs from running workloads"],
+   ans:1},
+
+  {id:32, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"conceptual", cat:"Conceptual",
+   q:"What are Azure Monitor Metrics?",
+   ex:"Metrics are numerical time-series values collected at regular intervals (1-minute granularity). Examples: VM CPU%, Network In/Out bytes, Disk IOPS, App Service response time. Retained 93 days in Azure Monitor. Used for dashboards, autoscale triggers, and metric alerts. Metrics Explorer lets you visualise and analyse them.",
+   opts:["Text-based event logs from applications","Numerical time-series measurements collected frequently (e.g., CPU%, network bytes, disk IOPS) — retained 93 days, used for dashboards, autoscale, and metric alerts in Azure Monitor Metrics Explorer","Billing data for Azure resources","Configuration snapshots of resources"],
+   ans:1},
+
+  {id:33, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"conceptual", cat:"Conceptual",
+   q:"What are Azure Monitor Alerts and what types exist?",
+   ex:"Alerts notify you (or trigger actions) when specific conditions are met. Types: Metric Alerts (triggered when metric crosses a threshold — CPU > 85%). Log Search Alerts (KQL query returns results — e.g., error count > 10). Activity Log Alerts (specific management operations — e.g., VM deleted). Service Health Alerts (Azure service outages).",
+   opts:["Only email notifications when resources fail","Alert types: Metric Alerts (numerical threshold), Log Search Alerts (KQL query results), Activity Log Alerts (management operations), and Service Health Alerts — each triggers notification and/or automated actions (Action Groups)","A monitoring system exclusive to virtual machines","Alerts that only work with Azure Sentinel"],
+   ans:1},
+
+  {id:34, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is an Action Group in Azure Monitor?",
+   ex:"An Action Group is a collection of notification and automation actions triggered when an alert fires. Notification types: Email, SMS, Voice call, Azure mobile app push. Automation: Azure Function, Logic App, Webhook, ITSM (ServiceNow), Automation Runbook. One Action Group can be shared across multiple alerts.",
+   opts:["A group of Azure resources that can be monitored together","A reusable collection of notification (email, SMS, voice) and automation (Function, Logic App, Webhook, Runbook) actions triggered when an alert fires — shared across multiple alerts","A security group for monitoring permissions","A billing group for monitoring costs"],
+   ans:1},
+
+  {id:35, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"technical", cat:"Technical",
+   q:"What is a Diagnostic Setting in Azure Monitor?",
+   ex:"Diagnostic Settings configure a resource to send its Platform Logs and Metrics to destinations: Log Analytics Workspace (for KQL queries), Storage Account (for archiving/compliance), Event Hub (for streaming to SIEM), or Azure Monitor partner solutions. Without a Diagnostic Setting, resource-level logs are not collected.",
+   opts:["A setting for configuring VM performance counters only","A configuration that routes a resource's platform logs and metrics to destinations like Log Analytics Workspace, Storage Account, Event Hub, or partner solutions — must be configured per resource","A setting that automatically fixes configuration drift","A network diagnostic setting for VNet traffic"],
+   ans:1},
+
+  {id:36, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"technical", cat:"Technical",
+   q:"What is Azure Monitor Logs (Log Analytics) and what query language does it use?",
+   ex:"Azure Monitor Logs stores structured log data in a Log Analytics Workspace. You query it using KQL (Kusto Query Language) — a powerful query language for filtering, aggregating, and visualising log data. Example KQL query: AzureActivity | where OperationName == 'Delete' | summarize count() by Caller.",
+   opts:["It uses SQL queries to analyse log data","Azure Monitor Logs stores log data in Log Analytics Workspaces, queried using KQL (Kusto Query Language) — used for troubleshooting, security analysis, compliance, and building dashboards from log data","It uses Python scripts for log analysis","It uses Azure Policy DSL for log queries"],
+   ans:1},
+
+  {id:37, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"technical", cat:"Technical",
+   q:"What is Azure Monitor Workbooks?",
+   ex:"Workbooks are interactive reports/dashboards in Azure Monitor that combine text, KQL queries, metrics, and parameters into rich visual reports. Unlike static dashboards, they support interactive filtering and drilling down. Used for: operational reports, incident investigations, capacity planning.",
+   opts:["Excel-like spreadsheets for Azure billing data","Interactive reports combining KQL queries, metrics, text, and visual components into rich analytical dashboards — used for operational reporting, investigations, and capacity planning","A backup monitoring tool only","A service for automating log collection"],
+   ans:1},
+
+  {id:38, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"logical", cat:"Logical/Scenario",
+   q:"You want to receive an email and trigger an Azure Logic App whenever a VM in your subscription is deleted by anyone. How do you set this up?",
+   ex:"Create an Activity Log Alert scoped to the subscription, filtered on OperationName = 'Delete Virtual Machines'. Create an Action Group with Email notification + Logic App action. When any VM deletion is detected in the activity log, the alert fires and executes both actions.",
+   opts:["Create a metric alert on VM CPU","Create a log search alert querying Diagnostic Logs","Create an Activity Log Alert for 'Delete Virtual Machines' operation, linked to an Action Group with Email + Logic App webhook — Activity Log captures all management operations","Create a Service Health alert for VM services"],
+   ans:2},
+
+  {id:39, part:"Part 3: Azure Monitor", icon:"📊",
+   type:"logical", cat:"Logical/Scenario",
+   q:"Your Azure Monitor metrics show VM CPU averaging 85% for the last 6 hours. Alerts are firing but the team only found out 3 hours later because the email went to spam. How do you improve this?",
+   ex:"Add multiple notification methods to the Action Group: SMS text message (harder to miss than email), Azure mobile app push notification, and escalate to ITSM (ServiceNow ticket). Also consider lowering the alert threshold and adding auto-remediation (Automation Runbook to scale up the VM) via the Action Group.",
+   opts:["Increase the alert threshold to reduce noise","Disable the email notification and rely on Azure portal only","Update the Action Group to include SMS and Azure mobile app push notifications alongside email — multiple channels ensure the team is notified even if email is missed","Create a new alert with a higher severity"],
+   ans:2},
+
+  // ═══════════════════════════════════════════
+  // PART 4 — Azure Site Recovery (ASR)
+  // ═══════════════════════════════════════════
+  {id:40, part:"Part 4: Azure Site Recovery (ASR)", icon:"🔁",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is Azure Site Recovery (ASR) and how does it differ from Azure Backup?",
+   ex:"ASR is a DISASTER RECOVERY service — it replicates VMs (Azure-to-Azure, on-prem-to-Azure, on-prem-to-on-prem) in near-real-time for fast failover. Azure Backup is a DATA PROTECTION service for backup/restore. Key difference: ASR = business continuity/minimal RTO (minutes). Azure Backup = data recovery (hours, accepts data loss).",
+   opts:["They are the same service — ASR is just another name for Azure Backup","ASR: Disaster Recovery — continuous VM replication for near-zero RTO/RPO failover (minutes). Azure Backup: Data protection — periodic snapshots for restore (hours, accepts some data loss). ASR keeps systems running; Backup recovers data","ASR is only for on-premises to Azure migrations","ASR provides backup; Azure Backup provides disaster recovery"],
+   ans:1},
+
+  {id:41, part:"Part 4: Azure Site Recovery (ASR)", icon:"🔁",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is a Replication Policy in Azure Site Recovery?",
+   ex:"A Replication Policy defines: RPO threshold (how often recovery points are created — e.g., every 1 hour), app-consistent snapshot frequency (e.g., every 4 hours), retention period for recovery points. Applied to VMs being replicated. Alerts you if replication health falls below the RPO threshold.",
+   opts:["A policy for scheduling backup jobs","A configuration defining how often recovery points are created (RPO threshold), how often app-consistent snapshots are taken, and how long recovery points are retained for replicated VMs","A policy for routing replication traffic","A billing policy for ASR usage"],
+   ans:1},
+
+  {id:42, part:"Part 4: Azure Site Recovery (ASR)", icon:"🔁",
+   type:"technical", cat:"Technical",
+   q:"What is a Recovery Plan in Azure Site Recovery?",
+   ex:"A Recovery Plan groups VMs for coordinated failover in the right order. Define: which VMs to failover first, custom scripts/manual actions between groups, dependencies (start database VM before app VM before web VM). You can also add Azure Automation Runbooks as failover steps. Used for testing DR as well as actual failover.",
+   opts:["A document listing recovery procedures for the support team","A structured plan grouping VMs for coordinated, ordered failover — defining startup sequence, dependencies, custom scripts, and Azure Automation Runbooks to execute during failover","A backup schedule for all VMs in a resource group","A billing estimate for disaster recovery costs"],
+   ans:1},
+
+  {id:43, part:"Part 4: Azure Site Recovery (ASR)", icon:"🔁",
+   type:"technical", cat:"Technical",
+   q:"What is the difference between Test Failover, Planned Failover, and Unplanned Failover in ASR?",
+   ex:"Test Failover: creates a copy in an isolated network — validates DR works without impacting production. No data loss, production runs normally. Planned Failover: controlled migration/planned DR test — synchronises all data before failing over. Zero data loss. Unplanned Failover: emergency when primary is down — uses latest recovery point, may have some data loss.",
+   opts:["They are all identical operations","Test Failover: validates DR in isolation (no production impact). Planned Failover: controlled, zero-data-loss failover. Unplanned Failover: emergency failover using latest recovery point when primary fails — may have minimal data loss","Test Failover permanently moves VMs","Planned Failover requires shutting down all VMs first"],
+   ans:1},
+
+  {id:44, part:"Part 4: Azure Site Recovery (ASR)", icon:"🔁",
+   type:"logical", cat:"Logical/Scenario",
+   q:"Your company has VMs in Azure UK South. They need to failover to UK West within 1 hour if UK South goes down (RTO < 1 hour) with maximum 5 minutes data loss (RPO 5 min). Which solution achieves this?",
+   ex:"Azure Site Recovery with Azure-to-Azure replication from UK South to UK West. Configure Replication Policy with 5-minute RPO threshold. Create a Recovery Plan for ordered failover. Test failover regularly. ASR's continuous replication meets sub-minute RPO and failover takes minutes — well within the 1-hour RTO.",
+   opts:["Azure Backup with GRS replication to UK West","Manual VM recreation in UK West using ARM templates","Azure Site Recovery — configure Azure-to-Azure replication (UK South to UK West) with 5-minute RPO replication policy and a Recovery Plan for ordered failover. Meets both RTO and RPO requirements","Azure Backup cross-region restore to UK West"],
+   ans:2},
+
+  // ═══════════════════════════════════════════
+  // BONUS — Cross-Topic Exam Traps
+  // ═══════════════════════════════════════════
+  {id:45, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Exam Trap",
+   q:"Exam Trap: Azure Backup vs Azure Site Recovery — which do you use for each scenario? (A) A developer deletes a database table by mistake. (B) An entire Azure region goes down and your app must keep running.",
+   ex:"(A) Azure Backup — this is data recovery. Restore the database from a backup point to recover the deleted table. (B) Azure Site Recovery — this is disaster recovery/business continuity. Fail over to the replicated VM in the secondary region. Backup can't give you regional failover in minutes; ASR can't replace granular data restore.",
+   opts:["Use Azure Backup for both scenarios","Use Azure Site Recovery for both scenarios","(A) Azure Backup for data recovery (restore deleted data). (B) Azure Site Recovery for disaster recovery (regional failover). Each tool has a distinct purpose — Backup for data, ASR for continuity","Neither — use Azure Migrate for both"],
+   ans:2},
+
+  {id:46, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Exam Trap",
+   q:"Exam Trap: You change the Recovery Services Vault replication from GRS to LRS after enabling VM backup. Is this allowed?",
+   ex:"NO — you CANNOT change vault storage replication type after any items have been protected (even once). You must set LRS/GRS/ZRS BEFORE protecting the first item. This is a common exam trap: always set the replication type first before configuring any backups.",
+   opts:["Yes — you can change vault replication type at any time","Yes — but only within the first 24 hours of the first backup","No — vault storage replication type can only be changed BEFORE any items are protected. Once backup has been configured for any item, the replication setting is locked","Yes — via Azure CLI only, not the portal"],
+   ans:2},
+
+  {id:47, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Exam Trap",
+   q:"Exam Trap: Does Azure Backup deduct the backup storage cost from your budget even when Soft Delete data is retained?",
+   ex:"YES — during the 14-day Soft Delete retention period, the backup data still occupies vault storage. Azure continues charging for that storage. Soft Delete prevents data loss but does NOT make it free. Plan your storage costs accordingly.",
+   opts:["No — Soft Delete storage is always free","Yes only for GRS vaults","Yes — storage for Soft Deleted backup data is charged during the 14-day retention window. Soft Delete prevents loss but doesn't waive storage fees","No — Soft Delete moves data to cold tier at no charge"],
+   ans:2},
+
+  {id:48, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"technical", cat:"Technical",
+   q:"How many days are Azure Monitor Metrics retained by default, and how does this differ from Activity Logs?",
+   ex:"Metrics: retained 93 days in Azure Monitor by default. Activity Logs: retained 90 days in Azure Monitor by default. To keep either longer, send to Log Analytics Workspace (configurable retention up to years) or Archive to a Storage Account. These retention periods are commonly tested exam facts.",
+   opts:["Both Metrics and Activity Logs are retained for 30 days","Metrics: 30 days, Activity Logs: 90 days","Metrics: 93 days, Activity Logs: 90 days — both can be extended by archiving to Log Analytics Workspace or Storage Account","Both are retained for 1 year by default"],
+   ans:2},
+
+  {id:49, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Logical/Scenario",
+   q:"You want all Azure Monitor logs across 10 subscriptions to be queryable from one place. What architecture do you use?",
+   ex:"Create a centralised Log Analytics Workspace. Configure Diagnostic Settings on resources across all 10 subscriptions to send logs to that single workspace. You can query data from all subscriptions in one KQL query. Azure Monitor supports cross-workspace queries too.",
+   opts:["Create one Log Analytics Workspace per subscription (10 total)","Use Azure Monitor only with its default built-in storage","Create a centralised Log Analytics Workspace and configure Diagnostic Settings on resources in all 10 subscriptions to send logs to it — enables unified querying across subscriptions","Use Azure Storage Accounts for log centralisation"],
+   ans:2},
+
+  {id:50, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"technical", cat:"Technical",
+   q:"What is the difference between Azure Monitor Metric Alerts and Log Search Alerts in terms of evaluation frequency?",
+   ex:"Metric Alerts: near real-time (evaluate every 1-5 minutes) — immediate alerting on spikes. Log Search Alerts: evaluate KQL query results periodically (minimum 1 minute, typically 5 minutes) — slight delay because logs must be ingested first. For immediate threshold breaches, use Metric Alerts. For complex multi-condition scenarios, use Log Search Alerts.",
+   opts:["Both evaluate at the same frequency — every 5 minutes","Metric Alerts are slower; Log Search are faster","Metric Alerts: near real-time (1-5 min, immediate numeric threshold). Log Search Alerts: periodic KQL evaluation (minimum 1 min, typically 5+ min) — logs need ingestion time. Metric for immediacy; Log for complex conditions","Log Search Alerts evaluate continuously in real time"],
+   ans:2},
+
+  {id:51, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Logical/Scenario",
+   q:"Your company needs to prove to auditors that production VMs were backed up every day for the last 2 years with no missed backups. Which Azure Backup feature provides this compliance evidence?",
+   ex:"Azure Backup Reports (via Log Analytics + Backup Center) provide historical backup job data, trends, and compliance reports. Send backup diagnostic data to a Log Analytics Workspace — this enables long-term retention (beyond 90 days) and rich KQL-based compliance reports showing every backup job over 2 years.",
+   opts:["Export the Azure Activity Log for the last 2 years","Screenshot the vault dashboard daily","Configure Azure Backup to send diagnostic logs to a Log Analytics Workspace — Backup Center and Azure Backup Reports provide historical job data, compliance trends, and audit-ready evidence over the long-term retention period","Use Azure Policy compliance reports"],
+   ans:2},
+
+  {id:52, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"conceptual", cat:"Conceptual",
+   q:"What is Azure Backup's Archive Tier and when should you use it?",
+   ex:"Archive Tier stores long-term recovery points (monthly/yearly) in cold storage at significantly lower cost — similar to Blob Archive tier. Trade-off: rehydration takes up to 24 hours before you can restore. Used for: compliance-required long-term retention (7+ years), audit points, yearly recovery points you rarely need.",
+   opts:["A tier that provides faster restores than the standard vault tier","A low-cost cold storage tier for long-term recovery points (monthly/yearly) at reduced cost — rehydration takes up to 24 hours before restore. Use for compliance-driven long-term retention you rarely access","A tier for storing deleted VM backups during Soft Delete period","A separate vault for archiving backups across regions"],
+   ans:1},
+
+  {id:53, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"technical", cat:"Technical",
+   q:"What permissions are required to configure and manage Azure Backup?",
+   ex:"Built-in RBAC roles for Azure Backup: Backup Contributor (full backup management — configure, backup, restore, but not manage vault), Backup Operator (trigger backups/restores, can't configure), Backup Reader (view only). Owner/Contributor on the vault also works. Least privilege = assign Backup Contributor for backup admins, Backup Reader for monitoring teams.",
+   opts:["Owner on the subscription is the only way to manage backups","Global Administrator is required for all backup operations","Azure Backup has built-in RBAC roles: Backup Contributor (configure/restore), Backup Operator (trigger jobs), Backup Reader (view only) — apply least privilege principle so backup admins don't have full subscription access","No special permissions needed — anyone can manage backups"],
+   ans:2},
+
+  {id:54, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Logical/Scenario",
+   q:"A malicious insider with Contributor access deletes all VMs and their backup data in a Recovery Services Vault. Soft Delete was disabled. How could this attack have been prevented?",
+   ex:"Multiple controls: (1) Enable Soft Delete — gives 14-day recovery window. (2) Enable Multi-User Authorization (MUA) on the vault — requires a second approver (Resource Guard) before destructive operations. (3) Apply Resource Lock (CanNotDelete) on the vault. (4) Separate backup vault management using Backup Contributor role. Defence in depth.",
+   opts:["Give the insider read-only access from the start","Use GRS replication so data is in two regions","Enable Soft Delete, Multi-User Authorization (MUA/Resource Guard requiring second approval for delete), and apply a CanNotDelete Resource Lock on the vault — multiple layers prevent even privileged users from destroying backup data instantly","Use a separate subscription for backups"],
+   ans:2},
+
+  {id:55, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Logical/Scenario",
+   q:"Exam Trap: Can you restore an Azure VM backup to a DIFFERENT region than where the vault is located?",
+   ex:"Yes — but ONLY via Cross-Region Restore (CRR), and ONLY if the vault uses GRS replication (which copies data to the secondary/paired region). You can restore to the secondary region from the GRS copy. You CANNOT restore to an arbitrary third region — only to the primary (normal restore) or the GRS paired secondary (CRR).",
+   opts:["Yes — you can restore to any Azure region at any time","No — you can only restore to the same region as the vault","Yes — but only to the GRS-paired secondary region via Cross-Region Restore, and only if the vault uses GRS replication. Not to any arbitrary region","Yes — but it requires a support ticket to Azure"],
+   ans:2},
+
+  {id:56, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"technical", cat:"Technical",
+   q:"What is Azure Monitor Application Insights used for?",
+   ex:"Application Insights is an Application Performance Monitoring (APM) service for live web applications. It collects: request rates, response times, failure rates, dependency tracking, user sessions, custom events, exceptions, and performance traces. For developers — monitors what's happening INSIDE the app (not just the host VM).",
+   opts:["A tool for monitoring Azure infrastructure (VMs, networks)","An Application Performance Monitoring (APM) service for web apps — tracks request rates, response times, exceptions, dependencies, and user behaviour inside the application code itself (not just infrastructure metrics)","A backup monitoring tool","A security monitoring service for web applications"],
+   ans:1},
+
+  {id:57, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"technical", cat:"Technical",
+   q:"What is Azure Monitor's Data Collection Rules (DCR)?",
+   ex:"DCRs define WHAT data to collect, WHERE to collect it from, and WHERE to send it. Replace the older agent-based collection approach. Configured centrally and deployed to VMs via the Azure Monitor Agent (AMA) — modern replacement for MMA/OMS agents. DCRs reduce costs by filtering data before ingestion.",
+   opts:["Rules that define RBAC permissions for Azure Monitor","Centralised configurations defining what data (logs, performance counters) to collect from resources, filtering it before ingestion, and routing to destinations (Log Analytics, etc.) — deployed via Azure Monitor Agent","Rules for creating alerts based on metric thresholds","A compliance rule set for monitoring data retention"],
+   ans:1},
+
+  {id:58, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Logical/Scenario",
+   q:"You need a solution that: (a) backs up Azure VMs daily, (b) monitors VM performance, (c) sends an alert if backup fails, and (d) shows backup compliance trends over 6 months. What Azure services are required?",
+   ex:"(a) Azure Backup with Recovery Services Vault and daily backup policy. (b) Azure Monitor with VM metrics and Log Analytics Workspace. (c) Azure Backup built-in alerts + Action Group (email). (d) Azure Backup Reports via Log Analytics (send backup diagnostics to workspace). These services integrate natively.",
+   opts:["Only Azure Backup handles all four requirements","Only Azure Monitor handles all four requirements","Azure Backup (VM protection + alerts), Azure Monitor with Log Analytics Workspace (VM performance monitoring), Action Groups (alert notifications), and Azure Backup Reports via Log Analytics (compliance trends) — complementary services working together","Azure Site Recovery covers all four requirements"],
+   ans:2},
+
+  {id:59, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"technical", cat:"Technical",
+   q:"What is Multi-User Authorization (MUA) for Azure Backup, and what is a Resource Guard?",
+   ex:"MUA adds an extra approval layer for destructive backup operations (delete backup data, change replication settings, disable soft delete). A Resource Guard is a separate Azure resource in a DIFFERENT subscription. Any operation that would override backup protection must be approved by a user with permissions on the Resource Guard — making it very hard for a single compromised admin to destroy backup data.",
+   opts:["A two-person approval rule for creating backups","Multi-User Authorization requires a second approval via a Resource Guard (in a separate subscription) before destructive backup operations succeed — prevents a single compromised account from destroying backup data even with full vault permissions","A policy for rotating backup encryption keys","An audit log for tracking who accessed backup data"],
+   ans:1},
+
+  {id:60, part:"Bonus: Backup & Monitor Exam Traps", icon:"🎯",
+   type:"logical", cat:"Logical/Scenario",
+   q:"Final Exam Trap: A team says 'We have VM snapshots in Azure, so we don't need Azure Backup.' What is wrong with this reasoning?",
+   ex:"Azure VM snapshots are manual, point-in-time, and stored as managed disk snapshots — they are NOT a backup strategy. Issues: no automated scheduling, no retention policies, no centralised management, no protection against accidental deletion of the snapshot itself, no geo-redundancy, and restoring from snapshots is manual. Azure Backup provides all of these systematically.",
+   opts:["They are correct — snapshots are equivalent to backups","Snapshots are better than Azure Backup for all scenarios","Snapshots are manual, unmanaged, and stored on the same infrastructure — they lack: automated scheduling, retention policies, centralised management, geo-redundancy, soft delete protection, and compliance reporting. Azure Backup provides all of these — snapshots alone are not a backup strategy","Snapshots work but require a third-party tool to manage them"],
+   ans:2},
+];
+
+/* ── STATE ──────────────────────────────────── */
+let questions = [...QS];
+let answers   = {};
+let activeFilter = 'all';
+const KEYS = ['A','B','C','D'];
+
+/* ── HELPERS ──────────────────────────────── */
+function getFiltered(){
+  if(activeFilter==='all')        return questions;
+  if(activeFilter==='conceptual') return questions.filter(q=>q.type==='conceptual');
+  if(activeFilter==='technical')  return questions.filter(q=>q.type==='technical');
+  if(activeFilter==='logical')    return questions.filter(q=>q.type==='logical');
+  return questions;
+}
+
+function tagInfo(type,cat){
+  if(cat==='Exam Trap') return{cls:'tte',lbl:'🎯 Exam Trap'};
+  if(type==='technical') return{cls:'ttt',lbl:'⚙️ Technical'};
+  if(type==='logical')   return{cls:'ttl',lbl:'🧩 Scenario'};
+  return                        {cls:'ttc',lbl:'🛡️ Conceptual'};
+}
+
+/* ── RENDER ─────────────────────────────────── */
+function render(){
+  const wrap = document.getElementById('quizContainer');
+  const filtered = getFiltered();
+  wrap.innerHTML = '';
+
+  const parts = {};
+  filtered.forEach(q=>{
+    if(!parts[q.part]) parts[q.part]={icon:q.icon,items:[]};
+    parts[q.part].items.push(q);
+  });
+
+  let gi=0;
+  Object.entries(parts).forEach(([pname,data])=>{
+    const dv=document.createElement('div');
+    dv.className='pdiv';
+    dv.innerHTML=`
+      <div class="pline"></div>
+      <div class="ppill">
+        <span class="pico">${data.icon}</span>
+        <span class="ptxt">${pname}</span>
+        <span class="pcnt">${data.items.length}q</span>
+      </div>
+      <div class="pline r"></div>`;
+    wrap.appendChild(dv);
+
+    data.items.forEach(q=>{
+      gi++;
+      const ans = answers[q.id];
+      const isOk = ans!==undefined && ans===q.ans;
+      const tag = tagInfo(q.type,q.cat);
+
+      const card=document.createElement('div');
+      card.className=`qcard ${ans!==undefined?(isOk?'ok':'err'):''}`;
+      card.id=`card-${q.id}`;
+
+      const optsH=q.opts.map((o,i)=>{
+        let cls='';
+        if(ans!==undefined){
+          if(i===q.ans) cls='cor dis';
+          else if(i===ans) cls='wrn dis';
+          else cls='dis';
+        }
+        return `<button class="opt ${cls}" onclick="pick(${q.id},${i})" ${ans!==undefined?'disabled':''}>
+          <span class="okey">${KEYS[i]}</span><span>${o}</span>
+        </button>`;
+      }).join('');
+
+      card.innerHTML=`
+        <div class="qmeta">
+          <span class="qnum">#${gi}</span>
+          <span class="qtag ${tag.cls}">${tag.lbl}</span>
+          ${ans!==undefined?`<span class="qstat" style="display:inline">${isOk?'✅':'❌'}</span>`:''}
+        </div>
+        <div class="qtext">${q.q}</div>
+        <div class="opts">${optsH}</div>
+        <div class="expl ${ans!==undefined?'vis':''}" id="ex-${q.id}">
+          <div class="expl-hd">🔐 Simple Explanation</div>
+          ${q.ex}
+        </div>`;
+      wrap.appendChild(card);
+    });
+  });
+  updateStats();
+}
+
+/* ── ANSWER ──────────────────────────────────── */
+function pick(qId,idx){
+  if(answers[qId]!==undefined) return;
+  answers[qId]=idx;
+  const q=questions.find(x=>x.id===qId);
+  const card=document.getElementById(`card-${qId}`);
+  const ok=idx===q.ans;
+
+  card.className=`qcard ${ok?'ok':'err'}`;
+
+  const meta=card.querySelector('.qmeta');
+  if(!meta.querySelector('.qstat')){
+    const s=document.createElement('span');
+    s.className='qstat';s.style.display='inline';meta.appendChild(s);
+  }
+  meta.querySelector('.qstat').textContent=ok?'✅':'❌';
+
+  card.querySelectorAll('.opt').forEach((b,i)=>{
+    b.disabled=true;b.classList.add('dis');
+    if(i===q.ans) b.classList.add('cor');
+    else if(i===idx&&!ok) b.classList.add('wrn');
+  });
+
+  document.getElementById(`ex-${qId}`).classList.add('vis');
+  updateStats();
+
+  const filt=getFiltered();
+  if(filt.every(x=>answers[x.id]!==undefined)) setTimeout(showResult,900);
+}
+
+/* ── STATS ───────────────────────────────────── */
+function updateStats(){
+  const f=getFiltered();
+  const ans=f.filter(q=>answers[q.id]!==undefined);
+  const cor=ans.filter(q=>answers[q.id]===q.ans);
+  const pct=ans.length>0?Math.round((cor.length/ans.length)*100):null;
+  const prg=f.length>0?(ans.length/f.length)*100:0;
+
+  document.getElementById('totalQ').textContent=f.length;
+  document.getElementById('answeredQ').textContent=ans.length;
+  document.getElementById('correctQ').textContent=cor.length;
+  document.getElementById('pctQ').textContent=pct!==null?pct+'%':'—';
+  document.getElementById('progBar').style.width=prg+'%';
+  document.getElementById('progLabel').textContent=`${ans.length} of ${f.length} answered`;
+  document.getElementById('scoreLabel').textContent=pct!==null?`Score: ${pct}%`:'Score: —';
+}
+
+/* ── RESULT ──────────────────────────────────── */
+function showResult(){
+  const f=getFiltered();
+  const ans=f.filter(q=>answers[q.id]!==undefined);
+  const cor=ans.filter(q=>answers[q.id]===q.ans);
+  const bad=ans.length-cor.length;
+  const pct=ans.length>0?Math.round((cor.length/ans.length)*100):0;
+
+  document.getElementById('rCorrect').textContent=cor.length;
+  document.getElementById('rWrong').textContent=bad;
+  document.getElementById('rPct').textContent=pct+'%';
+
+  const sc=document.getElementById('rscore');
+  sc.textContent=pct+'%';
+
+  let trophy,verdict,msg,cls;
+  if(pct>=85){trophy='🏆';verdict='Backup Guardian!';msg='Excellent — you\'ve mastered Azure Backup & Monitor';cls='rse';}
+  else if(pct>=70){trophy='👍';verdict='Well Protected!';msg='Good understanding — review weaker areas';cls='rsg';}
+  else if(pct>=50){trophy='📚';verdict='Keep Studying';msg='Building your protection strategy — more practice needed';cls='rsa';}
+  else{trophy='🔄';verdict='Needs More Work';msg='Study the explanations and retry';cls='rsp';}
+
+  document.getElementById('rtrophy').textContent=trophy;
+  document.getElementById('rverdict').textContent=verdict;
+  document.getElementById('rmsg').textContent=msg;
+  sc.className=`rscore ${cls}`;
+
+  const types=[
+    {key:'conceptual',icon:'🛡️',lbl:'Conceptual',col:'#F1948A',fill:'#C0392B'},
+    {key:'technical', icon:'⚙️',lbl:'Technical', col:'#F4D03F',fill:'#D4AC0D'},
+    {key:'logical',   icon:'🧩',lbl:'Scenario',  col:'#82E0AA',fill:'#27AE60'},
+  ];
+
+  document.getElementById('tbgrid').innerHTML=types.map(t=>{
+    const tq=f.filter(q=>q.type===t.key);
+    const ta=tq.filter(q=>answers[q.id]!==undefined);
+    const tc2=ta.filter(q=>answers[q.id]===q.ans);
+    const tp=ta.length>0?Math.round((tc2.length/ta.length)*100):0;
+    return `<div class="tbc">
+      <div class="tbc-ico">${t.icon}</div>
+      <div class="tbc-lbl">${t.lbl}</div>
+      <div class="tbc-val" style="color:${t.col}">${ta.length>0?tp+'%':'—'}</div>
+      <div class="tbc-bar"><div class="tbc-fill" style="width:${tp}%;background:${t.fill}"></div></div>
+    </div>`;
+  }).join('');
+
+  const panel=document.getElementById('resultPanel');
+  panel.classList.add('vis');
+  panel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ── CONTROLS ─────────────────────────────────── */
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+}
+
+function shuffleReset(){
+  answers={};
+  for(let i=questions.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [questions[i],questions[j]]=[questions[j],questions[i]];
+  }
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetAll(){
+  answers={};questions=[...QS];
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>

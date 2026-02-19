@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AZ-104 — Manage Identities & Governance in Azure</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --em: #00C896;
+  --em-dark: #009970;
+  --em-light: #5FFFD4;
+  --em-dim: rgba(0,200,150,0.12);
+  --silver: #A8C4BC;
+  --bg: #030C08;
+  --bg2: #050F0A;
+  --surface: #0A1A12;
+  --surface2: #0D2018;
+  --surface3: #102416;
+  --border: #1A3526;
+  --border2: #1F4030;
+  --text: #DFF5EC;
+  --muted: #537B68;
+  --dim: #2A4A38;
+  --correct: #00C896;
+  --wrong: #FF5252;
+  --warn: #FFB020;
+
+  --tag-conceptual: #3B82F6;
+  --tag-technical: #00C896;
+  --tag-logical: #A855F7;
+  --tag-exam: #F59E0B;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND GEOMETRY ─────────────────────── */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.hex-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      60deg,
+      transparent,
+      transparent 30px,
+      rgba(0,200,150,0.015) 30px,
+      rgba(0,200,150,0.015) 31px
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      transparent,
+      transparent 30px,
+      rgba(0,200,150,0.015) 30px,
+      rgba(0,200,150,0.015) 31px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 30px,
+      rgba(0,200,150,0.015) 30px,
+      rgba(0,200,150,0.015) 31px
+    );
+}
+
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+}
+.orb1 { width:700px; height:700px; background: radial-gradient(circle, rgba(0,200,150,0.07) 0%, transparent 70%); top:-250px; left:-150px; }
+.orb2 { width:500px; height:500px; background: radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%); bottom:-150px; right:-150px; }
+.orb3 { width:350px; height:350px; background: radial-gradient(circle, rgba(168,85,247,0.04) 0%, transparent 70%); top:40%; right:5%; }
+
+.container {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 0 28px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── HEADER ──────────────────────────────────── */
+header { padding: 56px 0 28px; text-align: center; }
+
+.top-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 20px;
+  border-radius: 4px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--em);
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--em);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--em);
+  animation: blink 1.8s ease-in-out infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,200,150,0.5)} 50%{opacity:0.5;box-shadow:0 0 0 5px rgba(0,200,150,0)} }
+
+h1 {
+  font-size: clamp(26px, 5vw, 50px);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  margin-bottom: 14px;
+}
+
+.h1-line1 { display: block; color: var(--text); }
+.h1-line2 {
+  display: block;
+  background: linear-gradient(90deg, var(--em) 0%, var(--em-light) 55%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tagline {
+  font-family: 'Fira Code', monospace;
+  font-size: 11.5px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tg-sep { color: var(--dim); }
+
+/* ── STATS ───────────────────────────────────── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 32px 0 0;
+}
+
+.sc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 14px 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.25s;
+}
+
+.sc::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--em), transparent);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.sc:hover { border-color: var(--border2); transform: translateY(-3px); }
+.sc:hover::after { transform: scaleX(1); }
+
+.sc-num {
+  display: block;
+  font-size: 34px;
+  font-weight: 800;
+  font-family: 'Fira Code', monospace;
+  color: var(--em-light);
+  line-height: 1;
+  transition: color 0.3s;
+}
+
+.sc-label {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'Fira Code', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+}
+
+/* ── PROGRESS ────────────────────────────────── */
+.progress-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(3,12,8,0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 14px 0 12px;
+  border-bottom: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+.prog-track {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--em-dark), var(--em), var(--em-light));
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
+  position: relative;
+}
+
+.prog-fill::after {
+  content:'';
+  position:absolute; right:0; top:0; bottom:0; width:24px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25));
+}
+
+.prog-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.live-score { color: var(--em-light); font-weight: 700; font-size: 12px; }
+
+/* ── CONTROLS ────────────────────────────────── */
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.fb {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.fb:hover { border-color: var(--em); color: var(--em-light); }
+.fb.active { background: var(--em); border-color: var(--em); color: #000; font-weight: 700; }
+.fb.active.fc { background: var(--tag-conceptual); border-color: var(--tag-conceptual); color: #fff; }
+.fb.active.ft { background: var(--em); border-color: var(--em); color: #000; }
+.fb.active.fl { background: var(--tag-logical); border-color: var(--tag-logical); color: #fff; }
+
+.spacer { flex: 1; min-width: 8px; }
+
+.btn-go {
+  padding: 9px 22px;
+  border-radius: 7px;
+  border: none;
+  background: linear-gradient(135deg, var(--em-dark), var(--em));
+  color: #000;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.22s;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,200,150,0.2);
+}
+
+.btn-go:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,200,150,0.35); }
+.btn-go:active { transform: translateY(0); }
+
+.btn-out {
+  padding: 9px 20px;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-out:hover { border-color: var(--em); color: var(--em-light); }
+
+/* ── PART DIVIDER ────────────────────────────── */
+.pdiv {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 36px 0 18px;
+}
+
+.pdiv-line { flex:1; height:1px; background: var(--border); }
+
+.pdiv-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 18px;
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+.pdiv-icon { font-size: 15px; }
+
+.pdiv-text {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pdiv-cnt {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--em);
+  background: var(--em-dim);
+  border-radius: 3px;
+  padding: 1px 7px;
+}
+
+/* ── QUESTION CARD ───────────────────────────── */
+.qcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 26px 28px 22px;
+  margin-bottom: 12px;
+  transition: border-color 0.35s, background 0.35s, box-shadow 0.35s;
+  animation: risein 0.38s ease both;
+  position: relative;
+}
+
+.qcard::before {
+  content:'';
+  position:absolute;
+  top:0; left:20px; right:20px;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+}
+
+@keyframes risein {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.qcard.ok  { border-color:rgba(0,200,150,0.45); background:linear-gradient(135deg,var(--surface) 0%,rgba(0,200,150,0.04) 100%); box-shadow:0 0 28px rgba(0,200,150,0.06); }
+.qcard.err { border-color:rgba(255,82,82,0.4);  background:linear-gradient(135deg,var(--surface) 0%,rgba(255,82,82,0.04) 100%);  box-shadow:0 0 28px rgba(255,82,82,0.05); }
+
+.qmeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.qnum {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--dim);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+}
+
+.qtag {
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tc { background:rgba(59,130,246,0.14); color:#93C5FD; border:1px solid rgba(59,130,246,0.25); }
+.tt { background:rgba(0,200,150,0.12); color:var(--em); border:1px solid rgba(0,200,150,0.25); }
+.tl { background:rgba(168,85,247,0.14); color:#D8B4FE; border:1px solid rgba(168,85,247,0.25); }
+.te { background:rgba(245,158,11,0.14); color:#FCD34D; border:1px solid rgba(245,158,11,0.3); }
+
+.qstatus { font-size:16px; margin-left:auto; display:none; }
+
+.qtext {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 18px;
+  letter-spacing: -0.01em;
+}
+
+/* ── OPTIONS ─────────────────────────────────── */
+.opts { display:flex; flex-direction:column; gap:8px; }
+
+.opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.22,1,0.36,1);
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: left;
+  width: 100%;
+  color: #9ABEAD;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.opt:hover:not(.dis) {
+  border-color: var(--em);
+  background: rgba(0,200,150,0.07);
+  color: var(--text);
+  transform: translateX(5px);
+}
+
+.opt.cor  { border-color:var(--correct)!important; background:rgba(0,200,150,0.1)!important; color:var(--em-light)!important; }
+.opt.wrn  { border-color:var(--wrong)!important;   background:rgba(255,82,82,0.1)!important;  color:#FF8A8A!important; }
+.opt.dis  { cursor:default; }
+
+.okey {
+  min-width: 28px; height: 28px;
+  border-radius: 6px;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  display: flex; align-items:center; justify-content:center;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px; font-weight: 700;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: all 0.18s;
+}
+
+.opt.cor .okey { background:var(--correct); color:#000; border-color:var(--correct); }
+.opt.wrn .okey { background:var(--wrong);   color:#fff; border-color:var(--wrong); }
+.opt:hover:not(.dis) .okey { background:var(--em); color:#000; border-color:var(--em); }
+
+/* ── EXPLANATION ─────────────────────────────── */
+.expl {
+  display: none;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(0,200,150,0.06), rgba(59,130,246,0.03));
+  border: 1px solid rgba(0,200,150,0.2);
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: #7EC9AD;
+  font-family: 'Fira Code', monospace;
+}
+
+.expl.vis { display:block; animation:risein 0.3s ease; }
+
+.expl-hd {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--em);
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── RESULT PANEL ────────────────────────────── */
+.result {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 56px 44px;
+  text-align: center;
+  margin: 36px 0;
+  display: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.result::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 50% -5%, rgba(0,200,150,0.12) 0%, transparent 55%);
+  pointer-events:none;
+}
+
+.result.vis { display:block; animation:risein 0.55s ease; }
+
+.rtrophy { font-size:58px; display:block; margin-bottom:16px; }
+
+.rscore {
+  font-size: 92px;
+  font-weight: 900;
+  font-family: 'Fira Code', monospace;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-bottom: 10px;
+}
+
+.rse { background:linear-gradient(135deg,var(--em),var(--em-light),#3B82F6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.rsg { background:linear-gradient(135deg,var(--em-light),#A78BFA); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.rsa { background:linear-gradient(135deg,#FFB020,#FF6B35); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.rsp { background:linear-gradient(135deg,var(--wrong),#FF8A8A); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+.rverdict { font-size:20px; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; }
+.rmsg { font-size:13px; color:var(--muted); font-family:'Fira Code',monospace; margin-bottom:36px; }
+
+.rgrid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:12px; margin-bottom:24px;
+}
+
+.rgc {
+  padding:20px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+}
+
+.rgc .rnum { font-size:38px; font-weight:900; font-family:'Fira Code',monospace; }
+.rgc .rlbl { font-size:10px; color:var(--muted); font-family:'Fira Code',monospace; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px; }
+.rgc.rc .rnum { color:var(--correct); }
+.rgc.rw .rnum { color:var(--wrong); }
+.rgc.rp .rnum { color:var(--em-light); }
+
+.tbgrid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:10px; margin-bottom:32px;
+}
+
+.tbc {
+  padding:14px 10px;
+  border-radius:11px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+}
+
+.tbc-icon { font-size:18px; margin-bottom:6px; }
+.tbc-lbl  { font-size:9px; font-family:'Fira Code',monospace; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; }
+.tbc-val  { font-size:22px; font-weight:800; font-family:'Fira Code',monospace; color:var(--text); margin:4px 0 8px; }
+.tbc-bar  { height:4px; border-radius:2px; background:var(--border); overflow:hidden; }
+.tbc-fill { height:100%; border-radius:2px; transition:width 1.2s cubic-bezier(0.22,1,0.36,1); }
+
+.ract { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+
+/* ── FOOTER ──────────────────────────────────── */
+footer {
+  padding: 44px 0;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+}
+
+footer p { font-family:'Fira Code',monospace; font-size:11px; color:var(--dim); }
+
+/* ── SCROLLBAR ───────────────────────────────── */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--muted); }
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media(max-width:620px){
+  .stats-row { grid-template-columns:repeat(2,1fr); }
+  .rgrid,.tbgrid { grid-template-columns:1fr; }
+  .qcard { padding:20px 16px; }
+  .result { padding:36px 20px; }
+  .rscore { font-size:68px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="hex-overlay"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="container">
+
+  <header>
+    <div class="top-badge">
+      <div class="badge-dot"></div>
+      AZ-104 Module · Identity &amp; Governance
+    </div>
+    <h1>
+      <span class="h1-line1">Manage Identities &amp;</span>
+      <span class="h1-line2">Governance in Azure</span>
+    </h1>
+    <p class="tagline">
+      Microsoft Entra ID <span class="tg-sep">·</span>
+      RBAC <span class="tg-sep">·</span>
+      Azure Policy <span class="tg-sep">·</span>
+      SSPR <span class="tg-sep">·</span>
+      Subscriptions &amp; Management Groups
+    </p>
+  </header>
+
+  <div class="stats-row">
+    <div class="sc"><span class="sc-num" id="totalQ">65</span><span class="sc-label">Total Qs</span></div>
+    <div class="sc"><span class="sc-num" id="answeredQ">0</span><span class="sc-label">Answered</span></div>
+    <div class="sc"><span class="sc-num" id="correctQ">0</span><span class="sc-label">Correct</span></div>
+    <div class="sc"><span class="sc-num" id="pctQ">—</span><span class="sc-label">Score %</span></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="prog-track"><div class="prog-fill" id="progBar"></div></div>
+    <div class="prog-row">
+      <span id="progLabel">0 of 65 answered</span>
+      <span class="live-score" id="scoreLabel">Score: —</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="fb active"  onclick="setFilter('all',this)">All</button>
+    <button class="fb fc"      onclick="setFilter('conceptual',this)">📘 Conceptual</button>
+    <button class="fb ft"      onclick="setFilter('technical',this)">⚙️ Technical</button>
+    <button class="fb fl"      onclick="setFilter('logical',this)">🧩 Scenario</button>
+    <div class="spacer"></div>
+    <button class="btn-go"  onclick="shuffleReset()">🔀 Shuffle</button>
+    <button class="btn-out" onclick="resetAll()">↺ Reset</button>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <div class="result" id="resultPanel">
+    <span class="rtrophy" id="rtrophy">🏆</span>
+    <div class="rscore"   id="rscore">0%</div>
+    <div class="rverdict" id="rverdict">—</div>
+    <div class="rmsg"     id="rmsg">Keep going!</div>
+
+    <div class="rgrid">
+      <div class="rgc rc"><div class="rnum" id="rCorrect">0</div><div class="rlbl">Correct</div></div>
+      <div class="rgc rw"><div class="rnum" id="rWrong">0</div><div class="rlbl">Wrong</div></div>
+      <div class="rgc rp"><div class="rnum" id="rPct">0%</div><div class="rlbl">Accuracy</div></div>
+    </div>
+
+    <div class="tbgrid" id="tbgrid"></div>
+
+    <div class="ract">
+      <button class="btn-go"  onclick="shuffleReset()">🔀 Retake Shuffled</button>
+      <button class="btn-out" onclick="resetAll()">↺ Review All</button>
+    </div>
+  </div>
+
+  <footer><p>AZ-104 Exam Prep · Manage Identities &amp; Governance in Azure · 65 Questions</p></footer>
+</div>
+
+<script>
+/* ── BACKGROUND CANVAS ─────────────────────────── */
+(function(){
+  const cv = document.getElementById('bgCanvas');
+  const cx = cv.getContext('2d');
+  let W, H, pts = [], t = 0;
+
+  function resize(){
+    W = cv.width  = window.innerWidth;
+    H = cv.height = window.innerHeight;
+  }
+
+  function init(){
+    pts = [];
+    const n = Math.floor((W*H)/28000);
+    for(let i=0;i<n;i++) pts.push({
+      x: Math.random()*W, y: Math.random()*H,
+      vx:(Math.random()-.5)*.25, vy:(Math.random()-.5)*.25,
+      r: Math.random()*1.8+.6, ph:Math.random()*Math.PI*2
+    });
+  }
+
+  function frame(){
+    cx.clearRect(0,0,W,H);
+    t += .006;
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      const pulse = .5+.5*Math.sin(t+p.ph);
+      cx.beginPath();
+      cx.arc(p.x,p.y,p.r*pulse,0,Math.PI*2);
+      cx.fillStyle=`rgba(0,200,150,${.25*pulse})`;
+      cx.fill();
+    });
+    const D=110;
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<D){
+          const a=(1-d/D)*.18;
+          cx.beginPath();
+          cx.moveTo(pts[i].x,pts[i].y);
+          cx.lineTo(pts[j].x,pts[j].y);
+          cx.strokeStyle=`rgba(0,200,150,${a})`;
+          cx.lineWidth=.7;
+          cx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  resize(); init(); frame();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+
+/* ── QUESTION DATA ───────────────────────────────── */
+const QS = [
+
+  // ══════════════════════════════════════════
+  // PART 1 — Understand Microsoft Entra ID
+  // ══════════════════════════════════════════
+  {id:1,part:"Part 1: Understand Microsoft Entra ID",icon:"🪪",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Microsoft Entra ID and what does it replace?",
+   ex:"Microsoft Entra ID is Microsoft's cloud-based Identity & Access Management service. It is the rebrand of Azure Active Directory (Azure AD). It manages sign-ins, users, groups, and access to resources across Microsoft 365, Azure, and thousands of SaaS apps.",
+   opts:["A replacement for on-premises Windows Server","Microsoft's cloud-based Identity & Access Management service, the rebrand of Azure Active Directory","A new DNS service for Azure","A security firewall for Azure subscriptions"],
+   ans:1},
+
+  {id:2,part:"Part 1: Understand Microsoft Entra ID",icon:"🪪",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is the difference between Microsoft Entra ID (cloud) and Active Directory Domain Services (AD DS)?",
+   ex:"AD DS is on-premises, uses Kerberos/NTLM, manages domain-joined PCs. Entra ID is cloud-based, uses OAuth/OIDC, manages cloud identities, SaaS apps, and web access — not domain-joined PCs.",
+   opts:["They are identical — Entra ID is just hosted in the cloud","AD DS is on-premises using Kerberos for PCs; Entra ID is cloud-based using OAuth/OIDC for apps and web services","AD DS manages SaaS apps; Entra ID manages local servers","Entra ID is only for Microsoft 365, not Azure"],
+   ans:1},
+
+  {id:3,part:"Part 1: Understand Microsoft Entra ID",icon:"🪪",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is a Microsoft Entra ID Tenant?",
+   ex:"A Tenant is a dedicated, isolated instance of Entra ID for your organisation. When a company signs up for Azure or Microsoft 365, a tenant is automatically created. Think of it as your organisation's private identity directory in the cloud.",
+   opts:["A billing container for Azure resources","A dedicated, isolated instance of Microsoft Entra ID representing a single organisation","A type of user account","An Azure subscription"],
+   ans:1},
+
+  {id:4,part:"Part 1: Understand Microsoft Entra ID",icon:"🪪",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Microsoft Entra ID Connect used for?",
+   ex:"Entra ID Connect (formerly Azure AD Connect) synchronises on-premises Active Directory identities to Microsoft Entra ID — so users can log in to both on-prem and cloud resources with the same credentials. This is hybrid identity.",
+   opts:["Creating VPNs between on-premises and Azure","Synchronising on-premises Active Directory users and groups to Microsoft Entra ID for hybrid identity","Connecting Azure subscriptions to management groups","Enabling SSO between different cloud tenants"],
+   ans:1},
+
+  {id:5,part:"Part 1: Understand Microsoft Entra ID",icon:"🪪",
+   type:"technical",cat:"Technical",
+   q:"What are the three Microsoft Entra ID licence tiers and what does P2 add over P1?",
+   ex:"Free: basic SSO, MFA. P1 (included in M365 Business Premium): Conditional Access, hybrid identity. P2 adds: Identity Protection (risk-based sign-in policies) + Privileged Identity Management (just-in-time admin access).",
+   opts:["Free adds all features; P1 and P2 are the same","Free provides basic SSO/MFA; P1 adds Conditional Access; P2 adds Identity Protection and Privileged Identity Management","P2 only increases user limits","P1 adds PIM; P2 adds Conditional Access"],
+   ans:1},
+
+  {id:6,part:"Part 1: Understand Microsoft Entra ID",icon:"🪪",
+   type:"technical",cat:"Technical",
+   q:"What is a Guest User (B2B) in Microsoft Entra ID?",
+   ex:"B2B (Business-to-Business) lets you invite external users (partners, vendors) into your tenant using their own identities (Microsoft, Google, corporate). They appear as Guest users with limited default permissions.",
+   opts:["A temporary admin account","An external user from another organisation invited into your tenant, authenticating with their own identity provider","A service account for applications","A read-only user for compliance auditing"],
+   ans:1},
+
+  {id:7,part:"Part 1: Understand Microsoft Entra ID",icon:"🪪",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your company has on-premises AD DS with 5,000 users and is migrating to Azure. Users need to use their existing domain credentials to access Microsoft 365. What should you implement?",
+   ex:"Microsoft Entra ID Connect syncs on-prem AD users to Entra ID, enabling the same credentials to work for both on-prem resources and Microsoft 365 — the classic hybrid identity scenario.",
+   opts:["Create all 5,000 users manually in Entra ID","Deploy Microsoft Entra ID Connect to sync on-premises AD to Entra ID","Create a new Azure AD tenant for cloud users","Use separate passwords for cloud and on-prem"],
+   ans:1},
+
+  {id:8,part:"Part 1: Understand Microsoft Entra ID",icon:"🪪",
+   type:"logical",cat:"Logical/Scenario",
+   q:"A partner company needs access to your SharePoint Online without creating new accounts in your tenant. What is the best approach?",
+   ex:"B2B External Identities lets partners sign in with their OWN company credentials. You invite them as Guest users — no need to create and manage dedicated accounts for them in your tenant.",
+   opts:["Create accounts for them in your tenant and share passwords","Use B2B External Identities to invite them as Guest users using their own organisational credentials","Set up a VPN for the partner company","Create a separate Entra ID tenant for external users"],
+   ans:1},
+
+  // ══════════════════════════════════════════
+  // PART 2 — Create, Configure & Manage Identities
+  // ══════════════════════════════════════════
+  {id:9,part:"Part 2: Create, Configure & Manage Identities",icon:"👥",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are the two types of Groups in Microsoft Entra ID and what is each used for?",
+   ex:"Security Groups: used for granting access to resources (apps, SharePoint sites, Azure resources). Microsoft 365 Groups: used for collaboration — shared mailbox, Teams channel, SharePoint, calendar. Both can contain users and service principals.",
+   opts:["Admin Groups and User Groups","Security Groups (for access control) and Microsoft 365 Groups (for collaboration with shared mailbox, Teams, SharePoint)","Static Groups and Legacy Groups","Global Groups and Local Groups"],
+   ans:1},
+
+  {id:10,part:"Part 2: Create, Configure & Manage Identities",icon:"👥",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is the difference between Assigned and Dynamic membership in Entra ID groups?",
+   ex:"Assigned: admins manually add/remove members. Dynamic: membership automatically updates based on user attributes (e.g., department='Sales') — great for large organisations where manual management doesn't scale.",
+   opts:["Assigned groups are for guests; Dynamic groups are for employees","Assigned: manually managed membership; Dynamic: automatically manages membership based on user attribute rules","Dynamic groups are for Microsoft 365 only","Assigned groups support MFA; Dynamic groups don't"],
+   ans:1},
+
+  {id:11,part:"Part 2: Create, Configure & Manage Identities",icon:"👥",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is a Service Principal in Microsoft Entra ID?",
+   ex:"A Service Principal is the identity for an application or automated process — not a human user. Like a username/password for an app. When you register an app in Entra ID, a Service Principal is created to represent it.",
+   opts:["A special admin user account","The identity representation of an application or service in Entra ID, used for app authentication and authorization","A legacy name for a User account","A role assignment for a managed service"],
+   ans:1},
+
+  {id:12,part:"Part 2: Create, Configure & Manage Identities",icon:"👥",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is a Managed Identity in Azure, and why is it better than storing credentials?",
+   ex:"Managed Identity is an automatically managed Service Principal for Azure resources (VMs, App Services, etc.). It eliminates the need to store connection strings or secrets — Azure handles credential rotation automatically.",
+   opts:["A user account managed by the IT department","An automatically managed identity for Azure resources that eliminates the need to store or manage credentials","An identity synced from on-premises AD","A read-only identity for monitoring"],
+   ans:1},
+
+  {id:13,part:"Part 2: Create, Configure & Manage Identities",icon:"👥",
+   type:"technical",cat:"Technical",
+   q:"What is the difference between a System-assigned and User-assigned Managed Identity?",
+   ex:"System-assigned: created and tied to ONE specific resource; deleted when that resource is deleted. User-assigned: created independently, can be assigned to MULTIPLE resources, persists independently.",
+   opts:["They are identical — just different names","System-assigned: tied to one resource, deleted with it; User-assigned: standalone identity that can be shared across multiple resources","System-assigned is for VMs only; User-assigned is for App Services only","User-assigned requires P2 licence; System-assigned is free"],
+   ans:1},
+
+  {id:14,part:"Part 2: Create, Configure & Manage Identities",icon:"👥",
+   type:"technical",cat:"Technical",
+   q:"What is Bulk User Creation in Microsoft Entra ID and how is it done?",
+   ex:"Bulk operations allow admins to create, invite, or delete thousands of users at once using a CSV file template. This is much more efficient than creating users one by one in the Azure portal.",
+   opts:["Users can self-register in bulk using a link","Admins upload a CSV file with user data to create, invite, or delete multiple users at once","Using PowerShell scripts only","Syncing users from an external LDAP directory"],
+   ans:1},
+
+  {id:15,part:"Part 2: Create, Configure & Manage Identities",icon:"👥",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your Azure VM needs to read secrets from Azure Key Vault without storing credentials in the application code. What is the best solution?",
+   ex:"Assign a System-assigned Managed Identity to the VM, then grant that identity access to Key Vault. The VM can authenticate to Key Vault automatically — no secrets in code, no credential management.",
+   opts:["Store the Key Vault connection string in application settings","Create a service principal and store its credentials in the VM","Enable a System-assigned Managed Identity on the VM and grant it Key Vault access","Use a Guest User account for the VM"],
+   ans:2},
+
+  {id:16,part:"Part 2: Create, Configure & Manage Identities",icon:"👥",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You need to automatically add all users with job title 'Engineer' to a security group for accessing a development subscription. What is the most efficient approach?",
+   ex:"Dynamic Security Group with a membership rule like (user.jobTitle -eq 'Engineer') — users are automatically added or removed as their job title changes. No manual admin work needed.",
+   opts:["Manually add every engineer to the group","Create a Dynamic Security Group with a membership rule based on the jobTitle attribute","Run a weekly script to sync the group","Use a Conditional Access policy to manage group membership"],
+   ans:1},
+
+  // ══════════════════════════════════════════
+  // PART 3 — Core Azure Architecture
+  // ══════════════════════════════════════════
+  {id:17,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is the Azure Management Hierarchy from top to bottom?",
+   ex:"Root Management Group → Management Groups → Subscriptions → Resource Groups → Resources. This hierarchy lets you apply governance (policies, RBAC) at different levels — applying at a higher level cascades down to everything below it.",
+   opts:["Resources → Resource Groups → Subscriptions → Tenant","Tenant → Management Groups → Subscriptions → Resource Groups → Resources (each level inherits from above)","Subscriptions → Management Groups → Resource Groups → Resources","Resource Groups → Subscriptions → Management Groups → Tenant"],
+   ans:1},
+
+  {id:18,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is an Azure Subscription?",
+   ex:"An Azure Subscription is a billing and access boundary. All resources you create belong to a subscription. You can have multiple subscriptions (e.g., one for Dev, one for Prod) to separate billing, access control, and quotas.",
+   opts:["A user account for Azure","A billing and access boundary that contains Azure resources — all costs are billed to the subscription","A type of resource group","An Azure licence for Microsoft 365"],
+   ans:1},
+
+  {id:19,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is a Resource Group in Azure?",
+   ex:"A Resource Group is a logical container for related Azure resources. Everything in a resource group should share the same lifecycle — deploy together, manage together, delete together (e.g., all resources for a web app).",
+   opts:["A billing container like a subscription","A logical container that groups related Azure resources sharing the same lifecycle — created, managed, and deleted together","A type of Azure Virtual Network","A management group for subscriptions"],
+   ans:1},
+
+  {id:20,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is a Management Group in Azure?",
+   ex:"Management Groups sit above subscriptions. They let you apply policies and RBAC across multiple subscriptions at once — e.g., apply a 'no public IPs' policy to all production subscriptions in one action.",
+   opts:["A tool for managing Azure support tickets","A container above subscriptions used to apply Azure Policy and RBAC across multiple subscriptions","A security group for Entra ID","A billing rollup for multiple accounts"],
+   ans:1},
+
+  {id:21,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is an Azure Region and an Availability Zone?",
+   ex:"Region: A geographic area with one or more data centres (e.g., UK South). Availability Zone: Physically separate data centres within ONE region with independent power/cooling/networking. Deploying across zones protects against data centre failures.",
+   opts:["They are the same thing","Region: geographic location with data centres; Availability Zone: physically separate facilities within one region for high availability against data centre failure","Region is a billing concept; Availability Zones are network zones","Availability Zones are different countries"],
+   ans:1},
+
+  {id:22,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"technical",cat:"Technical",
+   q:"What is a Resource Lock in Azure and what are the two types?",
+   ex:"Resource Locks prevent accidental deletion or modification. CanNotDelete: read and modify allowed, but delete blocked. ReadOnly: no changes, no deletes — treat the resource like read-only. Locks override RBAC permissions.",
+   opts:["A permission type in RBAC","A protection mechanism: CanNotDelete (blocks deletion only) and ReadOnly (blocks all changes and deletions) — overrides RBAC","A network security rule","A type of Azure Policy effect"],
+   ans:1},
+
+  {id:23,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"technical",cat:"Technical",
+   q:"What are Azure Resource Tags used for?",
+   ex:"Tags are name-value pairs (e.g., Environment=Production, CostCenter=Finance) attached to resources. Used for: cost reporting/chargeback, organising resources, automation, filtering in Azure Policy.",
+   opts:["A way to set access permissions on resources","Name-value metadata pairs attached to resources used for cost management, organisation, filtering, and automation","Labels used to set resource priority in Azure","Billing codes automatically generated by Azure"],
+   ans:1},
+
+  {id:24,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your company has 3 teams (Dev, Test, Production) each needing separate billing and distinct access control. What Azure construct should each team have?",
+   ex:"Each environment (Dev/Test/Prod) should have its own Subscription — separate billing, independent access control, separate resource quotas. Resource Groups are too granular; Management Groups organise subscriptions but don't provide billing separation.",
+   opts:["One subscription with separate resource groups for each team","A separate Subscription per environment for independent billing, access control, and quota management","One tenant with separate Entra ID directories","A Management Group for each team"],
+   ans:1},
+
+  {id:25,part:"Part 3: Azure Architecture — Subscriptions & Management",icon:"🏗️",
+   type:"logical",cat:"Logical/Scenario",
+   q:"A critical production database should never be accidentally deleted by any admin. How do you protect it?",
+   ex:"Apply a CanNotDelete Resource Lock directly on the database resource. Even the subscription owner can't delete it without first removing the lock — adding a deliberate extra step to prevent accidents.",
+   opts:["Remove all RBAC permissions for the resource","Apply a CanNotDelete Resource Lock on the database resource","Move the database to a separate subscription","Enable soft delete only"],
+   ans:1},
+
+  // ══════════════════════════════════════════
+  // PART 4 — Azure Policy & Initiatives
+  // ══════════════════════════════════════════
+  {id:26,part:"Part 4: Azure Policy & Initiatives",icon:"📋",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Azure Policy?",
+   ex:"Azure Policy is a governance service that enforces organisational standards on Azure resources. It evaluates resources and flags non-compliant ones, or prevents non-compliant resources from being created.",
+   opts:["A network firewall service","A governance service that creates and enforces rules (policies) on Azure resources to ensure compliance with organisational standards","A billing management tool","A backup policy service"],
+   ans:1},
+
+  {id:27,part:"Part 4: Azure Policy & Initiatives",icon:"📋",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are the main Azure Policy Effects and what does each do?",
+   ex:"Deny: blocks the resource creation/modification if non-compliant. Audit: allows but flags non-compliance (logs it). AuditIfNotExists: audits if a related resource doesn't exist. DeployIfNotExists: auto-deploys a missing related resource. Append: adds fields.",
+   opts:["Allow and Block only","Deny (blocks action), Audit (allows but logs non-compliance), DeployIfNotExists (auto-deploys missing resources), Append (adds required fields)","Warn, Error, and Info","Enable and Disable only"],
+   ans:1},
+
+  {id:28,part:"Part 4: Azure Policy & Initiatives",icon:"📋",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is an Azure Policy Initiative (Policy Set)?",
+   ex:"An Initiative is a collection of related policies grouped together to achieve a broader compliance goal. Example: the 'ISO 27001' initiative bundles 80+ individual policies. You assign one initiative instead of assigning 80 policies individually.",
+   opts:["A single Azure Policy with multiple effects","A named collection of Azure Policies grouped to achieve a specific compliance goal, assigned as one unit","An Azure security baseline","A subscription-level billing policy"],
+   ans:1},
+
+  {id:29,part:"Part 4: Azure Policy & Initiatives",icon:"📋",
+   type:"conceptual",cat:"Conceptual",
+   q:"At which scopes can you assign an Azure Policy?",
+   ex:"Azure Policy can be assigned at: Management Group, Subscription, Resource Group, or individual Resource level. Policies assigned higher up cascade to everything below — a policy at Management Group level applies to all subscriptions beneath it.",
+   opts:["Resource Group only","Management Group, Subscription, Resource Group, or Resource — policies cascade down the hierarchy","Subscription level only","Tenant level only"],
+   ans:1},
+
+  {id:30,part:"Part 4: Azure Policy & Initiatives",icon:"📋",
+   type:"technical",cat:"Technical",
+   q:"What is a Policy Exemption and when would you use it?",
+   ex:"An Exemption marks a specific resource or scope as excluded from a policy assignment. Used for legitimate exceptions — e.g., a dev/test environment exempt from the 'require HTTPS' policy while still enforcing it everywhere else.",
+   opts:["Deleting a policy assignment","A way to exclude specific resources or scopes from a policy assignment for legitimate exceptions","Turning off all policies temporarily","A way to override a Deny effect"],
+   ans:1},
+
+  {id:31,part:"Part 4: Azure Policy & Initiatives",icon:"📋",
+   type:"technical",cat:"Technical",
+   q:"What is the difference between Azure Policy and Azure RBAC?",
+   ex:"Azure Policy controls WHAT can be done with resources (e.g., 'you can only create VMs in UK South'). RBAC controls WHO can perform actions (e.g., 'this person can create VMs'). They complement each other — both must be satisfied.",
+   opts:["They are identical governance tools","Azure Policy enforces resource properties and compliance (what resources can be); RBAC controls who has permission to perform actions — both must allow an action","Azure Policy is for billing; RBAC is for security","RBAC applies to subscriptions; Policy applies to resource groups only"],
+   ans:1},
+
+  {id:32,part:"Part 4: Azure Policy & Initiatives",icon:"📋",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your organisation wants to ensure ALL Azure resources in all subscriptions have the 'CostCenter' tag. Non-compliant resources should be automatically tagged when they're missing it. Which policy effect achieves this?",
+   ex:"The Append effect adds the required tag field automatically. Alternatively, Modify effect can add or replace tags on non-compliant resources. Audit would only report the issue without fixing it.",
+   opts:["Deny — block any resource without the tag","Audit — log resources missing the tag","Modify or Append — automatically add the CostCenter tag to resources that are missing it","DeployIfNotExists — deploy a tagging script"],
+   ans:2},
+
+  {id:33,part:"Part 4: Azure Policy & Initiatives",icon:"📋",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You need to prevent any developer from creating Azure resources outside of the UK South and UK West regions. What is the most efficient way to enforce this across all development subscriptions?",
+   ex:"Assign the built-in 'Allowed Locations' Azure Policy with Deny effect at the Management Group level (if one exists for dev subscriptions) or at each subscription. New resources in other regions will be blocked at creation time.",
+   opts:["Remove developers' Contributor role","Assign the 'Allowed Locations' Azure Policy with Deny effect to the development subscriptions or management group","Email developers the list of approved regions","Configure Network Security Groups to block traffic from other regions"],
+   ans:1},
+
+  // ══════════════════════════════════════════
+  // PART 5 — Azure RBAC
+  // ══════════════════════════════════════════
+  {id:34,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Azure RBAC and what problem does it solve?",
+   ex:"Azure RBAC is an authorisation system built into Azure. It controls WHO can do WHAT to WHICH resources. Instead of giving everyone full access, you assign specific roles — 'this person can only read VMs in this resource group'.",
+   opts:["A tool for encrypting Azure storage","An authorisation system that controls who (security principal) can do what (role) to which Azure resources (scope)","A network access control list","A billing access control system"],
+   ans:1},
+
+  {id:35,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are the four fundamental built-in Azure RBAC roles?",
+   ex:"Owner: full control + manage access. Contributor: create/manage resources but CANNOT assign roles. Reader: view resources only. User Access Administrator: manage access only, cannot manage resources.",
+   opts:["Admin, Power User, User, Guest","Owner (full control), Contributor (create/manage, no role assignment), Reader (view only), User Access Administrator (manage access only)","Global Admin, Billing Admin, Support Admin, Read Admin","Super Admin, Editor, Viewer, Operator"],
+   ans:1},
+
+  {id:36,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are the three components of an Azure RBAC Role Assignment?",
+   ex:"Every role assignment has: Security Principal (who — user/group/service principal/managed identity), Role Definition (what — list of permissions), Scope (where — management group/subscription/resource group/resource).",
+   opts:["User, Password, Resource","Security Principal (who), Role Definition (what permissions), Scope (where it applies)","Resource, Action, Effect","Owner, Resource, Location"],
+   ans:1},
+
+  {id:37,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"conceptual",cat:"Conceptual",
+   q:"How does RBAC Inheritance work in Azure?",
+   ex:"Access granted at a higher scope flows DOWN. If you give someone Reader on a Subscription, they automatically have Reader on all Resource Groups and Resources within it. Assign at the highest scope needed to avoid repetition.",
+   opts:["RBAC only applies where explicitly set — no inheritance","Access granted at a higher scope (e.g., subscription) automatically cascades to all child scopes (resource groups, resources) below it","RBAC is inherited upward — child permissions flow to parents","Inheritance only applies between resource groups, not subscriptions"],
+   ans:1},
+
+  {id:38,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"technical",cat:"Technical",
+   q:"What is the difference between a built-in role and a custom role in Azure RBAC?",
+   ex:"Built-in roles: pre-defined by Microsoft (Owner, Contributor, Reader + hundreds of service-specific roles). Custom roles: you define exactly which permissions (actions/notActions) to include — used when built-in roles are too broad or too restrictive.",
+   opts:["Built-in roles can be deleted; custom roles cannot","Built-in roles are pre-defined by Microsoft; custom roles allow you to define a precise set of permitted actions when built-in roles don't fit your needs","Custom roles are only available with P2 licence","Built-in roles apply at subscription level only"],
+   ans:1},
+
+  {id:39,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"technical",cat:"Technical",
+   q:"In Azure RBAC role definitions, what do 'Actions', 'NotActions', and 'DataActions' control?",
+   ex:"Actions: management operations allowed (e.g., start a VM). NotActions: excluded from Actions (e.g., delete). DataActions: operations on data inside a resource (e.g., read blob data). NotDataActions: excluded data operations. Net effect = Actions minus NotActions.",
+   opts:["Actions=create, NotActions=delete, DataActions=read","Actions: management plane permissions; NotActions: management plane exclusions; DataActions: data plane permissions (inside resource data); NotDataActions: data exclusions","Actions apply to ARM; NotActions apply to RBAC; DataActions apply to networks","They are aliases for Allow, Deny, and Audit"],
+   ans:1},
+
+  {id:40,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"technical",cat:"Technical",
+   q:"What happens when a user has multiple RBAC role assignments that conflict (one allows, one seems more restrictive)?",
+   ex:"RBAC is purely additive — all role assignments are COMBINED (union of permissions). There is NO deny within RBAC itself. The exception: Resource Locks and Azure Policy Deny effects CAN block actions even if RBAC allows them.",
+   opts:["The most restrictive role always wins","RBAC permissions are additive — all assigned roles are combined. Deny only comes from Resource Locks or Azure Policy, not from conflicting RBAC roles","The most recently assigned role overrides older ones","Conflicting roles cause an error"],
+   ans:1},
+
+  {id:41,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"logical",cat:"Logical/Scenario",
+   q:"A developer needs to deploy VMs and manage storage in a resource group but must NOT be able to assign roles to others. Which built-in RBAC role should you assign?",
+   ex:"Contributor can create and manage all resources but CANNOT assign roles. Owner can assign roles, which is too much. Reader is read-only. Contributor is the perfect fit.",
+   opts:["Owner","User Access Administrator","Reader","Contributor"],
+   ans:3},
+
+  {id:42,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your support team needs to view all resources across all subscriptions but must not be able to make any changes. What is the most efficient way to grant this?",
+   ex:"Assign the Reader role at the Root Management Group or top-level Management Group. This cascades to all subscriptions and resources below — one assignment covers everything, avoiding per-subscription repetition.",
+   opts:["Assign Reader to every individual resource group","Assign Reader role at the Management Group level so it cascades to all subscriptions and resources","Give them Owner on a test subscription","Create a custom role for viewing only"],
+   ans:1},
+
+  {id:43,part:"Part 5: Azure Role-Based Access Control (RBAC)",icon:"🔐",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Exam Trap: A user is Contributor on a subscription but cannot delete a production resource group. Why?",
+   ex:"A Resource Lock (CanNotDelete or ReadOnly) overrides RBAC. Even with Contributor or Owner permissions, you cannot delete a locked resource without first removing the lock — which itself requires appropriate permissions.",
+   opts:["Contributor doesn't allow deletion by default","The user needs Owner role to delete resource groups","A Resource Lock (CanNotDelete or ReadOnly) is applied — Locks override RBAC permissions","The subscription has expired"],
+   ans:2},
+
+  // ══════════════════════════════════════════
+  // PART 6 — Self-Service Password Reset (SSPR)
+  // ══════════════════════════════════════════
+  {id:44,part:"Part 6: Microsoft Entra Self-Service Password Reset (SSPR)",icon:"🔑",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Microsoft Entra Self-Service Password Reset (SSPR)?",
+   ex:"SSPR allows users to reset their own passwords or unlock their accounts WITHOUT calling the IT helpdesk. Users verify their identity using pre-registered authentication methods (phone, email, authenticator app) and reset their own password.",
+   opts:["A tool for admins to reset user passwords","A feature that allows users to reset their own passwords and unlock accounts using pre-registered authentication methods, without IT helpdesk involvement","An automatic password rotation policy","A MFA registration process"],
+   ans:1},
+
+  {id:45,part:"Part 6: Microsoft Entra Self-Service Password Reset (SSPR)",icon:"🔑",
+   type:"conceptual",cat:"Conceptual",
+   q:"What authentication methods can be used to verify identity in Microsoft Entra SSPR?",
+   ex:"SSPR supports: Mobile phone (SMS code), Mobile app notification (Authenticator), Mobile app code (TOTP), Office phone, Email (external), Security questions. Admins configure which methods are available and how many are required.",
+   opts:["Only email verification is supported","Mobile phone (SMS), Authenticator app (notification/code), Office phone, External email, and Security questions — admins choose which are available","Only security questions are allowed","Biometric verification only"],
+   ans:1},
+
+  {id:46,part:"Part 6: Microsoft Entra Self-Service Password Reset (SSPR)",icon:"🔑",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are the three SSPR scope options when enabling it in Entra ID?",
+   ex:"None: SSPR disabled for all users. All: SSPR enabled for every user in the tenant. Selected: SSPR enabled only for members of a specific security group — ideal for piloting SSPR before full rollout.",
+   opts:["Enabled, Disabled, Preview","None (disabled), All (all users), Selected (specific security group only) — allowing staged rollout","Active, Inactive, Limited","Basic, Standard, Premium"],
+   ans:1},
+
+  {id:47,part:"Part 6: Microsoft Entra Self-Service Password Reset (SSPR)",icon:"🔑",
+   type:"technical",cat:"Technical",
+   q:"What is Password Writeback in the context of SSPR?",
+   ex:"Password Writeback is a feature of Entra ID Connect. When a user resets their cloud password via SSPR, the new password is automatically written back to the on-premises Active Directory — keeping cloud and on-prem passwords in sync.",
+   opts:["A feature that saves password history in the cloud","A capability of Entra ID Connect that synchronises cloud password resets back to on-premises Active Directory in hybrid environments","A tool that generates strong passwords automatically","An audit log feature for password changes"],
+   ans:1},
+
+  {id:48,part:"Part 6: Microsoft Entra Self-Service Password Reset (SSPR)",icon:"🔑",
+   type:"technical",cat:"Technical",
+   q:"How many authentication methods should be required for SSPR — and what is Microsoft's recommendation?",
+   ex:"Microsoft recommends requiring 2 authentication methods for SSPR to balance security and usability. One method is weaker (if one method is compromised, the account is vulnerable). Two provides good assurance without excessive friction.",
+   opts:["Always require 3 methods for maximum security","Require 1 method for simplicity","Microsoft recommends requiring 2 authentication methods — balancing security with ease of use","Require all available methods for zero-trust compliance"],
+   ans:2},
+
+  {id:49,part:"Part 6: Microsoft Entra Self-Service Password Reset (SSPR)",icon:"🔑",
+   type:"technical",cat:"Technical",
+   q:"What Microsoft Entra ID licence is required to use SSPR for cloud-only users?",
+   ex:"SSPR for cloud-only users requires at minimum Microsoft Entra ID P1 (or Microsoft 365 Business Premium). SSPR with Password Writeback to on-premises AD requires Entra ID P1 or P2. The free tier does NOT include SSPR.",
+   opts:["Microsoft Entra ID Free is sufficient","Microsoft Entra ID P1 is the minimum licence for SSPR for cloud-only users; P1 is also required for Password Writeback","SSPR requires P2 licence","No licence needed — SSPR is always enabled"],
+   ans:1},
+
+  {id:50,part:"Part 6: Microsoft Entra Self-Service Password Reset (SSPR)",icon:"🔑",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Users at your company are in a hybrid environment (synced from on-prem AD). They reset their password via SSPR, but the new password doesn't work when logging into on-premises systems. What is missing?",
+   ex:"Password Writeback is not configured. Without it, SSPR only resets the cloud password in Entra ID — the on-prem AD password remains unchanged. Enable Password Writeback in Entra ID Connect to sync the reset back to on-prem AD.",
+   opts:["Users need Entra ID P2 instead of P1","SSPR needs to be re-enabled","Password Writeback must be configured in Entra ID Connect to sync cloud password resets to the on-premises Active Directory","The on-prem AD domain controller must be joined to Azure"],
+   ans:2},
+
+  {id:51,part:"Part 6: Microsoft Entra Self-Service Password Reset (SSPR)",icon:"🔑",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You want to pilot SSPR with just the IT department (50 people) before rolling it out to all 2,000 employees. How do you configure this?",
+   ex:"Set SSPR scope to 'Selected' and choose the IT department security group. Only members of that group can use SSPR. The rest of the organisation is unaffected until you expand the scope or switch to 'All'.",
+   opts:["Create a separate tenant for the IT department","Enable SSPR for 'All' and then exclude non-IT users using Conditional Access","Set SSPR scope to 'Selected' and assign the IT department security group","Manually enable SSPR on each IT user's account"],
+   ans:2},
+
+  // ══════════════════════════════════════════
+  // BONUS — Cross-Topic Exam Traps
+  // ══════════════════════════════════════════
+  {id:52,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"logical",cat:"Exam Trap",
+   q:"Exam Trap: What is the key difference between Azure Policy and Azure RBAC? When does each apply?",
+   ex:"RBAC = access control (who can perform actions). Azure Policy = governance (what properties resources must have). You need BOTH. A user with Contributor RBAC can still be blocked by a Deny Policy. Neither replaces the other.",
+   opts:["They are interchangeable — use whichever you prefer","RBAC controls who can take actions on resources; Azure Policy enforces what properties resources must have — both must pass for an action to succeed","Azure Policy applies first; if it allows, RBAC is skipped","RBAC is for users; Azure Policy is for service accounts"],
+   ans:1},
+
+  {id:53,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"logical",cat:"Exam Trap",
+   q:"Exam Trap: A user has Owner role on a subscription but cannot modify a virtual network. What is the most likely cause?",
+   ex:"A ReadOnly Resource Lock on the virtual network prevents modification even for Owner role. Locks override all RBAC — you must remove the lock before making changes (which itself requires appropriate permissions).",
+   opts:["Owner doesn't include network modification permissions","The subscription is in a read-only billing period","A ReadOnly Resource Lock is applied to the virtual network — Locks override RBAC including Owner","The virtual network is in a different tenant"],
+   ans:2},
+
+  {id:54,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"logical",cat:"Exam Trap",
+   q:"Exam Trap: What is the difference between a Management Group and a Resource Group?",
+   ex:"Management Group: organises SUBSCRIPTIONS. Used for applying governance across multiple subscriptions. Resource Group: organises RESOURCES within a subscription. They operate at completely different levels of the hierarchy.",
+   opts:["Management Groups hold resources; Resource Groups hold subscriptions","Management Groups organise subscriptions for governance at scale; Resource Groups organise related resources within a single subscription","They are the same — just different names","Management Groups are for billing; Resource Groups are for security"],
+   ans:1},
+
+  {id:55,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is the Azure Activity Log and how is it different from Diagnostic Logs?",
+   ex:"Activity Log: records subscription-level MANAGEMENT operations — who created/deleted/modified resources, RBAC changes, policy compliance. Automatically enabled, kept 90 days. Diagnostic Logs: resource-level operational logs — specific to each resource type.",
+   opts:["They are the same thing","Activity Log records subscription-level management operations (create/delete/RBAC); Diagnostic Logs record resource-level operational details — both are stored in Azure Monitor","Activity Log is for billing; Diagnostic Logs are for security","Activity Log is only for virtual machines"],
+   ans:1},
+
+  {id:56,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Microsoft Entra Privileged Identity Management (PIM) and why is it important for governance?",
+   ex:"PIM enforces just-in-time privileged access. Instead of being permanently a Global Admin (dangerous), PIM requires you to activate the role when needed, provide justification, get approval, and sets a time limit. This minimises standing privilege.",
+   opts:["A tool for managing user passwords","A just-in-time access system for privileged roles that requires activation, justification, approval, and time limits — minimising standing elevated access","A network access control system","A compliance reporting dashboard"],
+   ans:1},
+
+  {id:57,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Conditional Access in Microsoft Entra ID and how does it relate to governance?",
+   ex:"Conditional Access enforces access control policies: IF [condition] THEN [grant/block/require MFA]. Conditions: user/group, location, device compliance, app, sign-in risk. It's the primary enforcement point for Zero Trust in Entra ID.",
+   opts:["A type of Azure Policy for resource governance","An Entra ID feature that enforces context-aware access policies based on conditions like location, device health, and risk level — the Zero Trust enforcement engine","A firewall rule system","A GDPR compliance tool"],
+   ans:1},
+
+  {id:58,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your organisation needs to ensure that all Azure Virtual Machines automatically have a specific tag 'Department' applied and that they use managed disks. What approach covers both requirements?",
+   ex:"Assign TWO Azure Policies: one Modify/Append policy to enforce the Department tag, and one Deny policy to require managed disks. Or create a custom Initiative bundling both policies and assign the initiative once.",
+   opts:["Apply one RBAC role that restricts VM creation","Manually inspect resources monthly and fix non-compliant ones","Assign Azure Policies (or bundle into an Initiative): one to enforce the Department tag and one to deny VMs without managed disks","Configure Resource Locks on the VMs"],
+   ans:2},
+
+  {id:59,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What are Access Reviews in Microsoft Entra ID and when should they be used?",
+   ex:"Access Reviews periodically verify whether users still need their current access (group memberships, app roles, privileged roles). A reviewer (manager or the user themselves) confirms or revokes access. Prevents permission accumulation over time.",
+   opts:["A feature that logs every login attempt","Periodic reviews where designated reviewers verify whether users/guests still need their assigned access — automatically revoking unconfirmed access","A tool for auditing network traffic","A manual process only available via PowerShell"],
+   ans:1},
+
+  {id:60,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You must prove to auditors that all changes to RBAC role assignments in your Azure subscriptions for the past 60 days are logged. Where do you find this data?",
+   ex:"RBAC role assignment changes are management plane operations — they appear in the Azure Activity Log. Activity Log retains data for 90 days by default and shows who made the change, what was changed, and when.",
+   opts:["Microsoft Defender for Cloud dashboard","Application Insights logs","Azure Monitor Diagnostic Logs for each resource","Azure Activity Log — it records all management-plane operations including RBAC changes, retained for 90 days"],
+   ans:3},
+
+  {id:61,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is Azure Blueprints (now part of Deployment Stacks) and how does it differ from Azure Policy?",
+   ex:"Azure Blueprints packages together policies, RBAC assignments, resource groups, and ARM templates into a repeatable, versioned governance package — deploy a compliant environment in one step. Policy alone only enforces rules, not deploys infrastructure.",
+   opts:["Azure Blueprints is a network security tool; Azure Policy is for cost management","Azure Blueprints is a design tool for architecture diagrams","Azure Blueprints packages Policy, RBAC, resource groups, and templates into a versioned, repeatable governance package for deploying compliant environments; Azure Policy only enforces rules","They are identical — Azure Blueprints is just a new name for Azure Policy"],
+   ans:2},
+
+  {id:62,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Microsoft Entra ID Protection and what does it detect?",
+   ex:"Identity Protection uses Microsoft's threat intelligence to detect risky sign-ins and risky users. Risk types: sign-in risk (anonymous IP, atypical travel, malware-linked IP) and user risk (leaked credentials, suspicious activity patterns). Requires Entra ID P2.",
+   opts:["A general network security monitoring tool","A P2 feature that uses ML to detect risky sign-ins (anonymous IP, impossible travel) and risky users (leaked credentials) and can auto-remediate via Conditional Access","A P1 feature for enabling MFA","A tool for auditing guest user access"],
+   ans:1},
+
+  {id:63,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"A junior admin accidentally deleted a resource group with 20 production resources inside. How should you architect to prevent this in future?",
+   ex:"Apply a CanNotDelete Resource Lock at the resource group level. This prevents deletion of the group and all resources inside it. Even Owner-level users must remove the lock first — creating a deliberate safeguard against accidents.",
+   opts:["Remove the junior admin's access entirely","Apply a CanNotDelete Resource Lock to the resource group — deletion will be blocked until the lock is explicitly removed","Move all resources to a separate subscription","Create daily backups of the resource group"],
+   ans:1},
+
+  {id:64,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is the Azure Cost Management + Billing service used for in governance?",
+   ex:"Azure Cost Management provides cost visibility, budgets, and alerts. You can set spending budgets at subscription or resource group level, receive alerts when thresholds are hit, and analyse spending by department/tag/service — essential for financial governance.",
+   opts:["Blocking resource creation when costs exceed budget (automatic enforcement)","Providing cost visibility, budget alerts, spending analysis by tags/subscriptions, and cost recommendations — financial governance without hard spending blocks","Automatically shutting down expensive resources","A tool for comparing Azure vs AWS pricing"],
+   ans:1},
+
+  {id:65,part:"Bonus: Governance Architecture & Exam Traps",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Final Exam Trap: You assign a user both 'Contributor' and 'Reader' roles on the same resource group. What is their effective access?",
+   ex:"RBAC is ADDITIVE — all role assignments are combined (union). The user gets the permissions from BOTH roles. Since Contributor already includes everything Reader does plus more, the effective result is Contributor-level access. There is NO conflict — the union applies.",
+   opts:["Reader wins — the least privileged role takes precedence","Contributor wins — the most recently assigned role overrides","The assignments cancel each other out — access denied","Contributor access — RBAC is additive (union of all permissions) so the higher permission set applies"],
+   ans:3},
+];
+
+/* ── STATE ────────────────────────────────────────── */
+let questions    = [...QS];
+let answers      = {};
+let activeFilter = 'all';
+const KEYS       = ['A','B','C','D'];
+
+/* ── HELPERS ────────────────────────────────────── */
+function getFiltered(){
+  if(activeFilter==='all')         return questions;
+  if(activeFilter==='conceptual')  return questions.filter(q=>q.type==='conceptual');
+  if(activeFilter==='technical')   return questions.filter(q=>q.type==='technical');
+  if(activeFilter==='logical')     return questions.filter(q=>q.type==='logical');
+  return questions;
+}
+
+function tagInfo(type,cat){
+  if(cat==='Exam Trap') return {cls:'te',label:'🎯 Exam Trap'};
+  if(type==='technical') return {cls:'tt',label:'⚙️ Technical'};
+  if(type==='logical')   return {cls:'tl',label:'🧩 Scenario'};
+  return                        {cls:'tc',label:'📘 Conceptual'};
+}
+
+/* ── RENDER ─────────────────────────────────────── */
+function render(){
+  const wrap     = document.getElementById('quizContainer');
+  const filtered = getFiltered();
+  wrap.innerHTML = '';
+
+  // group by part
+  const parts = {};
+  filtered.forEach(q=>{
+    if(!parts[q.part]) parts[q.part]={icon:q.icon,items:[]};
+    parts[q.part].items.push(q);
+  });
+
+  let gi=0;
+  Object.entries(parts).forEach(([pname,data])=>{
+    // divider
+    const dv=document.createElement('div');
+    dv.className='pdiv';
+    dv.innerHTML=`
+      <div class="pdiv-line"></div>
+      <div class="pdiv-pill">
+        <span class="pdiv-icon">${data.icon}</span>
+        <span class="pdiv-text">${pname}</span>
+        <span class="pdiv-cnt">${data.items.length}q</span>
+      </div>
+      <div class="pdiv-line"></div>`;
+    wrap.appendChild(dv);
+
+    data.items.forEach(q=>{
+      gi++;
+      const ans   = answers[q.id];
+      const isOk  = ans!==undefined && ans===q.ans;
+      const isErr = ans!==undefined && ans!==q.ans;
+      const tag   = tagInfo(q.type,q.cat);
+
+      const card=document.createElement('div');
+      card.className=`qcard ${ans!==undefined?(isOk?'ok':'err'):''}`;
+      card.id=`card-${q.id}`;
+
+      const optsH=q.opts.map((o,i)=>{
+        let cls='';
+        if(ans!==undefined){
+          if(i===q.ans)       cls='cor dis';
+          else if(i===ans)    cls='wrn dis';
+          else                cls='dis';
+        }
+        return `<button class="opt ${cls}" onclick="pick(${q.id},${i})" ${ans!==undefined?'disabled':''}>
+          <span class="okey">${KEYS[i]}</span><span>${o}</span>
+        </button>`;
+      }).join('');
+
+      card.innerHTML=`
+        <div class="qmeta">
+          <span class="qnum">#${gi}</span>
+          <span class="qtag ${tag.cls}">${tag.label}</span>
+          ${ans!==undefined?`<span class="qstatus" style="display:inline">${isOk?'✅':'❌'}</span>`:''}
+        </div>
+        <div class="qtext">${q.q}</div>
+        <div class="opts">${optsH}</div>
+        <div class="expl ${ans!==undefined?'vis':''}" id="ex-${q.id}">
+          <div class="expl-hd">⚡ Simple Explanation</div>
+          ${q.ex}
+        </div>`;
+      wrap.appendChild(card);
+    });
+  });
+
+  updateStats();
+}
+
+/* ── PICK ANSWER ─────────────────────────────────── */
+function pick(qId,idx){
+  if(answers[qId]!==undefined) return;
+  answers[qId]=idx;
+
+  const q    = questions.find(x=>x.id===qId);
+  const card = document.getElementById(`card-${qId}`);
+  const ok   = idx===q.ans;
+
+  card.className=`qcard ${ok?'ok':'err'}`;
+
+  const meta=card.querySelector('.qmeta');
+  if(!meta.querySelector('.qstatus')){
+    const s=document.createElement('span');
+    s.className='qstatus'; s.style.display='inline';
+    meta.appendChild(s);
+  }
+  meta.querySelector('.qstatus').textContent=ok?'✅':'❌';
+
+  card.querySelectorAll('.opt').forEach((b,i)=>{
+    b.disabled=true; b.classList.add('dis');
+    if(i===q.ans)        b.classList.add('cor');
+    else if(i===idx&&!ok) b.classList.add('wrn');
+  });
+
+  document.getElementById(`ex-${qId}`).classList.add('vis');
+  updateStats();
+
+  const filt=getFiltered();
+  if(filt.every(x=>answers[x.id]!==undefined)) setTimeout(showResult,900);
+}
+
+/* ── STATS ───────────────────────────────────────── */
+function updateStats(){
+  const f   = getFiltered();
+  const ans = f.filter(q=>answers[q.id]!==undefined);
+  const cor = ans.filter(q=>answers[q.id]===q.ans);
+  const pct = ans.length>0?Math.round((cor.length/ans.length)*100):null;
+  const prg = f.length>0?(ans.length/f.length)*100:0;
+
+  document.getElementById('totalQ').textContent    = f.length;
+  document.getElementById('answeredQ').textContent = ans.length;
+  document.getElementById('correctQ').textContent  = cor.length;
+  document.getElementById('pctQ').textContent      = pct!==null?pct+'%':'—';
+  document.getElementById('progBar').style.width   = prg+'%';
+  document.getElementById('progLabel').textContent = `${ans.length} of ${f.length} answered`;
+  document.getElementById('scoreLabel').textContent= pct!==null?`Score: ${pct}%`:'Score: —';
+}
+
+/* ── RESULT ─────────────────────────────────────── */
+function showResult(){
+  const f   = getFiltered();
+  const ans = f.filter(q=>answers[q.id]!==undefined);
+  const cor = ans.filter(q=>answers[q.id]===q.ans);
+  const bad = ans.length-cor.length;
+  const pct = ans.length>0?Math.round((cor.length/ans.length)*100):0;
+
+  document.getElementById('rCorrect').textContent = cor.length;
+  document.getElementById('rWrong').textContent   = bad;
+  document.getElementById('rPct').textContent     = pct+'%';
+
+  const sc=document.getElementById('rscore');
+  sc.textContent=pct+'%';
+
+  let trophy,verdict,msg,cls;
+  if(pct>=85){trophy='🏆';verdict='Exam Ready!';msg='Outstanding — you\'ve mastered Identity & Governance';cls='rse';}
+  else if(pct>=70){trophy='👍';verdict='Solid Work!';msg='Good grasp — review weaker sections';cls='rsg';}
+  else if(pct>=50){trophy='📚';verdict='Keep Studying';msg='Building foundation — more practice needed';cls='rsa';}
+  else{trophy='🔄';verdict='More Work Needed';msg='Read the explanations carefully and retry';cls='rsp';}
+
+  document.getElementById('rtrophy').textContent=trophy;
+  document.getElementById('rverdict').textContent=verdict;
+  document.getElementById('rmsg').textContent=msg;
+  sc.className=`rscore ${cls}`;
+
+  const types=[
+    {key:'conceptual',icon:'📘',lbl:'Conceptual',col:'#93C5FD',fill:'#3B82F6'},
+    {key:'technical', icon:'⚙️', lbl:'Technical', col:'#5FFFD4',fill:'#00C896'},
+    {key:'logical',   icon:'🧩',lbl:'Scenario',  col:'#D8B4FE',fill:'#A855F7'},
+  ];
+
+  document.getElementById('tbgrid').innerHTML=types.map(t=>{
+    const tq  = f.filter(q=>q.type===t.key);
+    const ta  = tq.filter(q=>answers[q.id]!==undefined);
+    const tc2 = ta.filter(q=>answers[q.id]===q.ans);
+    const tp  = ta.length>0?Math.round((tc2.length/ta.length)*100):0;
+    return `<div class="tbc">
+      <div class="tbc-icon">${t.icon}</div>
+      <div class="tbc-lbl">${t.lbl}</div>
+      <div class="tbc-val" style="color:${t.col}">${ta.length>0?tp+'%':'—'}</div>
+      <div class="tbc-bar"><div class="tbc-fill" style="width:${tp}%;background:${t.fill}"></div></div>
+    </div>`;
+  }).join('');
+
+  const panel=document.getElementById('resultPanel');
+  panel.classList.add('vis');
+  panel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ── CONTROLS ───────────────────────────────────── */
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+}
+
+function shuffleReset(){
+  answers={};
+  for(let i=questions.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [questions[i],questions[j]]=[questions[j],questions[i]];
+  }
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetAll(){
+  answers={}; questions=[...QS];
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── INIT ───────────────────────────────────────── */
+render();
+</script>
+</body>
+</html>

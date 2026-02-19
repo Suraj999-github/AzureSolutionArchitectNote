@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Azure Solution Architect — Security, Compliance & Identity Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --azure: #0078D4;
+    --azure-dark: #005A9E;
+    --azure-light: #50E6FF;
+    --bg: #05080F;
+    --surface: #0D1420;
+    --surface2: #121B2E;
+    --border: #1E2E4A;
+    --text: #E8F0FF;
+    --muted: #6B7FA3;
+    --correct: #00C896;
+    --wrong: #FF4757;
+    --warn: #FFB300;
+    --tag-conceptual: #7C3AED;
+    --tag-technical: #0078D4;
+    --tag-logical: #059669;
+    --tag-exam: #B45309;
+  }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,120,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,120,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow {
+    position: fixed;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,120,212,0.08) 0%, transparent 70%);
+    top: -200px;
+    right: -100px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow2 {
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%);
+    bottom: -100px;
+    left: -100px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header { padding: 48px 0 28px; text-align: center; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,120,212,0.15);
+    border: 1px solid rgba(0,120,212,0.3);
+    border-radius: 100px;
+    padding: 6px 18px;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--azure-light);
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+  }
+
+  .badge::before {
+    content: '●';
+    color: var(--azure-light);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 {
+    font-size: clamp(26px, 5vw, 46px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 30%, var(--azure-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.03em;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 28px 0;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+
+  .stat-num {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--azure-light);
+    font-family: 'IBM Plex Mono', monospace;
+    display: block;
+    transition: all 0.3s;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  /* PROGRESS */
+  .progress-section {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(5,8,15,0.95);
+    backdrop-filter: blur(10px);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .progress-bar-wrap {
+    background: var(--surface);
+    height: 5px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--azure), var(--azure-light));
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .score-live { color: var(--azure-light); font-weight: 600; }
+
+  /* PART DIVIDER */
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 32px 0 18px;
+  }
+
+  .part-divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border));
+  }
+  .part-divider-line.left { background: linear-gradient(270deg, transparent, var(--border)); }
+
+  .part-divider-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: var(--surface);
+  }
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+  }
+
+  .filter-btn:hover { border-color: var(--azure); color: var(--azure-light); }
+  .filter-btn.active { background: var(--azure); border-color: var(--azure); color: #fff; }
+  .filter-btn.active.f-conceptual { background: var(--tag-conceptual); border-color: var(--tag-conceptual); }
+  .filter-btn.active.f-technical  { background: var(--tag-technical); border-color: var(--tag-technical); }
+  .filter-btn.active.f-logical    { background: var(--tag-logical); border-color: var(--tag-logical); }
+
+  .spacer { flex: 1; }
+
+  .btn-primary {
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: none;
+    background: var(--azure);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--azure-dark); transform: translateY(-1px); }
+  .btn-ghost {
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 28px;
+    margin-bottom: 14px;
+    transition: border-color 0.3s, background 0.3s;
+    animation: slideIn 0.35s ease both;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-card.answered-correct { border-color: rgba(0,200,150,0.5); background: rgba(0,200,150,0.03); }
+  .question-card.answered-wrong   { border-color: rgba(255,71,87,0.4); background: rgba(255,71,87,0.03); }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .q-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 32px;
+  }
+
+  .q-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .tag-multiple_choice, .tag-conceptual { background: rgba(124,58,237,0.18); color: #A78BFA; border: 1px solid rgba(124,58,237,0.3); }
+  .tag-technical  { background: rgba(0,120,212,0.18); color: var(--azure-light); border: 1px solid rgba(0,120,212,0.3); }
+  .tag-logical    { background: rgba(5,150,105,0.18); color: #34D399; border: 1px solid rgba(5,150,105,0.3); }
+  .tag-exam       { background: rgba(180,83,9,0.18); color: #FCD34D; border: 1px solid rgba(180,83,9,0.3); }
+
+  .q-status {
+    margin-left: auto;
+    font-size: 16px;
+    display: none;
+  }
+
+  .q-text {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 9px; }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+  }
+
+  .option:hover:not(.disabled) {
+    border-color: var(--azure);
+    background: rgba(0,120,212,0.09);
+    transform: translateX(4px);
+  }
+
+  .option.correct { border-color: var(--correct) !important; background: rgba(0,200,150,0.1) !important; color: #34D399; }
+  .option.wrong   { border-color: var(--wrong) !important; background: rgba(255,71,87,0.1) !important; color: #FF6B7A; }
+  .option.show-correct { border-color: rgba(0,200,150,0.4) !important; background: rgba(0,200,150,0.05) !important; }
+  .option.disabled { cursor: default; }
+
+  .opt-letter {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+
+  .option.correct .opt-letter { background: var(--correct); color: #000; border-color: var(--correct); }
+  .option.wrong   .opt-letter { background: var(--wrong); color: #fff; border-color: var(--wrong); }
+  .option.show-correct .opt-letter { background: rgba(0,200,150,0.3); color: var(--correct); border-color: var(--correct); }
+  .option:hover:not(.disabled) .opt-letter { background: var(--azure); color: #fff; border-color: var(--azure); }
+
+  .explanation {
+    margin-top: 14px;
+    padding: 13px 16px;
+    border-radius: 10px;
+    background: rgba(80,230,255,0.05);
+    border: 1px solid rgba(80,230,255,0.15);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #93C5FD;
+    display: none;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .explanation.show {
+    display: block;
+    animation: slideIn 0.3s ease;
+  }
+
+  .explanation .expl-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--azure-light);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* RESULT PANEL */
+  .result-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    text-align: center;
+    margin: 32px 0;
+    display: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,120,212,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .result-panel.show { display: block; animation: slideIn 0.5s ease; }
+
+  .result-emoji { font-size: 48px; margin-bottom: 12px; }
+
+  .result-score {
+    font-size: 80px;
+    font-weight: 800;
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .result-score.excellent { background: linear-gradient(135deg, #00C896, var(--azure-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .result-score.good      { background: linear-gradient(135deg, var(--azure-light), #A78BFA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .result-score.average   { background: linear-gradient(135deg, #FFB300, #FF6B35); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .result-score.poor      { background: linear-gradient(135deg, var(--wrong), #FF6B7A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .result-verdict { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .result-label { font-size: 13px; color: var(--muted); margin-bottom: 32px; font-family: 'IBM Plex Mono', monospace; }
+
+  .result-breakdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 0 0 32px;
+  }
+
+  .breakdown-item {
+    padding: 18px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .breakdown-item .num { font-size: 32px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; }
+  .breakdown-item .lbl { font-size: 10px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.06em; }
+  .breakdown-item.correct-item .num { color: var(--correct); }
+  .breakdown-item.wrong-item .num { color: var(--wrong); }
+  .breakdown-item.pct-item .num { color: var(--azure-light); }
+
+  .by-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .type-score {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    text-align: center;
+  }
+
+  .type-score .ts-label { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .type-score .ts-val { font-size: 20px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; color: var(--text); margin-top: 4px; }
+  .type-score .ts-bar { height: 3px; border-radius: 2px; background: var(--border); margin-top: 8px; overflow: hidden; }
+  .type-score .ts-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+
+  .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  footer { padding: 40px 0; text-align: center; }
+  footer p { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  @media (max-width: 600px) {
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .result-breakdown, .by-type-grid { grid-template-columns: 1fr; }
+    .question-card { padding: 20px 16px; }
+    .result-panel { padding: 32px 20px; }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="glow2"></div>
+
+<div class="container">
+  <header>
+    <div class="badge">AZ-305 Prep · SC-900 Concepts</div>
+    <h1>Microsoft Security,<br/>Compliance & Identity</h1>
+    <p class="subtitle">Entra · Defender · Sentinel · Purview · Priva · 55 Questions</p>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat-card"><span class="stat-num" id="totalQ">55</span><span class="stat-label">Total Questions</span></div>
+    <div class="stat-card"><span class="stat-num" id="answeredQ">0</span><span class="stat-label">Answered</span></div>
+    <div class="stat-card"><span class="stat-num" id="correctQ">0</span><span class="stat-label">Correct</span></div>
+    <div class="stat-card"><span class="stat-num" id="pctQ">—</span><span class="stat-label">Score %</span></div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-text">
+      <span id="progressLabel">0 of 55 answered</span>
+      <span class="score-live" id="scoreLabel">Score: —</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn f-conceptual" onclick="setFilter('conceptual',this)">💡 Conceptual</button>
+    <button class="filter-btn f-technical" onclick="setFilter('technical',this)">⚙️ Technical</button>
+    <button class="filter-btn f-logical" onclick="setFilter('logical',this)">🧩 Logical</button>
+    <div class="spacer"></div>
+    <button class="btn-primary" onclick="shuffleAndReset()">🔀 Shuffle</button>
+    <button class="btn-ghost" onclick="resetAll()">↺ Reset</button>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <div class="result-panel" id="resultPanel">
+    <div class="result-emoji" id="resultEmoji">🎯</div>
+    <div class="result-score" id="resultScore">0%</div>
+    <div class="result-verdict" id="resultVerdict">—</div>
+    <div class="result-label" id="resultLabel">Keep studying!</div>
+
+    <div class="result-breakdown">
+      <div class="breakdown-item correct-item"><div class="num" id="rCorrect">0</div><div class="lbl">Correct</div></div>
+      <div class="breakdown-item wrong-item"><div class="num" id="rWrong">0</div><div class="lbl">Wrong</div></div>
+      <div class="breakdown-item pct-item"><div class="num" id="rPct">0%</div><div class="lbl">Accuracy</div></div>
+    </div>
+
+    <div class="by-type-grid" id="byTypeGrid"></div>
+
+    <div class="result-actions">
+      <button class="btn-primary" onclick="shuffleAndReset()">🔀 Retake Shuffled</button>
+      <button class="btn-ghost" onclick="resetAll()">↺ Review Answers</button>
+    </div>
+  </div>
+
+  <footer><p>Azure Solution Architect Exam Prep · Security, Compliance & Identity · 55 Questions</p></footer>
+</div>
+
+<script>
+const QUESTIONS_RAW = [
+  // === PART 1 ===
+  {id:1,part:"Part 1: Security, Compliance & Identity Concepts",type:"conceptual",category:"Conceptual",
+   question:"What does the CIA Triad stand for in security?",
+   simple_explanation:"CIA Triad is the three pillars of security: keeping data secret (Confidentiality), accurate (Integrity), and always available (Availability).",
+   options:["Central Intelligence Agency","Confidentiality, Integrity, Availability","Control, Identity, Access","Compliance, Integration, Authorization"],correct:1},
+
+  {id:2,part:"Part 1: Security, Compliance & Identity Concepts",type:"conceptual",category:"Conceptual",
+   question:"Which security model assumes that NO user or device should be trusted by default, even inside the corporate network?",
+   simple_explanation:"Zero Trust means: always verify, never trust, least privilege — treat every request as if it comes from an untrusted network.",
+   options:["Defense in Depth","Zero Trust","Perimeter Security","Role-Based Access Control"],correct:1},
+
+  {id:3,part:"Part 1: Security, Compliance & Identity Concepts",type:"conceptual",category:"Conceptual",
+   question:"Which principle means giving users ONLY the minimum permissions they need to do their job?",
+   simple_explanation:"Least Privilege = don't give a receptionist access to payroll just because they work in the same building.",
+   options:["Need to Know","Separation of Duties","Least Privilege","Defense in Depth"],correct:2},
+
+  {id:4,part:"Part 1: Security, Compliance & Identity Concepts",type:"conceptual",category:"Conceptual",
+   question:"What is Multi-Factor Authentication (MFA)?",
+   simple_explanation:"MFA requires two or more proofs of identity — like a password PLUS a phone code. Even if your password is stolen, MFA keeps you safe.",
+   options:["Using a very long password","Verifying identity using two or more factors (something you know, have, or are)","Changing your password every 30 days","Using biometrics only"],correct:1},
+
+  {id:5,part:"Part 1: Security, Compliance & Identity Concepts",type:"conceptual",category:"Conceptual",
+   question:"What is Defense in Depth?",
+   simple_explanation:"Like an onion with many layers — if one security layer fails, others still protect you. Multiple security controls working together.",
+   options:["A single strong firewall","Encrypting all data","Multiple layers of security controls so if one fails, others protect you","Monitoring all network traffic"],correct:2},
+
+  {id:6,part:"Part 1: Security, Compliance & Identity Concepts",type:"conceptual",category:"Conceptual",
+   question:"What is the difference between Authentication and Authorization?",
+   simple_explanation:"Authentication = WHO are you? (proving identity). Authorization = WHAT can you do? (what permissions you have).",
+   options:["They are the same thing","Authentication is what you can do; Authorization is who you are","Authentication proves who you are; Authorization determines what you can access","Authentication uses MFA; Authorization uses passwords"],correct:2},
+
+  {id:7,part:"Part 1: Security, Compliance & Identity Concepts",type:"conceptual",category:"Conceptual",
+   question:"What is a Shared Responsibility Model in cloud computing?",
+   simple_explanation:"In the cloud, Microsoft handles security OF the cloud (hardware, network), while YOU are responsible for security IN the cloud (your data, identities, apps).",
+   options:["Microsoft is responsible for all cloud security","The customer is responsible for everything","Security responsibilities are divided between the cloud provider and the customer","Third-party vendors handle all security"],correct:2},
+
+  {id:8,part:"Part 1: Security, Compliance & Identity Concepts",type:"technical",category:"Technical",
+   question:"Which type of attack involves an attacker intercepting communication between two parties without their knowledge?",
+   simple_explanation:"Like someone secretly reading your mail between the post office and your home — they see everything.",
+   options:["Phishing","Man-in-the-Middle (MitM) attack","Denial of Service","SQL Injection"],correct:1},
+
+  {id:9,part:"Part 1: Security, Compliance & Identity Concepts",type:"technical",category:"Technical",
+   question:"What does RBAC stand for and what is its purpose?",
+   simple_explanation:"RBAC = Role-Based Access Control. Assign permissions to roles, then assign roles to users. Easier to manage than giving permissions one-by-one.",
+   options:["Resource-Based Access Control — controls resource allocation","Role-Based Access Control — assigns permissions based on job roles","Rule-Based Access Control — defines access rules in a firewall","Rights-Based Access Control — grants rights to specific users"],correct:1},
+
+  {id:10,part:"Part 1: Security, Compliance & Identity Concepts",type:"technical",category:"Technical",
+   question:"What is a Security Information and Event Management (SIEM) system used for?",
+   simple_explanation:"SIEM is like a security camera system for your IT — it collects logs from everywhere, detects suspicious patterns, and alerts you to threats.",
+   options:["Managing user identities","Encrypting sensitive data","Collecting and analyzing security logs to detect threats in real time","Patching vulnerabilities automatically"],correct:2},
+
+  {id:11,part:"Part 1: Security, Compliance & Identity Concepts",type:"logical",category:"Logical/Scenario",
+   question:"An employee's account was compromised. The attacker accessed only the HR system because the employee only had HR permissions. Which security principle helped limit the damage?",
+   simple_explanation:"Because the employee had limited access (least privilege), the attacker couldn't go anywhere else — the damage was contained.",
+   options:["Defense in Depth","Least Privilege","Zero Trust","Multi-Factor Authentication"],correct:1},
+
+  {id:12,part:"Part 1: Security, Compliance & Identity Concepts",type:"logical",category:"Logical/Scenario",
+   question:"Your company wants to ensure that no single employee can both approve AND process a financial payment. Which security principle applies?",
+   simple_explanation:"Separation of Duties means critical tasks need more than one person — so no one can commit fraud alone.",
+   options:["Least Privilege","Separation of Duties","Zero Trust","Need to Know"],correct:1},
+
+  // === PART 2 ===
+  {id:13,part:"Part 2: Microsoft Entra",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Entra ID (formerly Azure Active Directory)?",
+   simple_explanation:"Microsoft Entra ID is Microsoft's cloud-based identity service — it manages WHO can sign in and WHAT they can access across Microsoft 365, Azure, and third-party apps.",
+   options:["A cloud storage service","A cloud-based identity and access management service","A network security firewall","A data analytics platform"],correct:1},
+
+  {id:14,part:"Part 2: Microsoft Entra",type:"conceptual",category:"Conceptual",
+   question:"What is Conditional Access in Microsoft Entra ID?",
+   simple_explanation:"Conditional Access is like a smart bouncer — it checks conditions (location, device health, user risk) before allowing or blocking access.",
+   options:["A firewall rule for network traffic","A policy that grants or blocks access based on conditions like location, device, or user risk","A backup authentication method","A way to reset passwords"],correct:1},
+
+  {id:15,part:"Part 2: Microsoft Entra",type:"conceptual",category:"Conceptual",
+   question:"What is Single Sign-On (SSO)?",
+   simple_explanation:"SSO = login once, access everything. Like using your work badge to enter all rooms instead of having a different key for each one.",
+   options:["Using the same password for all applications","Signing in once to access multiple applications without re-entering credentials","Biometric authentication","Automatic password rotation"],correct:1},
+
+  {id:16,part:"Part 2: Microsoft Entra",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Entra Privileged Identity Management (PIM)?",
+   simple_explanation:"PIM gives admins elevated access ONLY when they need it, for a limited time. Like borrowing a master key — only when needed, and you have to return it.",
+   options:["A tool for managing passwords","A just-in-time access system for privileged roles that requires justification and approval","A multi-factor authentication method","A network access control system"],correct:1},
+
+  {id:17,part:"Part 2: Microsoft Entra",type:"conceptual",category:"Conceptual",
+   question:"What is Identity Protection in Microsoft Entra?",
+   simple_explanation:"Identity Protection uses AI to detect risky sign-ins (unfamiliar location, leaked credentials) and can automatically block or challenge suspicious logins.",
+   options:["Password hashing mechanism","Automated detection and remediation of identity-based risks using machine learning","Network perimeter protection","Data encryption at rest"],correct:1},
+
+  {id:18,part:"Part 2: Microsoft Entra",type:"conceptual",category:"Conceptual",
+   question:"What is External Identities in Microsoft Entra?",
+   simple_explanation:"External Identities lets partners and customers access your apps using their OWN identity (like Google or Facebook) — you don't need to create accounts for them.",
+   options:["Managing admin accounts","Allowing external users (partners, customers) to access your apps using their own identities","VPN access for remote employees","Guest network access control"],correct:1},
+
+  {id:19,part:"Part 2: Microsoft Entra",type:"technical",category:"Technical",
+   question:"Which Microsoft Entra feature allows you to periodically review who has access to resources and revoke unnecessary permissions?",
+   simple_explanation:"Access Reviews are like a periodic audit — 'Does this person still need this access?' If no, remove it automatically.",
+   options:["Conditional Access","Identity Protection","Access Reviews","Privileged Identity Management"],correct:2},
+
+  {id:20,part:"Part 2: Microsoft Entra",type:"technical",category:"Technical",
+   question:"What is the difference between Microsoft Entra ID Free and Microsoft Entra ID P2?",
+   simple_explanation:"Free gives basic SSO and MFA. P1 adds Conditional Access. P2 adds Identity Protection and PIM — advanced risk-based features for enterprise security.",
+   options:["Free includes PIM; P2 does not","P2 adds Identity Protection and Privileged Identity Management over the Free and P1 tiers","P2 only adds more storage","There is no difference"],correct:1},
+
+  {id:21,part:"Part 2: Microsoft Entra",type:"technical",category:"Technical",
+   question:"In Microsoft Entra Conditional Access, which signal is NOT typically used to evaluate access?",
+   simple_explanation:"Conditional Access uses: user/group, location (IP), device compliance, app, and risk level. It does NOT check the user's job title directly.",
+   options:["User's sign-in risk level","Device compliance status","User's annual salary","Location (IP address)"],correct:2},
+
+  {id:22,part:"Part 2: Microsoft Entra",type:"technical",category:"Technical",
+   question:"Which protocol does Microsoft Entra ID use for modern authentication?",
+   simple_explanation:"OAuth 2.0 handles authorization (what you can do) and OpenID Connect handles authentication (who you are) — these are the modern web standards Entra uses.",
+   options:["LDAP and Kerberos only","OAuth 2.0 and OpenID Connect","NTLM and SAML only","WS-Federation only"],correct:1},
+
+  {id:23,part:"Part 2: Microsoft Entra",type:"logical",category:"Logical/Scenario",
+   question:"A Global Administrator is permanently assigned the Global Admin role. The security team wants to reduce risk. What should they implement?",
+   simple_explanation:"Instead of always being a Global Admin (risky if account is compromised), use PIM to activate the role only when needed for specific tasks.",
+   options:["Enable MFA for the admin","Implement Privileged Identity Management (PIM) for just-in-time role activation","Create a Conditional Access policy","Enable Identity Protection"],correct:1},
+
+  {id:24,part:"Part 2: Microsoft Entra",type:"logical",category:"Logical/Scenario",
+   question:"Users are being asked for MFA every time they sign in from their corporate office. How can you reduce friction while maintaining security?",
+   simple_explanation:"Mark the corporate office IP as a trusted/named location — Conditional Access can then skip MFA for sign-ins from known, trusted locations.",
+   options:["Disable MFA completely","Configure Named Locations in Conditional Access to trust the corporate IP range","Switch to password-only authentication","Create a new tenant for office users"],correct:1},
+
+  // === PART 3 ===
+  {id:25,part:"Part 3: Microsoft Security Solutions",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Defender for Cloud?",
+   simple_explanation:"Defender for Cloud is your cloud security score card + threat protector. It tells you how secure your Azure resources are and alerts you to active threats.",
+   options:["An email security product","A cloud security posture management (CSPM) and workload protection service for Azure and hybrid environments","A backup and recovery service","A virtual network service"],correct:1},
+
+  {id:26,part:"Part 3: Microsoft Security Solutions",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Sentinel?",
+   simple_explanation:"Microsoft Sentinel is Azure's cloud-native SIEM + SOAR — it collects security data from everywhere, detects threats using AI, and can automatically respond to incidents.",
+   options:["A password management tool","A cloud-native SIEM and SOAR solution for threat detection and automated response","A data backup service","An endpoint antivirus solution"],correct:1},
+
+  {id:27,part:"Part 3: Microsoft Security Solutions",type:"conceptual",category:"Conceptual",
+   question:"What does SOAR stand for in the context of Microsoft Sentinel?",
+   simple_explanation:"SOAR = Security Orchestration, Automation, and Response. When Sentinel detects a threat, SOAR can automatically run playbooks to respond — like automatically blocking a suspicious IP.",
+   options:["Security Operations and Risk","Security Orchestration, Automation, and Response","System Operations and Resilience","Secure Operations and Recovery"],correct:1},
+
+  {id:28,part:"Part 3: Microsoft Security Solutions",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Defender for Endpoint?",
+   simple_explanation:"Defender for Endpoint protects individual devices (laptops, servers) — it detects malware, suspicious behavior, and helps investigate and respond to threats on endpoints.",
+   options:["A firewall for network perimeter","An enterprise endpoint security platform for threat protection, detection, and response","A cloud access security broker","A data loss prevention tool"],correct:1},
+
+  {id:29,part:"Part 3: Microsoft Security Solutions",type:"conceptual",category:"Conceptual",
+   question:"What is Azure DDoS Protection?",
+   simple_explanation:"DDoS Protection shields your Azure services from Distributed Denial of Service attacks — when attackers flood your service with fake traffic to take it down.",
+   options:["A tool to prevent data exfiltration","Protection against volumetric network attacks that overwhelm your service with fake traffic","An encryption service for data at rest","A backup service for virtual machines"],correct:1},
+
+  {id:30,part:"Part 3: Microsoft Security Solutions",type:"conceptual",category:"Conceptual",
+   question:"What is Azure Firewall?",
+   simple_explanation:"Azure Firewall is a managed, cloud-native network security service that filters traffic in and out of your Azure virtual networks.",
+   options:["A web application firewall for HTTP traffic only","A managed stateful network security service that controls traffic in and out of Azure VNets","A data encryption service","An identity protection tool"],correct:1},
+
+  {id:31,part:"Part 3: Microsoft Security Solutions",type:"conceptual",category:"Conceptual",
+   question:"What is Azure Web Application Firewall (WAF)?",
+   simple_explanation:"WAF protects web apps from common web attacks like SQL injection, cross-site scripting (XSS) — think of it as a specialized security guard just for your website.",
+   options:["A network-level firewall","A web application protection service that defends against OWASP top 10 threats like SQL injection and XSS","A VPN solution","An identity access management tool"],correct:1},
+
+  {id:32,part:"Part 3: Microsoft Security Solutions",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Defender for Cloud Apps (formerly MCAS)?",
+   simple_explanation:"It's a Cloud Access Security Broker (CASB) — it sees which cloud apps your employees are using (even unauthorized ones) and controls data sharing.",
+   options:["An antivirus for mobile devices","A Cloud Access Security Broker that provides visibility and control over cloud app usage and data","A backup solution for SaaS apps","A multi-cloud billing tool"],correct:1},
+
+  {id:33,part:"Part 3: Microsoft Security Solutions",type:"technical",category:"Technical",
+   question:"What is the Secure Score in Microsoft Defender for Cloud?",
+   simple_explanation:"Secure Score is a percentage that shows how well you follow security recommendations. Higher score = better security posture. It helps prioritize what to fix first.",
+   options:["The number of active threats detected","A numerical representation of your security posture based on implemented recommendations","The cost of security services","The uptime percentage of security services"],correct:1},
+
+  {id:34,part:"Part 3: Microsoft Security Solutions",type:"technical",category:"Technical",
+   question:"Which two main capabilities does Microsoft Defender for Cloud provide?",
+   simple_explanation:"Defender for Cloud does two things: CSPM (tells you your security posture/score) and CWP (actively protects workloads from threats).",
+   options:["Backup and Disaster Recovery","Cloud Security Posture Management (CSPM) and Cloud Workload Protection (CWP)","Identity Management and Network Security","Data Encryption and Compliance Reporting"],correct:1},
+
+  {id:35,part:"Part 3: Microsoft Security Solutions",type:"technical",category:"Technical",
+   question:"In Microsoft Sentinel, what are 'Playbooks' used for?",
+   simple_explanation:"Playbooks are automated response scripts (built on Azure Logic Apps). When Sentinel detects a threat, a playbook can automatically send an email, block a user, or open a ticket.",
+   options:["Manual investigation guides for analysts","Automated workflows that respond to security incidents using Azure Logic Apps","Data collection rules for ingesting logs","Compliance policy documents"],correct:1},
+
+  {id:36,part:"Part 3: Microsoft Security Solutions",type:"logical",category:"Logical/Scenario",
+   question:"Your web app on Azure is being attacked with SQL injection attempts. Which Azure service should you enable to block these attacks?",
+   simple_explanation:"WAF (Web Application Firewall) specifically blocks web-layer attacks like SQL injection and XSS. Azure Firewall handles network-level traffic, not HTTP attacks.",
+   options:["Azure Firewall","Azure DDoS Protection","Azure Web Application Firewall (WAF)","Network Security Group (NSG)"],correct:2},
+
+  {id:37,part:"Part 3: Microsoft Security Solutions",type:"logical",category:"Logical/Scenario",
+   question:"Your security team wants to centrally collect logs from Azure VMs, Microsoft 365, and third-party firewalls, then use AI to detect threats. Which service fits best?",
+   simple_explanation:"Microsoft Sentinel is the cloud SIEM that aggregates logs from ANY source and uses AI/ML to find threats across your entire environment.",
+   options:["Microsoft Defender for Cloud","Microsoft Sentinel","Azure Monitor","Microsoft Defender for Endpoint"],correct:1},
+
+  {id:38,part:"Part 3: Microsoft Security Solutions",type:"logical",category:"Logical/Scenario",
+   question:"A developer accidentally exposed an Azure Storage account to the public internet. Which service would proactively detect this misconfiguration?",
+   simple_explanation:"Defender for Cloud continuously checks your resource configurations and flags misconfigurations like public storage accounts — improving your Secure Score.",
+   options:["Microsoft Sentinel","Azure Policy only","Microsoft Defender for Cloud (CSPM)","Azure Firewall"],correct:2},
+
+  // === PART 4 ===
+  {id:39,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Purview?",
+   simple_explanation:"Microsoft Purview is the umbrella for data governance, compliance, and risk management — it helps you know WHERE your sensitive data is, WHO is using it, and ensures you meet regulations like GDPR.",
+   options:["An antivirus solution","A unified data governance and compliance platform covering data discovery, classification, and regulatory compliance","A cloud storage service","A network monitoring tool"],correct:1},
+
+  {id:40,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"conceptual",category:"Conceptual",
+   question:"What is Data Loss Prevention (DLP) in Microsoft Purview?",
+   simple_explanation:"DLP prevents sensitive data (like credit card numbers or SSNs) from being shared outside your organization — it automatically detects and blocks unauthorized sharing.",
+   options:["A backup solution for lost data","A policy that detects and prevents unauthorized sharing of sensitive information","A data recovery service","A data archiving solution"],correct:1},
+
+  {id:41,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Purview Information Protection (formerly AIP)?",
+   simple_explanation:"It classifies and labels your documents (e.g., Confidential, Public) and applies protection like encryption — so even if a file is stolen, it cannot be read without authorization.",
+   options:["A VPN solution for secure browsing","A service that classifies, labels, and protects sensitive documents with encryption and access control","A backup service for Microsoft 365 data","A network traffic analyzer"],correct:1},
+
+  {id:42,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"conceptual",category:"Conceptual",
+   question:"What is eDiscovery in Microsoft Purview?",
+   simple_explanation:"eDiscovery helps legal teams search, find, and export emails/documents for legal investigations or lawsuits — like a legal search engine for your Microsoft 365 data.",
+   options:["A tool for discovering network vulnerabilities","A legal hold and search capability to identify, preserve, and export content for legal proceedings","A device discovery tool","A cloud app discovery feature"],correct:1},
+
+  {id:43,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Priva?",
+   simple_explanation:"Microsoft Priva helps manage personal data privacy — it finds where personal data is stored, reduces privacy risks, and handles privacy subject requests (like GDPR right-to-delete requests).",
+   options:["A threat detection tool","A privacy management solution that helps manage personal data risks and comply with privacy regulations","A network firewall","An identity management platform"],correct:1},
+
+  {id:44,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"conceptual",category:"Conceptual",
+   question:"What is Microsoft Purview Compliance Manager?",
+   simple_explanation:"Compliance Manager gives you a compliance score and pre-built templates for regulations like GDPR, ISO 27001, HIPAA — it tracks your compliance actions and tells you what still needs to be done.",
+   options:["A tool for managing IT compliance certifications of employees","A risk assessment and compliance tracking tool with pre-built regulatory templates and a compliance score","A software license compliance tool","A network compliance scanner"],correct:1},
+
+  {id:45,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"conceptual",category:"Conceptual",
+   question:"What is Insider Risk Management in Microsoft Purview?",
+   simple_explanation:"Insider Risk Management detects risky behaviors from employees — like someone downloading large amounts of data before resigning. It helps catch internal threats before damage occurs.",
+   options:["Managing VPN access for remote workers","Detecting and managing risks from employees or insiders who may be leaking or misusing data","Managing employee performance","Blocking external attackers"],correct:1},
+
+  {id:46,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"technical",category:"Technical",
+   question:"What are Sensitivity Labels in Microsoft Purview?",
+   simple_explanation:"Sensitivity Labels are tags applied to documents or emails (like 'Confidential') that can enforce encryption, watermarks, and access restrictions — the label travels with the file.",
+   options:["Tags used for Azure resource billing","Labels applied to content that enforce protection like encryption, watermarks, and access restrictions","Tags for classifying Azure VM sizes","Labels for organizing SharePoint folders"],correct:1},
+
+  {id:47,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"technical",category:"Technical",
+   question:"What is Retention Policy in Microsoft Purview?",
+   simple_explanation:"Retention policies keep data for a minimum time (e.g., keep emails for 7 years for regulations) or delete data after a set time — helping meet legal and compliance requirements.",
+   options:["A policy for retaining admin accounts","A policy that defines how long content is kept or when it should be deleted to meet legal or business requirements","A disaster recovery retention plan","A policy for keeping audit logs in Azure Monitor"],correct:1},
+
+  {id:48,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"technical",category:"Technical",
+   question:"What is the Microsoft Purview Data Map?",
+   simple_explanation:"The Data Map is like a GPS for your data — it automatically discovers, scans, and maps where sensitive data exists across your Azure, on-prem, and multicloud sources.",
+   options:["A network topology diagram tool","A scanning and cataloging system that discovers and maps data assets across your environment","A data migration roadmap","A visual dashboard for compliance scores"],correct:1},
+
+  {id:49,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"logical",category:"Logical/Scenario",
+   question:"An employee emails a document containing customer credit card numbers to their personal Gmail. Which Purview feature should have prevented this?",
+   simple_explanation:"DLP policies scan outgoing content for sensitive data patterns (like credit card numbers) and block or warn when someone tries to send it outside the organization.",
+   options:["Retention Policy","Insider Risk Management","Data Loss Prevention (DLP) Policy","eDiscovery"],correct:2},
+
+  {id:50,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"logical",category:"Logical/Scenario",
+   question:"Your legal team needs to investigate a potential fraud and must preserve all emails from a specific employee for the last 6 months without the employee knowing. What should you use?",
+   simple_explanation:"eDiscovery with a Legal Hold preserves all content silently — the employee can't delete the emails, and the legal team can search and export them.",
+   options:["Sensitivity Labels","Insider Risk Management alert","eDiscovery with Legal Hold","Retention Policy"],correct:2},
+
+  {id:51,part:"Part 4: Microsoft Priva and Microsoft Purview",type:"logical",category:"Logical/Scenario",
+   question:"A customer submits a GDPR 'right to erasure' request asking you to delete all their personal data. Which Microsoft solution helps manage this request?",
+   simple_explanation:"Microsoft Priva has a Subject Rights Requests feature specifically designed to manage GDPR and privacy requests — finding, reviewing, and deleting personal data on request.",
+   options:["Microsoft Purview Compliance Manager","Microsoft Priva Subject Rights Requests","Microsoft Purview Information Protection","Microsoft Defender for Cloud Apps"],correct:1},
+
+  // === BONUS ===
+  {id:52,part:"Bonus: Cross-Topic Exam Traps",type:"logical",category:"Exam Trap",
+   question:"Which service would you use to manage compliance with regulations like HIPAA and GDPR in Microsoft 365 and Azure?",
+   simple_explanation:"Compliance Manager gives you a score and action items for specific regulations — don't confuse it with Defender for Cloud's Secure Score which is about security posture.",
+   options:["Microsoft Defender for Cloud Secure Score","Microsoft Purview Compliance Manager","Microsoft Sentinel","Azure Policy"],correct:1},
+
+  {id:53,part:"Bonus: Cross-Topic Exam Traps",type:"logical",category:"Exam Trap",
+   question:"Azure Policy vs Conditional Access — which prevents non-compliant RESOURCES from being deployed?",
+   simple_explanation:"Azure Policy controls RESOURCES (e.g., 'only deploy VMs in certain regions'). Conditional Access controls USER ACCESS to apps based on conditions.",
+   options:["Conditional Access","Privileged Identity Management","Azure Policy","Microsoft Sentinel"],correct:2},
+
+  {id:54,part:"Bonus: Cross-Topic Exam Traps",type:"logical",category:"Exam Trap",
+   question:"What is the difference between Microsoft Defender for Cloud and Microsoft Defender for Endpoint?",
+   simple_explanation:"Defender for Cloud = cloud infrastructure security (CSPM + workload protection). Defender for Endpoint = endpoint device security (laptops, servers, phones).",
+   options:["They are the same product with different names","Defender for Cloud secures cloud infrastructure; Defender for Endpoint secures individual devices","Defender for Endpoint only works on mobile devices","Defender for Cloud only works on Azure VMs"],correct:1},
+
+  {id:55,part:"Bonus: Cross-Topic Exam Traps",type:"logical",category:"Exam Trap",
+   question:"You need to monitor who accessed a sensitive SharePoint document containing financial data 3 months ago. Where do you look?",
+   simple_explanation:"Microsoft Purview Audit tracks user activity like file access, edits, and shares across Microsoft 365 services.",
+   options:["Azure Monitor Activity Logs","Microsoft Sentinel workspace","Microsoft Purview Audit","Microsoft Defender for Cloud"],correct:2},
+];
+
+// State
+let questions = [...QUESTIONS_RAW];
+let answers = {};
+let currentFilter = 'all';
+
+const LETTERS = ['A','B','C','D'];
+
+function getFilteredQuestions() {
+  if (currentFilter === 'all') return questions;
+  if (currentFilter === 'conceptual') return questions.filter(q => q.type === 'conceptual' || q.type === 'multiple_choice');
+  if (currentFilter === 'technical') return questions.filter(q => q.type === 'technical');
+  if (currentFilter === 'logical') return questions.filter(q => q.type === 'logical');
+  return questions;
+}
+
+function getTypeClass(type) {
+  if (type === 'conceptual' || type === 'multiple_choice') return 'conceptual';
+  if (type === 'technical') return 'technical';
+  if (type === 'logical') return 'logical';
+  return 'conceptual';
+}
+
+function getTagLabel(type, category) {
+  if (category === 'Exam Trap') return { cls: 'tag-exam', label: '🎯 Exam Trap' };
+  if (type === 'technical') return { cls: 'tag-technical', label: '⚙️ Technical' };
+  if (type === 'logical') return { cls: 'tag-logical', label: '🧩 Logical' };
+  return { cls: 'tag-conceptual', label: '💡 Conceptual' };
+}
+
+function renderQuiz() {
+  const container = document.getElementById('quizContainer');
+  const filtered = getFilteredQuestions();
+  container.innerHTML = '';
+
+  // Group by part
+  const parts = {};
+  filtered.forEach((q, idx) => {
+    if (!parts[q.part]) parts[q.part] = [];
+    parts[q.part].push({ q, idx });
+  });
+
+  let globalIdx = 0;
+  Object.entries(parts).forEach(([partName, items]) => {
+    // Part divider
+    const divider = document.createElement('div');
+    divider.className = 'part-divider';
+    divider.innerHTML = `<div class="part-divider-line left"></div><div class="part-divider-label">${partName}</div><div class="part-divider-line"></div>`;
+    container.appendChild(divider);
+
+    items.forEach(({ q }) => {
+      globalIdx++;
+      const answered = answers[q.id];
+      const isCorrect = answered !== undefined && answered === q.correct;
+      const isWrong = answered !== undefined && answered !== q.correct;
+
+      const tag = getTagLabel(q.type, q.category);
+
+      const card = document.createElement('div');
+      card.className = `question-card ${answered !== undefined ? (isCorrect ? 'answered-correct' : 'answered-wrong') : ''}`;
+      card.id = `card-${q.id}`;
+
+      let optionsHTML = q.options.map((opt, i) => {
+        let cls = '';
+        if (answered !== undefined) {
+          if (i === q.correct) cls = 'correct disabled';
+          else if (i === answered && i !== q.correct) cls = 'wrong disabled';
+          else cls = 'disabled';
+        }
+        return `<button class="option ${cls}" onclick="selectAnswer(${q.id}, ${i})" ${answered !== undefined ? 'disabled' : ''}>
+          <span class="opt-letter">${LETTERS[i]}</span>
+          <span>${opt}</span>
+        </button>`;
+      }).join('');
+
+      const statusIcon = answered !== undefined ? (isCorrect ? '✅' : '❌') : '';
+
+      card.innerHTML = `
+        <div class="q-meta">
+          <span class="q-num">#${globalIdx}</span>
+          <span class="q-tag ${tag.cls}">${tag.label}</span>
+          ${answered !== undefined ? `<span class="q-status" style="display:inline">${statusIcon}</span>` : ''}
+        </div>
+        <div class="q-text">${q.question}</div>
+        <div class="options">${optionsHTML}</div>
+        <div class="explanation ${answered !== undefined ? 'show' : ''}" id="expl-${q.id}">
+          <span class="expl-label">💬 Simple Explanation</span>
+          ${q.simple_explanation}
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  });
+
+  updateStats();
+}
+
+function selectAnswer(qId, optIdx) {
+  if (answers[qId] !== undefined) return;
+  answers[qId] = optIdx;
+
+  const q = questions.find(q => q.id === qId);
+  const card = document.getElementById(`card-${qId}`);
+  const isCorrect = optIdx === q.correct;
+
+  // Update card class
+  card.className = `question-card ${isCorrect ? 'answered-correct' : 'answered-wrong'}`;
+
+  // Update status icon
+  const meta = card.querySelector('.q-meta');
+  let status = meta.querySelector('.q-status');
+  if (!status) {
+    status = document.createElement('span');
+    status.className = 'q-status';
+    meta.appendChild(status);
+  }
+  status.style.display = 'inline';
+  status.textContent = isCorrect ? '✅' : '❌';
+
+  // Update options
+  const options = card.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.disabled = true;
+    opt.classList.add('disabled');
+    if (i === q.correct) opt.classList.add('correct');
+    if (i === optIdx && !isCorrect) opt.classList.add('wrong');
+  });
+
+  // Show explanation
+  const expl = document.getElementById(`expl-${qId}`);
+  expl.classList.add('show');
+
+  updateStats();
+
+  // Check if all filtered questions answered
+  const filtered = getFilteredQuestions();
+  const allAnswered = filtered.every(q => answers[q.id] !== undefined);
+  if (allAnswered && filtered.length > 0) {
+    setTimeout(showResults, 800);
+  }
+}
+
+function updateStats() {
+  const filtered = getFilteredQuestions();
+  const answered = filtered.filter(q => answers[q.id] !== undefined);
+  const correct = answered.filter(q => answers[q.id] === q.correct);
+  const pct = answered.length > 0 ? Math.round((correct.length / answered.length) * 100) : null;
+
+  document.getElementById('totalQ').textContent = filtered.length;
+  document.getElementById('answeredQ').textContent = answered.length;
+  document.getElementById('correctQ').textContent = correct.length;
+  document.getElementById('pctQ').textContent = pct !== null ? pct + '%' : '—';
+
+  const progress = filtered.length > 0 ? (answered.length / filtered.length) * 100 : 0;
+  document.getElementById('progressBar').style.width = progress + '%';
+  document.getElementById('progressLabel').textContent = `${answered.length} of ${filtered.length} answered`;
+  document.getElementById('scoreLabel').textContent = pct !== null ? `Score: ${pct}%` : 'Score: —';
+}
+
+function showResults() {
+  const filtered = getFilteredQuestions();
+  const answered = filtered.filter(q => answers[q.id] !== undefined);
+  const correct = answered.filter(q => answers[q.id] === q.correct);
+  const wrong = answered.length - correct.length;
+  const pct = answered.length > 0 ? Math.round((correct.length / answered.length) * 100) : 0;
+
+  document.getElementById('rCorrect').textContent = correct.length;
+  document.getElementById('rWrong').textContent = wrong;
+  document.getElementById('rPct').textContent = pct + '%';
+
+  const scoreEl = document.getElementById('resultScore');
+  scoreEl.textContent = pct + '%';
+
+  let emoji, verdict, label, scoreClass;
+  if (pct >= 85) { emoji='🏆'; verdict='Excellent! Exam Ready'; label='Outstanding performance — you\'re well prepared'; scoreClass='excellent'; }
+  else if (pct >= 70) { emoji='👍'; verdict='Good Job!'; label='Solid understanding — review weak areas'; scoreClass='good'; }
+  else if (pct >= 50) { emoji='📚'; verdict='Keep Studying'; label='Decent foundation — more practice needed'; scoreClass='average'; }
+  else { emoji='🔄'; verdict='Needs More Work'; label='Focus on the explanations and retry'; scoreClass='poor'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultVerdict').textContent = verdict;
+  document.getElementById('resultLabel').textContent = label;
+  scoreEl.className = `result-score ${scoreClass}`;
+
+  // By type breakdown
+  const types = ['conceptual','technical','logical'];
+  const typeLabels = { conceptual:'💡 Conceptual', technical:'⚙️ Technical', logical:'🧩 Logical' };
+  const typeColors = { conceptual:'#A78BFA', technical:'#50E6FF', logical:'#34D399' };
+
+  const grid = document.getElementById('byTypeGrid');
+  grid.innerHTML = types.map(type => {
+    const typeQs = filtered.filter(q => {
+      if (type === 'conceptual') return q.type === 'conceptual' || q.type === 'multiple_choice';
+      return q.type === type;
+    });
+    const typeAns = typeQs.filter(q => answers[q.id] !== undefined);
+    const typeCorrect = typeAns.filter(q => answers[q.id] === q.correct);
+    const typePct = typeAns.length > 0 ? Math.round((typeCorrect.length / typeAns.length) * 100) : 0;
+    return `<div class="type-score">
+      <div class="ts-label">${typeLabels[type]}</div>
+      <div class="ts-val" style="color:${typeColors[type]}">${typeAns.length > 0 ? typePct + '%' : '—'}</div>
+      <div class="ts-bar"><div class="ts-fill" style="width:${typePct}%;background:${typeColors[type]}"></div></div>
+    </div>`;
+  }).join('');
+
+  const panel = document.getElementById('resultPanel');
+  panel.classList.add('show');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.remove('active');
+    b.className = b.className.replace(/\s*active/, '');
+  });
+  btn.classList.add('active');
+  document.getElementById('resultPanel').classList.remove('show');
+  renderQuiz();
+}
+
+function shuffleAndReset() {
+  answers = {};
+  // Fisher-Yates shuffle
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  document.getElementById('resultPanel').classList.remove('show');
+  renderQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetAll() {
+  answers = {};
+  questions = [...QUESTIONS_RAW];
+  document.getElementById('resultPanel').classList.remove('show');
+  renderQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Init
+renderQuiz();
+</script>
+</body>
+</html>

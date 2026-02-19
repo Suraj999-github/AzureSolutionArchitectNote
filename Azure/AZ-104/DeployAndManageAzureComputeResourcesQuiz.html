@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AZ-104 — Deploy & Manage Azure Compute Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800;900&family=Barlow+Condensed:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --cy:#00E5FF;
+  --cy-dark:#00B8D9;
+  --cy-dim:rgba(0,229,255,0.1);
+  --cy-glow:rgba(0,229,255,0.2);
+  --steel:#1C2B35;
+  --bg:#080D10;
+  --bg2:#0B1218;
+  --s1:#0F1A22;
+  --s2:#13202A;
+  --s3:#172530;
+  --bdr:#1E3040;
+  --bdr2:#254055;
+  --txt:#D0E8F0;
+  --muted:#4A6878;
+  --dim:#1A3040;
+  --correct:#39FF85;
+  --wrong:#FF3E5A;
+  --warn:#FFBF00;
+  --tc:#00E5FF;
+  --tt:#A259FF;
+  --tl:#39FF85;
+  --te:#FFBF00;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:'Barlow',sans-serif;
+  background:var(--bg);
+  color:var(--txt);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ─── SCANLINE OVERLAY ─────────────────────── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,transparent 2px,
+    rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px
+  );
+  pointer-events:none;z-index:0;
+}
+
+/* ─── CIRCUIT CANVAS ───────────────────────── */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.45}
+
+/* ─── AMBIENT GLOWS ────────────────────────── */
+.glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(100px)}
+.g1{width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,255,0.06) 0%,transparent 70%);top:-200px;right:-100px}
+.g2{width:500px;height:500px;background:radial-gradient(circle,rgba(162,89,255,0.04) 0%,transparent 70%);bottom:-200px;left:-100px}
+
+.wrap{max-width:960px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+/* ─── HEADER ───────────────────────────────── */
+header{padding:52px 0 28px;text-align:center}
+
+.mod-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--s1);
+  border:1px solid var(--bdr2);
+  border-top:2px solid var(--cy);
+  padding:8px 22px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--cy);letter-spacing:0.1em;
+  text-transform:uppercase;margin-bottom:24px;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+}
+
+.badge-ind{
+  width:8px;height:8px;background:var(--cy);
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+  animation:spin-diamond 3s linear infinite;
+}
+@keyframes spin-diamond{to{transform:rotate(360deg)}}
+
+h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,6vw,58px);font-weight:900;letter-spacing:-0.01em;line-height:1.05;margin-bottom:12px}
+.h1a{display:block;color:var(--txt);text-transform:uppercase}
+.h1b{
+  display:block;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--cy) 0%,#A259FF 60%,var(--correct) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.subline{
+  font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);
+  letter-spacing:0.05em;
+  display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+}
+.sep{color:var(--dim)}
+
+/* ─── STATS ────────────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:32px 0 0}
+
+.scard{
+  background:var(--s1);border:1px solid var(--bdr);padding:18px 12px;text-align:center;
+  position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.2s;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cy),transparent);opacity:0;transition:opacity 0.3s}
+.scard:hover{border-color:var(--cy);transform:translateY(-3px)}
+.scard:hover::before{opacity:1}
+
+.snum{display:block;font-size:34px;font-weight:800;font-family:'Share Tech Mono',monospace;color:var(--cy);line-height:1;transition:all 0.3s}
+.slbl{display:block;font-size:10px;color:var(--muted);font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;margin-top:6px}
+
+/* ─── PROGRESS ─────────────────────────────── */
+.prog-wrap{
+  position:sticky;top:0;z-index:20;
+  background:rgba(8,13,16,0.95);backdrop-filter:blur(16px);
+  padding:13px 0;border-bottom:1px solid var(--bdr);margin:24px 0;
+}
+
+.prog-track{background:var(--s2);border:1px solid var(--bdr);height:8px;overflow:hidden;margin-bottom:9px;position:relative}
+.prog-track::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 20px,rgba(0,229,255,0.03) 20px,rgba(0,229,255,0.03) 21px)}
+
+.prog-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--cy-dark),var(--cy),#A259FF);
+  width:0%;transition:width 0.55s cubic-bezier(0.22,1,0.36,1);
+  position:relative;
+}
+.prog-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:20px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3))}
+
+.prog-row{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted)}
+.live{color:var(--cy);font-weight:700;font-size:12px}
+
+/* ─── CONTROLS ─────────────────────────────── */
+.controls{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;align-items:center}
+
+.fb{
+  padding:8px 16px;border:1px solid var(--bdr2);background:var(--s1);
+  color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:11px;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.05em;white-space:nowrap;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
+}
+.fb:hover{border-color:var(--cy);color:var(--cy)}
+.fb.active{background:var(--cy);border-color:var(--cy);color:#000;font-weight:700}
+.fb.active.fc{background:#00B8D9;border-color:#00B8D9}
+.fb.active.ft{background:#A259FF;border-color:#A259FF;color:#fff}
+.fb.active.fl{background:var(--correct);border-color:var(--correct)}
+
+.sp{flex:1;min-width:8px}
+
+.btn-main{
+  padding:9px 22px;border:none;
+  background:linear-gradient(135deg,var(--cy-dark),var(--cy));
+  color:#000;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;
+  cursor:pointer;transition:all 0.22s;white-space:nowrap;letter-spacing:0.04em;
+  text-transform:uppercase;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+  box-shadow:0 4px 20px rgba(0,229,255,0.2);
+}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,229,255,0.35)}
+
+.btn-sec{
+  padding:9px 20px;border:1px solid var(--bdr2);background:transparent;
+  color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;text-transform:uppercase;letter-spacing:0.04em;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
+}
+.btn-sec:hover{border-color:var(--cy);color:var(--cy)}
+
+/* ─── PART DIVIDER ─────────────────────────── */
+.pdiv{display:flex;align-items:center;gap:14px;margin:38px 0 18px}
+.pline{flex:1;height:1px;background:var(--bdr)}
+
+.ppill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 18px;border:1px solid var(--bdr2);
+  background:var(--s1);white-space:nowrap;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
+}
+.pico{font-size:14px}
+.ptxt{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted)}
+.pcnt{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cy);background:var(--cy-dim);padding:1px 7px}
+
+/* ─── QUESTION CARD ────────────────────────── */
+.qcard{
+  background:var(--s1);border:1px solid var(--bdr);padding:26px 28px 22px;
+  margin-bottom:12px;
+  transition:border-color 0.35s,background 0.35s,box-shadow 0.35s;
+  animation:risein 0.38s ease both;position:relative;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+}
+.qcard::before{
+  content:'';position:absolute;top:0;left:0;width:3px;height:0;
+  background:var(--cy);transition:height 0.4s ease;
+}
+.qcard:hover::before,.qcard.ok::before{height:100%;background:var(--correct)}
+.qcard.err::before{height:100%;background:var(--wrong)}
+
+@keyframes risein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.qcard.ok{border-color:rgba(57,255,133,0.4);background:linear-gradient(135deg,var(--s1) 0%,rgba(57,255,133,0.04) 100%);box-shadow:0 0 28px rgba(57,255,133,0.06)}
+.qcard.err{border-color:rgba(255,62,90,0.4);background:linear-gradient(135deg,var(--s1) 0%,rgba(255,62,90,0.04) 100%);box-shadow:0 0 28px rgba(255,62,90,0.05)}
+
+.qmeta{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+
+.qnum{
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:var(--muted);background:var(--s2);border:1px solid var(--bdr);padding:2px 9px;
+  letter-spacing:0.05em;
+}
+
+.qtag{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;padding:3px 10px;text-transform:uppercase;letter-spacing:0.08em}
+.ttc{background:rgba(0,229,255,0.12);color:var(--cy);border:1px solid rgba(0,229,255,0.25)}
+.ttt{background:rgba(162,89,255,0.14);color:#C084FC;border:1px solid rgba(162,89,255,0.3)}
+.ttl{background:rgba(57,255,133,0.12);color:var(--correct);border:1px solid rgba(57,255,133,0.25)}
+.tte{background:rgba(255,191,0,0.12);color:var(--warn);border:1px solid rgba(255,191,0,0.25)}
+
+.qstat{font-size:15px;margin-left:auto;display:none}
+
+.qtext{font-size:16px;font-weight:600;line-height:1.6;color:var(--txt);margin-bottom:18px;letter-spacing:-0.01em}
+
+/* ─── OPTIONS ──────────────────────────────── */
+.opts{display:flex;flex-direction:column;gap:8px}
+
+.opt{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 16px;
+  border:1px solid var(--bdr);background:var(--s2);
+  cursor:pointer;transition:all 0.18s cubic-bezier(0.22,1,0.36,1);
+  font-size:14px;line-height:1.55;text-align:left;width:100%;
+  color:#7FA8BE;font-family:'Barlow',sans-serif;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
+}
+.opt:hover:not(.dis){border-color:var(--cy);background:rgba(0,229,255,0.06);color:var(--txt);transform:translateX(5px)}
+.opt.cor{border-color:var(--correct)!important;background:rgba(57,255,133,0.09)!important;color:var(--correct)!important}
+.opt.wrn{border-color:var(--wrong)!important;background:rgba(255,62,90,0.09)!important;color:#FF8095!important}
+.opt.dis{cursor:default}
+
+.okey{
+  min-width:28px;height:28px;
+  background:var(--s3);border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);
+  flex-shrink:0;transition:all 0.18s;
+}
+.opt.cor .okey{background:var(--correct);color:#000;border-color:var(--correct)}
+.opt.wrn .okey{background:var(--wrong);color:#fff;border-color:var(--wrong)}
+.opt:hover:not(.dis) .okey{background:var(--cy);color:#000;border-color:var(--cy)}
+
+/* ─── EXPLANATION ───────────────────────────── */
+.expl{
+  display:none;margin-top:14px;padding:14px 18px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(162,89,255,0.03));
+  border:1px solid rgba(0,229,255,0.2);border-left:3px solid var(--cy);
+  font-size:12.5px;line-height:1.75;color:#7EC8DC;
+  font-family:'Share Tech Mono',monospace;
+}
+.expl.vis{display:block;animation:risein 0.3s ease}
+.expl-hd{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--cy);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+
+/* ─── RESULT PANEL ─────────────────────────── */
+.result{
+  background:var(--s1);border:1px solid var(--bdr2);padding:56px 44px;
+  text-align:center;margin:36px 0;display:none;position:relative;overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));
+}
+.result::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -5%,rgba(0,229,255,0.1) 0%,transparent 55%);pointer-events:none}
+.result.vis{display:block;animation:risein 0.55s ease}
+
+.rtrophy{font-size:56px;display:block;margin-bottom:16px}
+.rscore{font-size:90px;font-weight:900;font-family:'Share Tech Mono',monospace;line-height:1;letter-spacing:-0.04em;margin-bottom:10px}
+.rse{background:linear-gradient(135deg,var(--cy),var(--correct));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rsg{background:linear-gradient(135deg,var(--cy),#A259FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rsa{background:linear-gradient(135deg,var(--warn),#FF8C00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rsp{background:linear-gradient(135deg,var(--wrong),#FF8095);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.rverdict{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px}
+.rmsg{font-size:13px;color:var(--muted);font-family:'Share Tech Mono',monospace;margin-bottom:36px}
+
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.rgc{padding:20px 12px;border:1px solid var(--bdr);background:var(--s2)}
+.rgc .rnum{font-size:38px;font-weight:900;font-family:'Share Tech Mono',monospace}
+.rgc .rlbl{font-size:10px;color:var(--muted);font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+.rgc.rc .rnum{color:var(--correct)}
+.rgc.rw .rnum{color:var(--wrong)}
+.rgc.rp .rnum{color:var(--cy)}
+
+.tbgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:32px}
+.tbc{padding:14px 10px;border:1px solid var(--bdr);background:var(--s2)}
+.tbc-ico{font-size:18px;margin-bottom:6px}
+.tbc-lbl{font-size:9px;font-family:'Share Tech Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em}
+.tbc-val{font-size:22px;font-weight:800;font-family:'Share Tech Mono',monospace;color:var(--txt);margin:4px 0 8px}
+.tbc-bar{height:4px;background:var(--bdr);overflow:hidden}
+.tbc-fill{height:100%;transition:width 1.2s cubic-bezier(0.22,1,0.36,1)}
+
+.ract{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+footer{padding:44px 0;text-align:center;border-top:1px solid var(--bdr);margin-top:16px}
+footer p{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim)}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bdr2)}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+
+@media(max-width:620px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .rgrid,.tbgrid{grid-template-columns:1fr}
+  .qcard{padding:20px 16px}
+  .result{padding:36px 20px}
+  .rscore{font-size:66px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+
+<div class="wrap">
+
+  <header>
+    <div class="mod-badge"><div class="badge-ind"></div>AZ-104 Module · Compute Resources</div>
+    <h1>
+      <span class="h1a">Deploy &amp; Manage</span>
+      <span class="h1b">Azure Compute Resources</span>
+    </h1>
+    <p class="subline">
+      Virtual Machines <span class="sep">·</span>
+      VM Availability <span class="sep">·</span>
+      App Service Plans <span class="sep">·</span>
+      App Service <span class="sep">·</span>
+      Container Instances
+    </p>
+  </header>
+
+  <div class="stats">
+    <div class="scard"><span class="snum" id="totalQ">70</span><span class="slbl">Total Qs</span></div>
+    <div class="scard"><span class="snum" id="answeredQ">0</span><span class="slbl">Answered</span></div>
+    <div class="scard"><span class="snum" id="correctQ">0</span><span class="slbl">Correct</span></div>
+    <div class="scard"><span class="snum" id="pctQ">—</span><span class="slbl">Score %</span></div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-track"><div class="prog-fill" id="progBar"></div></div>
+    <div class="prog-row">
+      <span id="progLabel">0 of 70 answered</span>
+      <span class="live" id="scoreLabel">Score: —</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="fb active" onclick="setFilter('all',this)">All</button>
+    <button class="fb fc" onclick="setFilter('conceptual',this)">💡 Conceptual</button>
+    <button class="fb ft" onclick="setFilter('technical',this)">⚙️ Technical</button>
+    <button class="fb fl" onclick="setFilter('logical',this)">🧩 Scenario</button>
+    <div class="sp"></div>
+    <button class="btn-main" onclick="shuffleReset()">🔀 Shuffle</button>
+    <button class="btn-sec"  onclick="resetAll()">↺ Reset</button>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <div class="result" id="resultPanel">
+    <span class="rtrophy" id="rtrophy">🏆</span>
+    <div class="rscore"   id="rscore">0%</div>
+    <div class="rverdict" id="rverdict">—</div>
+    <div class="rmsg"     id="rmsg">Keep going!</div>
+    <div class="rgrid">
+      <div class="rgc rc"><div class="rnum" id="rCorrect">0</div><div class="rlbl">Correct</div></div>
+      <div class="rgc rw"><div class="rnum" id="rWrong">0</div><div class="rlbl">Wrong</div></div>
+      <div class="rgc rp"><div class="rnum" id="rPct">0%</div><div class="rlbl">Accuracy</div></div>
+    </div>
+    <div class="tbgrid" id="tbgrid"></div>
+    <div class="ract">
+      <button class="btn-main" onclick="shuffleReset()">🔀 Retake Shuffled</button>
+      <button class="btn-sec"  onclick="resetAll()">↺ Review All</button>
+    </div>
+  </div>
+
+  <footer><p>AZ-104 Exam Prep · Deploy &amp; Manage Azure Compute Resources · 70 Questions</p></footer>
+</div>
+
+<script>
+/* ── CIRCUIT BOARD BACKGROUND ─────────────────── */
+(function(){
+  const cv=document.getElementById('bgCanvas');
+  const cx=cv.getContext('2d');
+  let W,H,segs=[],t=0;
+
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
+
+  function init(){
+    segs=[];
+    const n=Math.floor((W*H)/18000);
+    for(let i=0;i<n;i++){
+      const x=Math.random()*W,y=Math.random()*H;
+      const angle=(Math.floor(Math.random()*4)*Math.PI/2);
+      const len=Math.random()*60+20;
+      segs.push({x,y,angle,len,ph:Math.random()*Math.PI*2,spd:Math.random()*0.01+0.005});
+    }
+  }
+
+  function frame(){
+    cx.clearRect(0,0,W,H);
+    t+=0.008;
+    segs.forEach(s=>{
+      const pulse=0.3+0.7*Math.abs(Math.sin(t*s.spd*60+s.ph));
+      const ex=s.x+Math.cos(s.angle)*s.len;
+      const ey=s.y+Math.sin(s.angle)*s.len;
+      cx.beginPath();cx.moveTo(s.x,s.y);cx.lineTo(ex,ey);
+      cx.strokeStyle=`rgba(0,229,255,${0.12*pulse})`;
+      cx.lineWidth=0.8;cx.stroke();
+      // dot at end
+      cx.beginPath();cx.arc(ex,ey,1.5,0,Math.PI*2);
+      cx.fillStyle=`rgba(0,229,255,${0.3*pulse})`;cx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  resize();init();frame();
+  window.addEventListener('resize',()=>{resize();init()});
+})();
+
+/* ── QUESTION DATA ────────────────────────────── */
+const QS=[
+
+  // ══════════════════════════════════════════════
+  // PART 1 — Introduction to Azure Virtual Machines
+  // ══════════════════════════════════════════════
+  {id:1,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is an Azure Virtual Machine (VM) and what type of cloud service is it?",
+   ex:"An Azure VM is an Infrastructure-as-a-Service (IaaS) offering. You get a virtualised computer in the cloud — you control the OS, software, and configuration. Microsoft manages the physical hardware. You are responsible for patching, updates, and the OS.",
+   opts:["A Platform-as-a-Service for running web apps","An Infrastructure-as-a-Service (IaaS) that provides a full virtualised computer — you control the OS and software, Microsoft manages the physical hardware","A serverless compute option","A managed database service"],
+   ans:1},
+
+  {id:2,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are the main VM Series families in Azure and what is each optimised for?",
+   ex:"B-series: burstable, cost-effective for low-CPU workloads. D-series: general purpose (balanced CPU/RAM). E-series: memory-optimised (large RAM for databases). F-series: compute-optimised (high CPU). N-series: GPU-enabled (AI/graphics). M-series: ultra memory.",
+   opts:["All VM sizes are identical — only the region differs","VM series are optimised for specific workloads: B (burstable/cheap), D (general), E (memory), F (compute), N (GPU), M (huge memory)","Only two types: Standard and Premium","Series only differ in storage type"],
+   ans:1},
+
+  {id:3,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is the difference between Managed Disks and Unmanaged Disks in Azure VMs?",
+   ex:"Managed Disks: Microsoft manages the storage account behind the disk automatically — simpler, recommended. Unmanaged Disks: you manage the storage account yourself — legacy, more complexity, no longer recommended for new deployments.",
+   opts:["Managed Disks are more expensive but no functional difference","Managed Disks: Azure manages the underlying storage automatically (recommended). Unmanaged Disks: you manage the storage account yourself (legacy)","Managed Disks only support Windows VMs","Unmanaged Disks offer better performance"],
+   ans:1},
+
+  {id:4,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are the Azure VM disk types and when would you use each?",
+   ex:"Ultra Disk: highest IOPS/throughput for SAP HANA, databases. Premium SSD v2: high perf with flexible IOPS. Premium SSD: production workloads needing guaranteed latency. Standard SSD: web servers, light workloads. Standard HDD: dev/test, non-critical backups.",
+   opts:["Only one disk type exists — Azure SSD","Ultra Disk (max perf), Premium SSD (production), Standard SSD (web apps), Standard HDD (dev/test) — chosen based on IOPS and latency requirements","All disks provide identical IOPS","Disk type only affects cost, not performance"],
+   ans:1},
+
+  {id:5,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"technical",cat:"Technical",
+   q:"What is Azure Bastion and why is it more secure than opening RDP/SSH ports?",
+   ex:"Azure Bastion provides secure RDP/SSH access to VMs directly from the Azure portal over TLS (HTTPS/443) without exposing RDP (3389) or SSH (22) ports to the internet. Eliminates the public IP requirement on the VM and removes the attack surface from those ports.",
+   opts:["A VPN service for connecting to Azure","A managed service providing secure RDP/SSH to VMs via the Azure portal over HTTPS — no exposed RDP/SSH ports or public IPs needed on the VM","An antivirus service for Azure VMs","A load balancer for SSH connections"],
+   ans:1},
+
+  {id:6,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"technical",cat:"Technical",
+   q:"What is a VM Extension in Azure?",
+   ex:"VM Extensions are small applications that run post-deployment on Azure VMs to provide configuration, automation, or monitoring. Examples: Custom Script Extension (run scripts), Microsoft Monitoring Agent (connect to Log Analytics), DSC (Desired State Configuration).",
+   opts:["Extra vCPUs added to a VM after creation","Small post-deployment applications that configure, automate, or monitor Azure VMs (e.g., run scripts, install agents, configure monitoring)","A type of VM disk","An additional network interface for a VM"],
+   ans:1},
+
+  {id:7,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"technical",cat:"Technical",
+   q:"What is Azure Spot VM and what is the key trade-off?",
+   ex:"Spot VMs use unused Azure capacity at up to 90% discount. Trade-off: Azure can evict (terminate) your Spot VM with 30-second notice when capacity is needed. Best for: batch jobs, CI/CD pipelines, rendering — workloads that can tolerate interruption.",
+   opts:["Spot VMs are reserved instances at fixed price","Spot VMs use surplus Azure capacity at up to 90% discount but can be evicted with 30 seconds notice — suitable only for interruptible workloads","Spot VMs are the same as Reserved Instances","Spot VMs have no SLA but cannot be evicted"],
+   ans:1},
+
+  {id:8,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your team needs to connect to a Windows VM for administration but your security policy prohibits opening RDP port 3389 on the network security group. What is the best solution?",
+   ex:"Deploy Azure Bastion in the VM's VNet. Bastion provides RDP access from the Azure portal over HTTPS (port 443) — no need to open 3389 on the NSG and no need for a public IP on the VM.",
+   opts:["Open port 3389 but restrict to a specific IP","Use SSH instead of RDP","Deploy Azure Bastion — it provides RDP via the Azure portal over HTTPS (443) without exposing port 3389","Use a VPN Gateway to access the VM"],
+   ans:2},
+
+  {id:9,part:"Part 1: Introduction to Azure Virtual Machines",icon:"🖥️",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You need to run batch rendering jobs that can be interrupted and restarted. Cost is the top priority. Which VM pricing model should you use?",
+   ex:"Spot VMs offer up to 90% discount for interruptible workloads. Batch rendering can checkpoint and restart — perfect for Spot. Reserved Instances save money but are for predictable, long-running workloads. Pay-as-you-go is most expensive.",
+   opts:["Pay-as-you-go for maximum flexibility","Reserved Instances (1-year) for the discount","Spot VMs — up to 90% cheaper, acceptable since batch jobs can tolerate eviction and restart","Standard VMs with auto-shutdown"],
+   ans:2},
+
+  // ══════════════════════════════════════════════
+  // PART 2 — Configure VM Availability
+  // ══════════════════════════════════════════════
+  {id:10,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is an Availability Set and what does it protect against?",
+   ex:"An Availability Set distributes VMs across Fault Domains (separate hardware racks/power/network) and Update Domains (servers updated separately during maintenance). Protects against: hardware failures in one rack AND planned maintenance affecting all VMs simultaneously. Guarantees 99.95% SLA.",
+   opts:["A group of VMs in the same region","A logical grouping distributing VMs across Fault Domains (separate hardware) and Update Domains (separate maintenance windows) for 99.95% SLA against hardware failures and planned maintenance","A load balancer configuration","A backup strategy for VMs"],
+   ans:1},
+
+  {id:11,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is an Availability Zone and how does it differ from an Availability Set?",
+   ex:"Availability Zones = physically separate data centres within a REGION (different buildings, power, cooling, network). Availability Sets = distributed across racks within ONE data centre. Zones protect against entire data centre failures. Zones give 99.99% SLA vs 99.95% for Availability Sets.",
+   opts:["They are the same concept with different names","Availability Zones: physically separate data centres in a region (protects against data centre failure, 99.99% SLA). Availability Sets: distributed across racks in one data centre (99.95% SLA)","Availability Zones are only for Premium VMs","Availability Sets span multiple regions"],
+   ans:1},
+
+  {id:12,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is a Virtual Machine Scale Set (VMSS)?",
+   ex:"VMSS lets you deploy and auto-scale a set of identical VMs. As load increases, VMSS adds VMs automatically; as load decreases, it removes them. Integrates with Azure Load Balancer or Application Gateway. Used for web servers, batch processing, any horizontally scalable workload.",
+   opts:["A way to resize a single VM automatically","A service that deploys and autoscales a group of identical VMs based on demand — automatically adds/removes VMs to handle load changes","A backup solution for VMs","A pricing tier for multiple VMs"],
+   ans:1},
+
+  {id:13,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are Fault Domains and Update Domains in an Availability Set?",
+   ex:"Fault Domain (FD): a group of hardware sharing the same power source and network switch — a physical rack. If the rack fails, only VMs in that FD are affected. Update Domain (UD): a group of VMs and hardware updated together during planned maintenance. VMs in different UDs stay running while one UD is updated.",
+   opts:["FDs are network zones; UDs are billing zones","Fault Domains: logical groups sharing physical power/network (rack). If one FD fails, others continue. Update Domains: groups maintained separately so not all VMs go down during planned maintenance simultaneously","FDs and UDs are the same thing","FDs only apply to Premium VMs"],
+   ans:1},
+
+  {id:14,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"technical",cat:"Technical",
+   q:"What SLA does Azure guarantee for VMs in each availability configuration?",
+   ex:"Single VM with Premium SSD: 99.9% SLA. VMs in Availability Set: 99.95% SLA. VMs in Availability Zones: 99.99% SLA. No availability config: no SLA guarantee. Always check: a single VM alone has a lower SLA than two VMs in an Availability Set.",
+   opts:["All VM configurations get 99.99% SLA","Single VM (Premium SSD): 99.9% | Availability Set: 99.95% | Availability Zones: 99.99% | No config: no SLA","SLA is the same regardless of configuration","Only Reserved VMs get an SLA"],
+   ans:1},
+
+  {id:15,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"technical",cat:"Technical",
+   q:"What is the purpose of Azure VM Scale Set Scaling Policies (Autoscale)?",
+   ex:"Autoscale rules define WHEN and HOW MUCH to scale. Scale-out rule: add 2 VMs when CPU > 75% for 5 minutes. Scale-in rule: remove 1 VM when CPU < 25% for 10 minutes. Min/max instance limits prevent runaway scaling. Keeps cost optimal while meeting demand.",
+   opts:["Policies that set VM pricing tiers automatically","Rules defining when to add or remove VM instances based on metrics (CPU%, memory, custom metrics) with configurable thresholds, cooldown periods, and min/max instance limits","Disk scaling policies for increasing storage size","Network scaling to add bandwidth automatically"],
+   ans:1},
+
+  {id:16,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You have two web server VMs. Azure updates the host OS, both VMs restart at the same time, and your website goes down. What should you have configured to prevent this?",
+   ex:"An Availability Set with Update Domains ensures VMs are in DIFFERENT Update Domains — only one Update Domain is updated at a time. Your VMs would never both restart simultaneously during planned maintenance.",
+   opts:["Deploy both VMs in the same Availability Zone","Enable Azure Backup on both VMs","Place both VMs in an Availability Set — Update Domains ensure they restart in separate maintenance windows, never simultaneously","Use Premium SSD on both VMs"],
+   ans:2},
+
+  {id:17,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"logical",cat:"Logical/Scenario",
+   q:"An e-commerce app needs to survive the complete failure of an entire Azure data centre. What availability solution should you choose?",
+   ex:"Availability Zones span SEPARATE data centres — if one entire building loses power, VMs in other zones keep running. Availability Sets only protect within ONE data centre. For data centre-level failure protection, you MUST use Availability Zones.",
+   opts:["Availability Set across 3 Fault Domains","Azure Backup with geo-redundant restore","Deploy VMs across multiple Availability Zones — each zone is a physically separate data centre within the region","Use a larger VM size for single-VM resiliency"],
+   ans:2},
+
+  {id:18,part:"Part 2: Configure VM Availability",icon:"🔄",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your web tier handles unpredictable traffic — quiet overnight, then sudden peak during business hours. You need to automatically handle peaks without over-provisioning 24/7. What is the right compute service?",
+   ex:"VM Scale Sets with autoscale rules: scale out when CPU spikes during business hours, scale in overnight when quiet. This gives elastic capacity matching actual demand — you only pay for VMs that are running.",
+   opts:["Deploy 20 VMs always-on to handle any peak","Use a single large VM with more RAM","Use Virtual Machine Scale Sets with autoscale policies — automatically adds VMs during peaks, removes them during quiet periods","Use Azure Functions instead"],
+   ans:2},
+
+  // ══════════════════════════════════════════════
+  // PART 3 — Configure Azure App Service Plans
+  // ══════════════════════════════════════════════
+  {id:19,part:"Part 3: Configure Azure App Service Plans",icon:"📦",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is an Azure App Service Plan?",
+   ex:"An App Service Plan defines the underlying compute resources (VM size, OS, region, number of instances) for your App Service apps. It's the hosting infrastructure. Multiple apps can share one plan. You pay for the plan, not per-app — all apps on the plan share the same compute.",
+   opts:["A billing plan for choosing Azure spending tiers","The underlying compute infrastructure (VM size, region, instance count, OS) that App Service apps run on — multiple apps can share one plan, and you pay for the plan not individual apps","A deployment package for web applications","A security policy for web apps"],
+   ans:1},
+
+  {id:20,part:"Part 3: Configure Azure App Service Plans",icon:"📦",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are the App Service Plan pricing tiers and what key features does each offer?",
+   ex:"Free/Shared: dev/test only, shared infrastructure, no SLA, no custom domains on Free. Basic: dedicated VMs, custom domains/SSL, no autoscale. Standard: autoscale, up to 10 instances, staging slots (5). Premium: more instances, more slots, VNET integration. Isolated: private VNet, dedicated hardware.",
+   opts:["All tiers offer the same features — only storage differs","Free (shared,no SLA), Basic (dedicated,no autoscale), Standard (autoscale,staging slots), Premium (more scale,VNet), Isolated (private dedicated environment) — higher tiers unlock key features","Only three tiers exist: Free, Standard, Premium","Tiers only differ in pricing region"],
+   ans:1},
+
+  {id:21,part:"Part 3: Configure Azure App Service Plans",icon:"📦",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is the key advantage of running multiple apps on the same App Service Plan?",
+   ex:"Cost efficiency — all apps on the plan share the same underlying compute resources at no extra charge. If the plan is Standard S2, you can host 10 apps on it and only pay for ONE plan, not 10. However, all apps compete for the same CPU/memory resources.",
+   opts:["Apps on the same plan get dedicated CPU each","Multiple apps share the same compute resources on one plan — pay once for the plan, not per app. Trade-off: apps compete for shared CPU/memory","Apps on the same plan get automatic load balancing","The apps can communicate without going over the internet"],
+   ans:1},
+
+  {id:22,part:"Part 3: Configure Azure App Service Plans",icon:"📦",
+   type:"technical",cat:"Technical",
+   q:"What is the App Service Plan Isolated tier (App Service Environment - ASE)?",
+   ex:"ASE deploys your App Service into your own dedicated Azure Virtual Network on dedicated hardware — fully isolated from other customers. Used for: strict security/compliance requirements, predictable high-scale, internal apps with no public internet access, PCI/HIPAA workloads.",
+   opts:["A plan that runs apps without any compute resources","A dedicated, isolated deployment within a private Azure VNet on dedicated hardware — used for high-security, compliance-driven, or large-scale workloads requiring full network isolation","A plan for running containers only","An on-premises deployment of App Service"],
+   ans:1},
+
+  {id:23,part:"Part 3: Configure Azure App Service Plans",icon:"📦",
+   type:"technical",cat:"Technical",
+   q:"How does App Service Plan scaling work — scale UP vs scale OUT?",
+   ex:"Scale Up (Vertical): change to a larger plan tier (e.g., S1 → S2 → S3) — more CPU, RAM, disk on the same number of instances. Quick but has a ceiling. Scale Out (Horizontal): add more VM instances (e.g., 1 → 5 instances) — more parallel processing capacity. Can autoscale for Standard+.",
+   opts:["Scale up adds more apps; scale out adds more storage","Scale Up: move to a higher tier (more CPU/RAM per instance). Scale Out: add more instances to handle more concurrent requests. Standard+ tiers support autoscale for automatic scale-out","Scale up means adding a new App Service Plan","They are the same operation"],
+   ans:1},
+
+  {id:24,part:"Part 3: Configure Azure App Service Plans",icon:"📦",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You have a production web app on an App Service Plan Standard S1. Traffic has grown and the app is slow. You add 4 more apps to the same plan to share costs. Now ALL apps are slow. Why?",
+   ex:"All apps on the same App Service Plan share the same CPU and memory. Adding more apps increases resource contention — the S1 plan's compute is now split between 5 apps instead of 1. Either scale up the plan or move heavy apps to dedicated plans.",
+   opts:["The Standard tier doesn't support multiple apps","Adding more apps automatically reduces the plan's performance SLA","All apps on the same App Service Plan share the same compute resources — adding more apps to an already strained plan increases contention and degrades performance for all apps","The apps need separate resource groups"],
+   ans:2},
+
+  // ══════════════════════════════════════════════
+  // PART 4 — Configure Azure App Service
+  // ══════════════════════════════════════════════
+  {id:25,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Azure App Service?",
+   ex:"Azure App Service is a fully managed Platform-as-a-Service (PaaS) for hosting web apps, REST APIs, and mobile backends. It supports many languages (Node.js, Python, .NET, Java, PHP, Ruby). Microsoft manages the underlying OS, patches, and scaling infrastructure — you just deploy your code.",
+   opts:["An IaaS service for running web servers on VMs","A fully managed PaaS for hosting web applications, REST APIs, and mobile backends — supports multiple languages, Microsoft manages the OS and infrastructure","A database hosting service","A CDN service for static websites"],
+   ans:1},
+
+  {id:26,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"conceptual",cat:"Conceptual",
+   q:"What are Deployment Slots in Azure App Service and why are they used?",
+   ex:"Deployment Slots are live, independent environments for your app (e.g., production, staging, dev). Each has its own URL and settings. You deploy to staging, test it, then SWAP staging with production — zero-downtime deployment. If the new version has issues, swap back instantly.",
+   opts:["Time slots for scheduling deployments","Independent live environments for the same app (staging, production) with their own URLs. Deploy to staging, test, then swap to production for zero-downtime releases with instant rollback capability","Storage allocation for deployment packages","Network slots for traffic routing"],
+   ans:1},
+
+  {id:27,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is App Service Custom Domain and what DNS record is needed?",
+   ex:"You can map your own domain (e.g., www.mycompany.com) to an App Service app. DNS: for subdomain (www) use CNAME record pointing to the app's .azurewebsites.net hostname. For root/apex domain (@) use an A record pointing to the app's IP + TXT verification record.",
+   opts:["You cannot use custom domains with App Service","Map your own domain using a CNAME record (for subdomains like www) or an A record + TXT record (for apex/root domain @) in your DNS registrar — requires Basic tier or higher","Custom domains are set up by Microsoft support","Only .com domains are supported"],
+   ans:1},
+
+  {id:28,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is App Service Authentication/Authorization (Easy Auth)?",
+   ex:"Easy Auth is a built-in authentication layer for App Service that handles sign-in without changing your application code. Supports: Microsoft Entra ID, Facebook, Google, Twitter, GitHub. The App Service intercepts requests and authenticates users before they reach your app.",
+   opts:["A firewall for blocking unauthenticated IPs","A built-in authentication layer that handles identity provider integration (Entra ID, Google, Facebook etc.) in front of your app without modifying app code","An SSL certificate manager","A WAF for blocking SQL injection"],
+   ans:1},
+
+  {id:29,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"technical",cat:"Technical",
+   q:"What are App Service Application Settings and Connection Strings, and how do they compare to code-stored config?",
+   ex:"App Settings and Connection Strings store configuration as key-value pairs in the Azure portal, separate from code. They are injected as environment variables at runtime and override values in web.config / appsettings.json. They are encrypted at rest and not visible in source code — secure for passwords and keys.",
+   opts:["They are the same as hardcoding values in code","Key-value configuration stored in Azure (not in code), injected as environment variables at runtime, encrypted at rest — slots have their own settings and sticky settings don't swap with the slot","They only work for .NET applications","Application Settings are stored in Azure Key Vault automatically"],
+   ans:1},
+
+  {id:30,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"technical",cat:"Technical",
+   q:"What is App Service VNet Integration and when do you need it?",
+   ex:"VNet Integration allows your App Service app to make OUTBOUND calls to resources inside a private Azure Virtual Network (e.g., VMs, databases, private endpoints) without those resources being exposed to the internet. Required for: accessing private databases, internal APIs, on-prem resources via VPN/ExpressRoute.",
+   opts:["A feature to expose App Service on a private IP","Allows App Service to make outbound calls to resources inside a private Azure Virtual Network — needed for accessing private databases, internal services, or on-premises resources","A way to block all inbound public traffic","A feature to connect two App Service apps"],
+   ans:1},
+
+  {id:31,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"technical",cat:"Technical",
+   q:"What is the difference between WebJobs and Azure Functions in the context of App Service?",
+   ex:"WebJobs run background tasks WITHIN your existing App Service app — same plan, no extra cost. Triggered or continuous. Azure Functions is a separate serverless service with its own scaling and billing. WebJobs suit simple background tasks tied to an existing app; Functions are better for independent event-driven workloads.",
+   opts:["They are identical — WebJobs is the old name for Azure Functions","WebJobs run background tasks within an existing App Service app (same plan, no extra cost); Azure Functions is a separate serverless service with independent scaling — WebJobs suit app-coupled tasks, Functions suit decoupled event-driven workloads","WebJobs only support .NET","Azure Functions cannot be triggered by timers"],
+   ans:1},
+
+  {id:32,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your web app is deployed to production. You want to deploy a new version, test it with real traffic (10%), and instantly roll back if something goes wrong — without downtime. How?",
+   ex:"Use Deployment Slots: deploy to a staging slot, enable Traffic Manager / traffic routing to send 10% to staging (Traffic Splitting in App Service). If issues arise, remove the traffic split. If all good, swap staging to production — zero-downtime, instant rollback available.",
+   opts:["Deploy directly to production and monitor","Use Azure DevOps to deploy with a 10-minute delay","Use Deployment Slots: deploy to staging, configure traffic splitting (10% to staging), then swap to production when validated — instant rollback by swapping back","Create a new App Service for the new version"],
+   ans:2},
+
+  {id:33,part:"Part 4: Configure Azure App Service",icon:"🌐",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your App Service connects to an Azure SQL Database using a connection string hardcoded in appsettings.json. A developer accidentally commits this to a public GitHub repo. How should this have been handled?",
+   ex:"Connection strings should be stored as App Service Connection Strings in the Azure portal (or Azure Key Vault), NOT in code files. They are injected at runtime, encrypted at rest, and never appear in source code — completely avoiding the credential leak scenario.",
+   opts:["Encrypt the appsettings.json file before committing","Use private GitHub repositories only","Store the connection string in App Service Connection Strings (or Azure Key Vault) — they are injected as environment variables at runtime and never exist in source code","Use Windows Authentication instead of connection strings"],
+   ans:2},
+
+  // ══════════════════════════════════════════════
+  // PART 5 — Configure Azure Container Instances
+  // ══════════════════════════════════════════════
+  {id:34,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is a Container and how does it differ from a Virtual Machine?",
+   ex:"A container packages an application with its dependencies and runs on a shared OS kernel — lightweight, starts in seconds. A VM includes a full OS — heavier, takes minutes to start. Containers = faster, smaller, more portable. VMs = stronger isolation, full OS control.",
+   opts:["Containers and VMs are identical in architecture","Containers package app + dependencies, share the host OS kernel (lightweight, seconds to start). VMs include a full OS (heavier, minutes to start). Containers trade some isolation for speed and density","Containers require more memory than VMs","Containers cannot run on Linux"],
+   ans:1},
+
+  {id:35,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Azure Container Instances (ACI)?",
+   ex:"ACI is the simplest way to run containers in Azure without managing any VMs or orchestration. You specify a container image, CPU/memory, and click run — Azure starts it in seconds. Billed per second of usage. No cluster to manage. Best for: simple, isolated, event-driven, or burst workloads.",
+   opts:["A Kubernetes cluster management service","The simplest serverless container service — run containers directly without managing VMs or clusters, billed per second, starts in seconds, ideal for simple/burst/isolated workloads","A container registry for storing Docker images","A managed Kubernetes service"],
+   ans:1},
+
+  {id:36,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Azure Container Registry (ACR)?",
+   ex:"ACR is a private Docker registry hosted in Azure. You push container images to ACR, and then pull from ACR to ACI, AKS, or App Service. It's private (unlike Docker Hub which is public), geo-replicated, and integrates with Entra ID for authentication.",
+   opts:["A service for managing container costs","A private Docker container image registry hosted in Azure — store, manage, and deploy container images privately, integrated with Azure services and secured with Entra ID","A public marketplace for container images","A monitoring service for running containers"],
+   ans:1},
+
+  {id:37,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is a Container Group in Azure Container Instances?",
+   ex:"A Container Group is a collection of containers that run on the SAME host machine, share the same lifecycle, networking, and storage. Like a Kubernetes Pod. All containers in a group share an IP address and port namespace — they communicate via localhost.",
+   opts:["A billing group for multiple separate containers","A collection of containers that share the same host, lifecycle, network (IP), and storage — similar to a Kubernetes Pod, containers communicate via localhost","A security group for containers","A resource group containing ACI resources"],
+   ans:1},
+
+  {id:38,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is the difference between Azure Container Instances (ACI) and Azure Kubernetes Service (AKS)?",
+   ex:"ACI: simple, no orchestration, no cluster management, single containers or simple groups, good for burst/dev/test/simple tasks. AKS: full Kubernetes — orchestration, auto-scaling, service discovery, rolling updates — for complex, production, multi-container microservices at scale.",
+   opts:["ACI is newer and replaces AKS","ACI: simple serverless containers (no cluster management, good for burst/isolation). AKS: full Kubernetes orchestration for complex, production-grade microservices requiring auto-scaling, service mesh, rolling deployments","AKS is cheaper than ACI","ACI supports larger containers than AKS"],
+   ans:1},
+
+  {id:39,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"technical",cat:"Technical",
+   q:"What are the networking options for Azure Container Instances?",
+   ex:"Public IP: container gets a public IP directly accessible from internet. Private VNet: deploy ACI into a VNet subnet — container gets a private IP, can communicate with VNet resources securely. None (no network): for batch jobs that only need outbound internet. Port mapping configures which container ports are exposed.",
+   opts:["ACI containers can only have private IPs","ACI supports: Public IP (internet accessible), Private VNet deployment (private IP in subnet for accessing VNet resources securely), or no public IP for outbound-only batch workloads","ACI requires a VNet in all deployments","ACI containers cannot communicate with other Azure services"],
+   ans:1},
+
+  {id:40,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"technical",cat:"Technical",
+   q:"How do you pass configuration to an Azure Container Instance at runtime?",
+   ex:"Environment Variables: key-value pairs injected into the container at startup (like docker -e). Secure Environment Variables: encrypted, not visible in portal/API logs — for secrets. Volumes: mount Azure File Shares into the container for persistent storage. Command-line override: override the container's default CMD.",
+   opts:["You must bake all config into the container image","Environment Variables (plain or secure/encrypted for secrets), Volume mounts (Azure Files for persistent data), and command-line overrides — config is passed at startup without rebuilding the image","Config can only be passed via Azure Key Vault","ACI containers cannot be configured after image creation"],
+   ans:1},
+
+  {id:41,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"technical",cat:"Technical",
+   q:"What persistent storage options are available for Azure Container Instances?",
+   ex:"ACI is stateless by default (container restarts lose data). For persistence: mount an Azure Files share as a volume — data persists even if container restarts or is replaced. Azure Files uses SMB protocol. You can also mount Azure Git repos (for config). No Azure Disk support (that requires VMs/AKS).",
+   opts:["ACI supports Azure Managed Disks like VMs","Mount Azure Files shares as volumes for persistent storage that survives container restarts — ACI containers are stateless by default and do not support Azure Managed Disks","ACI automatically saves all container data to blob storage","Persistent storage requires Premium ACI tier"],
+   ans:1},
+
+  {id:42,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You have a nightly data processing job that runs for 30 minutes, processes a batch of files, then exits. You don't want to manage infrastructure. What is the ideal compute service?",
+   ex:"ACI is perfect: launch container on a schedule, it runs and exits, you pay only for 30 minutes of compute. No VM to manage 24/7, no cluster needed. Azure Logic Apps or Event Grid can trigger ACI. Much cheaper than keeping a VM running idle.",
+   opts:["Deploy a VM and run the job via Task Scheduler","Use Azure Kubernetes Service for the batch job","Use Azure Container Instances — starts in seconds, runs the job, terminates, and you're billed only for those 30 minutes. No infrastructure to manage","Use App Service WebJobs on a Premium plan"],
+   ans:2},
+
+  {id:43,part:"Part 5: Configure Azure Container Instances",icon:"📦",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your microservices app has 15 services that need auto-scaling, service discovery, rolling updates, and health monitoring in production. Which Azure container service is appropriate?",
+   ex:"AKS (Azure Kubernetes Service) is designed for complex, production microservices — it orchestrates multiple services, handles auto-scaling, service discovery (DNS), rolling updates, health checks, and self-healing. ACI would require manual management of all those aspects.",
+   opts:["Azure Container Instances — it supports multiple containers","Azure App Service — it supports containers","Azure Kubernetes Service (AKS) — built for orchestrating complex multi-service applications at scale with auto-scaling, service discovery, and rolling updates","Azure Container Registry — it stores and manages images"],
+   ans:2},
+
+  // ══════════════════════════════════════════════
+  // BONUS — Cross-Topic Exam Traps
+  // ══════════════════════════════════════════════
+  {id:44,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Exam Trap",
+   q:"Exam Trap: IaaS vs PaaS vs Serverless — classify Azure VMs, App Service, and ACI correctly.",
+   ex:"Azure VMs = IaaS (you manage OS, patches, software). App Service = PaaS (Microsoft manages OS/runtime, you manage code and config). ACI = serverless/PaaS hybrid (no VM management at all, billed per second). This is a frequent AZ-104 classification question.",
+   opts:["VMs = PaaS, App Service = IaaS, ACI = SaaS","VMs = IaaS (manage OS yourself), App Service = PaaS (manage only code/config), ACI = serverless-like PaaS (no infrastructure management, per-second billing)","All three are IaaS","VMs = SaaS, App Service = IaaS, ACI = PaaS"],
+   ans:1},
+
+  {id:45,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Exam Trap",
+   q:"Exam Trap: Can you add a VM to an Availability Set AFTER it's been created?",
+   ex:"NO — Availability Set membership must be configured at VM creation time. You CANNOT move an existing VM into an Availability Set after it's created. You must delete and recreate the VM, or use Azure Site Recovery migration in some scenarios.",
+   opts:["Yes — you can add a VM to an Availability Set at any time","No — Availability Set membership is configured at VM creation and cannot be changed afterwards without deleting and recreating the VM","Yes — but only if the VM is turned off","Yes — via the Azure CLI only, not the portal"],
+   ans:1},
+
+  {id:46,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Exam Trap",
+   q:"Exam Trap: What is the minimum App Service Plan tier required for Deployment Slots?",
+   ex:"Deployment Slots require Standard tier or higher. Free and Basic plans do NOT support slots. Standard gives 5 slots, Premium gives more. This is a very commonly tested exam fact — remember: Free/Basic = no slots.",
+   opts:["Free tier supports 1 slot","Basic tier supports deployment slots","Standard tier is the minimum — Free and Basic do NOT support Deployment Slots. Standard gives 5 slots, Premium gives more","Premium tier is required for all slot features"],
+   ans:2},
+
+  {id:47,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is the Azure VM Compute Unit (ACU) and why does it matter when comparing VM sizes?",
+   ex:"ACU is a standardised way to compare CPU performance across VM sizes — a Standard_A1 = 100 ACU baseline. Higher ACU = more CPU performance per vCPU. Useful for comparing: will an F4s (compute-optimised) give better CPU per core than a D4s (general purpose)? F-series has higher ACU.",
+   opts:["ACU measures network bandwidth of a VM","A standardised performance benchmark for comparing relative CPU performance across different VM sizes — higher ACU = more CPU performance per vCPU","ACU is a pricing unit for VMs","ACU measures the number of available storage IOPS"],
+   ans:1},
+
+  {id:48,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is a Proximity Placement Group (PPG) in Azure?",
+   ex:"A PPG ensures VMs are placed in the same data centre as close together as possible — minimising network latency between them. Critical for: tightly coupled HPC applications, database clusters, or any workload where VM-to-VM latency must be under 1ms.",
+   opts:["A group that places VMs in different regions","A logical group ensuring VMs are placed physically close together (same data centre) to minimise network latency between them — critical for latency-sensitive workloads like HPC clusters","A billing group for co-located VMs","An availability group for Premium SSD VMs"],
+   ans:1},
+
+  {id:49,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You need to deploy a web app in a private VNet with no public internet access, require high scale (50+ instances), and need compliance isolation. Which App Service configuration is needed?",
+   ex:"App Service Environment (ASE) — the Isolated tier. It deploys your App Service Plan into your own private VNet on dedicated hardware. No shared infrastructure with other Azure customers. Supports internal load balancer (ILB) for completely private (no public IP) deployment.",
+   opts:["Standard App Service Plan with VNet Integration","Premium App Service Plan with private endpoint","App Service Environment (Isolated tier) — deploys into a private VNet on dedicated hardware, supports Internal Load Balancer for no public IP, provides full network isolation for compliance","Basic App Service Plan with IP restrictions"],
+   ans:2},
+
+  {id:50,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is the difference between a Container Image and a Container Instance?",
+   ex:"Image: the read-only template/blueprint for a container — it contains the app code, runtime, libraries, and dependencies. Built once, stored in a registry (ACR, Docker Hub). Instance: a running container created FROM an image — it's the live process. Multiple instances can run from the same image.",
+   opts:["They are the same — 'image' and 'instance' are interchangeable","Container Image: the read-only blueprint/template stored in a registry. Container Instance: a running container created from the image — many instances can run from the same image","Images run code; Instances store code","Images are for Linux; Instances are for Windows"],
+   ans:1},
+
+  {id:51,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your App Service app is getting slow during peak hours. CPU is consistently at 85%. The plan is Standard S2. What are your two options, and when would you choose each?",
+   ex:"Option 1 — Scale Up: move to S3 (bigger VM, more CPU/RAM per instance). Good if you have one instance that needs more power per request. Option 2 — Scale Out: add more S2 instances (2, 3, 4...). Better for concurrent users — more instances handle more requests in parallel. Scale out is usually preferred for web apps (stateless, horizontal).",
+   opts:["Upgrade to Premium Plan immediately","Delete and recreate with a new plan","Scale Up (move to S3 for more power per instance) or Scale Out (add more S2 instances for more parallel capacity) — Scale Out is generally preferred for stateless web apps handling concurrent requests","Switch to a VM instead of App Service"],
+   ans:2},
+
+  {id:52,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Azure Dedicated Host?",
+   ex:"Azure Dedicated Host gives you a physical server entirely to yourself — no other customer shares your hardware. Use cases: compliance requirements that prohibit shared hardware (e.g., financial regulations), licensing requirements (SQL Server, Windows Server per-core licensing). Higher cost but full hardware isolation.",
+   opts:["A reserved VM that other customers cannot scale up next to","A physical Azure server dedicated entirely to your organisation — no sharing with other customers. Used for compliance, regulatory, or licensing requirements that mandate dedicated hardware","A special region for government workloads","A VM type with guaranteed uptime"],
+   ans:1},
+
+  {id:53,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is Azure VM Disk Caching and what are the options?",
+   ex:"Disk caching uses the VM's RAM/SSD to cache disk I/O. Options: Read-Only caching: caches read operations (good for data that's read frequently but rarely written — OS disks). Read/Write caching: caches both (used carefully — risk of data loss on crash). None: no caching (for write-heavy data like database log files).",
+   opts:["Disk caching is only for Premium SSD and has one setting","Caching modes: None (no caching, for write-heavy like DB logs), ReadOnly (cache reads, good for OS disk), Read/Write (cache both, use carefully) — chosen per disk based on workload read/write patterns","Disk caching is managed automatically and cannot be configured","Caching adds a second copy of the disk automatically"],
+   ans:1},
+
+  {id:54,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You have a multi-tier app: web tier (App Service), API tier (ACI), and database (Azure SQL). The API and database must NOT be publicly accessible. How do you secure this architecture?",
+   ex:"Web tier (App Service): public internet facing, OK with public IP. API (ACI in VNet): deploy ACI with VNet integration into a private subnet — no public IP. Database (Azure SQL): use Private Endpoint to give it a private IP in the VNet — no public endpoint. App Service connects to API via VNet Integration.",
+   opts:["Use Network Security Groups on all public IPs","Put everything in the same resource group for network isolation","Deploy ACI into a private VNet subnet (no public IP), use Azure SQL Private Endpoint (private IP in VNet), and enable App Service VNet Integration for outbound private communication — no public access to API or database","Use Azure Firewall to block all inbound traffic"],
+   ans:2},
+
+  {id:55,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is Azure App Service Diagnostics Logging and what log types are available?",
+   ex:"App Service Logging types: Application Logging (app-written log messages to filesystem/blob). Web Server Logging (raw HTTP request logs). Detailed Error Messages (HTML error pages for 400+ status codes). Failed Request Tracing (detailed XML trace for failed requests). Deployment Logging (log output from deployment operations).",
+   opts:["Only one log type is available: application log","App Service provides: Application Logging (app messages), Web Server Logging (HTTP logs), Detailed Error Messages (error pages), Failed Request Tracing (request trace XML), and Deployment Logging — each stored to filesystem or blob storage","Logs are only sent to Azure Monitor by default","Logging requires a Premium plan"],
+   ans:1},
+
+  {id:56,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Exam Trap: You run 5 apps on a single App Service Plan Standard S2. One app's traffic spikes and autoscale triggers, adding 3 more instances. How many instances does each of the other 4 apps get?",
+   ex:"When the App Service Plan scales out to 4 instances total, ALL apps on that plan run on ALL instances. Each app gets 4 instances — the scale applies to the PLAN, not to individual apps. This is both a benefit (other apps also scale) and a risk (cost multiplies for all apps on the plan).",
+   opts:["Only the app that triggered autoscale gets more instances","Each app independently decides whether to use the new instances","All apps on the App Service Plan run on all instances — when the plan scales to 4 instances, ALL 5 apps run on all 4 instances (both benefit and cost consideration)","Apps must be individually configured to use new instances"],
+   ans:2},
+
+  {id:57,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Azure VM Reserved Instances (Reserved Capacity)?",
+   ex:"Reserved Instances = commit to 1 or 3 years of a specific VM size in a region in exchange for up to 72% discount over pay-as-you-go. Paid upfront (all), monthly, or split. Best for: predictable, steady-state workloads you'll run 24/7. Exchange or cancel with some restrictions.",
+   opts:["A VM that is kept reserved and never started","A 1 or 3-year commitment to a specific VM size/region in exchange for up to 72% discount over pay-as-you-go pricing — ideal for steady-state predictable workloads","A type of VM that cannot be resized","A billing option exclusive to Enterprise agreements"],
+   ans:1},
+
+  {id:58,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is the Azure Custom Script Extension and when would you use it?",
+   ex:"Custom Script Extension downloads and executes scripts on Azure VMs during or after deployment. Used for: installing software, configuring the OS, downloading agents, running post-deployment configuration. Scripts can be stored in Azure Storage or GitHub. Works on both Windows (PowerShell) and Linux (Bash).",
+   opts:["A feature for writing custom Azure Policy rules","A VM extension that downloads and runs PowerShell/Bash scripts on a VM post-deployment — used for OS configuration, software installation, and automation without needing to create custom VM images","A tool for creating custom VM images","A service for running scripts in Azure Functions"],
+   ans:1},
+
+  {id:59,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You need to deploy a containerised application but your team has no Kubernetes expertise. The app has variable load with long quiet periods and short intense bursts. Which service is most appropriate?",
+   ex:"Azure Container Apps (or ACI for simpler cases) handles containerised apps without Kubernetes knowledge. For burst workloads: ACI scales to zero and starts on demand. For more advanced scenarios with KEDA-based autoscaling without K8s knowledge, Azure Container Apps is the modern answer. ACI for simplest burst jobs.",
+   opts:["Azure Kubernetes Service — it's the only container service","Azure Virtual Machines with Docker installed","Azure Container Instances (for simple burst) or Azure Container Apps (for event-driven autoscaling without Kubernetes expertise) — both avoid Kubernetes cluster management","Azure App Service with Docker — but it requires Kubernetes knowledge"],
+   ans:2},
+
+  {id:60,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is Azure VM Capture (Generalisation) and what does it create?",
+   ex:"Capturing a VM: first run Sysprep (Windows) or waagent deprovision (Linux) to generalise the VM (remove machine-specific info like hostname, user accounts). Then capture creates a custom VM image in Azure. This image can be used to deploy multiple identical VMs. The original VM is unusable after capture — it's destructive.",
+   opts:["A backup of the VM that can be restored","First generalise the VM (Sysprep/waagent) to remove machine-specific data, then capture creates a reusable custom VM image — used to deploy multiple identical VMs. WARNING: the original VM is destroyed in the process","A snapshot of VM disks that keeps the VM running","An Azure Site Recovery operation"],
+   ans:1},
+
+  {id:61,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Your App Service app needs to access an Azure SQL database. The database's firewall blocks all public internet traffic. Only traffic from inside a specific VNet is allowed. What configuration enables this?",
+   ex:"Enable VNet Integration on the App Service — this allows App Service to make OUTBOUND connections through a VNet subnet. The SQL database allows the VNet subnet in its firewall. Now the App Service reaches SQL via private network, complying with the firewall rule.",
+   opts:["Enable Hybrid Connections on the App Service","Add the App Service's public IP to the SQL firewall rules","Enable VNet Integration on the App Service so it routes outbound traffic through the VNet, then allow that VNet subnet in the SQL database firewall rules","Use Azure API Management to proxy the SQL connection"],
+   ans:2},
+
+  {id:62,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"conceptual",cat:"Conceptual",
+   q:"What is Azure App Service Health Check?",
+   ex:"Health Check pings a path on your app (e.g., /health) at regular intervals. If an instance fails health checks, App Service: removes it from the load balancer (stops sending traffic to it), and if it stays unhealthy for a threshold, replaces it with a new instance. Requires 2+ instances to be effective.",
+   opts:["A monitoring dashboard for viewing app metrics","A feature that regularly pings a health endpoint — unhealthy instances are removed from load balancer rotation and replaced if they stay unhealthy, ensuring traffic only goes to healthy instances (requires 2+ instances)","An SSL certificate health validator","A test that runs before each deployment"],
+   ans:1},
+
+  {id:63,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is the difference between Vertical Scaling and Horizontal Scaling for VMs?",
+   ex:"Vertical (Scale Up): resize the VM to a larger size (e.g., D2s → D4s) — more CPU and RAM on the SAME machine. Requires VM restart. Has a hardware ceiling. Horizontal (Scale Out): add more VM instances (1 → 3 VMs) running your app in parallel. No restart, no ceiling (within quota). Preferred for web/stateless workloads.",
+   opts:["Vertical = add more VMs, Horizontal = use larger VMs","Vertical Scaling (Scale Up): resize to larger VM (more CPU/RAM, requires restart, has ceiling). Horizontal Scaling (Scale Out): add more VM instances (no restart, no ceiling). Scale Out preferred for stateless/web workloads","They are the same — both add compute resources","Vertical scaling is only available with Reserved Instances"],
+   ans:1},
+
+  {id:64,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Exam Trap: What happens to Deployment Slot settings during a SWAP operation?",
+   ex:"Some settings SWAP with the slot (travel with the code): app settings NOT marked 'sticky', connection strings NOT marked sticky, handler mappings, WebJobs content. Sticky settings STAY with the slot (do NOT swap): settings marked 'deployment slot setting', custom domain names, TLS/SSL certificates, scale settings. Know which swap and which don't!",
+   opts:["All settings always swap with the slot content","No settings ever swap — only code swaps","Slot settings either swap (travel with code) or stay (sticky). Sticky settings marked 'deployment slot setting' remain with the slot. Non-sticky app settings and connection strings travel with the app code during swap","Sticky settings are copied to both slots during swap"],
+   ans:2},
+
+  {id:65,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You have a VMSS running 3 instances. Autoscale is configured: scale out (add 2) when CPU > 70% for 5 min, scale in (remove 1) when CPU < 30% for 10 min. CPU spikes to 80% for 7 minutes. What happens?",
+   ex:"The scale-out condition (CPU > 70% for 5+ minutes) is met at the 5-minute mark. VMSS adds 2 instances → now 5 instances. The new instances help handle the load, CPU drops below 70%. Scale-in won't trigger until CPU stays below 30% for 10+ minutes. The cooldown period also prevents immediate re-scaling.",
+   opts:["Nothing happens — 7 minutes isn't long enough","VMSS adds 1 instance every minute","After CPU stays above 70% for 5 minutes, VMSS adds 2 instances (total = 5). New instances reduce CPU load. Scale-in (remove 1) won't trigger until CPU drops below 30% and stays there for 10+ minutes","VMSS removes instances to reduce CPU load"],
+   ans:2},
+
+  {id:66,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is Azure VM Disk Encryption and what two technologies are used?",
+   ex:"Azure Disk Encryption (ADE) encrypts VM OS and data disks. Windows: uses BitLocker. Linux: uses DM-Crypt. Encryption keys are stored in Azure Key Vault. ADE goes BEYOND Storage Service Encryption (SSE) — SSE encrypts data at rest in storage, ADE encrypts the volume inside the VM OS.",
+   opts:["Azure VMs use TLS to encrypt disk data","Azure Disk Encryption uses BitLocker (Windows) or DM-Crypt (Linux) to encrypt VM disks, with keys managed in Azure Key Vault — goes beyond server-side storage encryption to encrypt the OS-level volume","Azure disks are never encrypted by default","ADE is automatically enabled on all new VMs"],
+   ans:1},
+
+  {id:67,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"A microservices team wants to deploy Docker containers but needs: auto-scaling, rolling updates, and service discovery between 8 services without managing Kubernetes. What modern Azure service addresses this?",
+   ex:"Azure Container Apps (not AKS) is designed for microservices and event-driven containerised apps without Kubernetes management overhead. It handles auto-scaling (including scale-to-zero), rolling deployments, service discovery, and DAPR sidecar integration — all without K8s expertise.",
+   opts:["Azure Container Instances — supports all these features","Azure App Service with container support","Azure Container Apps — managed microservices platform with auto-scaling, rolling updates, and service discovery built-in, without requiring Kubernetes expertise","Azure Kubernetes Service — there is no other option for microservices"],
+   ans:2},
+
+  {id:68,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"technical",cat:"Technical",
+   q:"What is an Azure VM's Ephemeral OS Disk and when should you use it?",
+   ex:"Ephemeral OS Disk stores the OS disk on the VM's local NVMe/SSD storage (temp storage) instead of remote managed disk storage. Benefits: near-zero read/write latency (local SSD), free (no separate disk cost), immediate provisioning. Trade-off: data is lost when VM is deallocated. Great for stateless VMs in VMSS.",
+   opts:["A temporary disk that disappears when the VM is turned off — unusable for production","Stores the OS disk on local VM SSD/NVMe storage — lower latency, free, faster provisioning. Data is lost on deallocation. Ideal for stateless VMSS instances where OS is re-created from image on each startup","An encrypted disk that auto-deletes after 30 days","A disk type only available for B-series VMs"],
+   ans:1},
+
+  {id:69,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"You need to ensure your App Service app is always serving traffic even during Azure platform maintenance or instance failures. What configuration provides the highest availability?",
+   ex:"Run 2+ instances in the App Service Plan + enable Health Check (removes unhealthy instances from rotation). Optionally deploy across Availability Zones (zone redundancy) if your region supports it. Azure SLA for App Service requires 2+ instances for 99.95%+ SLA — single instance has lower SLA.",
+   opts:["Use Premium SSD storage for the App Service","Enable Always On setting in App Service configuration","Run 2+ instances (scale out) to get 99.95% SLA, enable Health Check to remove unhealthy instances from rotation, and optionally enable Availability Zone redundancy for data centre-level resilience","Enable auto-heal in App Service settings"],
+   ans:2},
+
+  {id:70,part:"Bonus: Compute Exam Traps & Architecture",icon:"🎯",
+   type:"logical",cat:"Logical/Scenario",
+   q:"Final Exam Trap: A developer on your team says 'I deployed to the staging slot so production is safe'. They then run a database migration script directly against the production database. What is wrong with this reasoning?",
+   ex:"Deployment Slots isolate the APPLICATION code — not the database. Both staging and production typically connect to the SAME production database (unless you've deliberately set up separate databases per slot with sticky connection strings). The DB migration affected production immediately. Slot swaps protect code, not data.",
+   opts:["Nothing is wrong — staging slots fully isolate all changes","The staging slot should have been swapped before running migrations","Deployment Slots isolate code/app configuration — NOT the database. Both slots typically share the same database. Running a migration against production DB is dangerous regardless of which slot the code is on","The developer needed Owner RBAC to run migrations"],
+   ans:2},
+];
+
+/* ── STATE ─────────────────────────────────────── */
+let questions=[...QS];
+let answers={};
+let activeFilter='all';
+const KEYS=['A','B','C','D'];
+
+/* ── HELPERS ───────────────────────────────────── */
+function getFiltered(){
+  if(activeFilter==='all')        return questions;
+  if(activeFilter==='conceptual') return questions.filter(q=>q.type==='conceptual');
+  if(activeFilter==='technical')  return questions.filter(q=>q.type==='technical');
+  if(activeFilter==='logical')    return questions.filter(q=>q.type==='logical');
+  return questions;
+}
+
+function tagInfo(type,cat){
+  if(cat==='Exam Trap') return{cls:'tte',lbl:'🎯 Exam Trap'};
+  if(type==='technical') return{cls:'ttt',lbl:'⚙️ Technical'};
+  if(type==='logical')   return{cls:'ttl',lbl:'🧩 Scenario'};
+  return                       {cls:'ttc',lbl:'💡 Conceptual'};
+}
+
+/* ── RENDER ────────────────────────────────────── */
+function render(){
+  const wrap=document.getElementById('quizContainer');
+  const filtered=getFiltered();
+  wrap.innerHTML='';
+
+  const parts={};
+  filtered.forEach(q=>{
+    if(!parts[q.part]) parts[q.part]={icon:q.icon,items:[]};
+    parts[q.part].items.push(q);
+  });
+
+  let gi=0;
+  Object.entries(parts).forEach(([pname,data])=>{
+    const dv=document.createElement('div');
+    dv.className='pdiv';
+    dv.innerHTML=`
+      <div class="pline"></div>
+      <div class="ppill">
+        <span class="pico">${data.icon}</span>
+        <span class="ptxt">${pname}</span>
+        <span class="pcnt">${data.items.length}q</span>
+      </div>
+      <div class="pline"></div>`;
+    wrap.appendChild(dv);
+
+    data.items.forEach(q=>{
+      gi++;
+      const ans=answers[q.id];
+      const isOk=ans!==undefined&&ans===q.ans;
+      const tag=tagInfo(q.type,q.cat);
+
+      const card=document.createElement('div');
+      card.className=`qcard ${ans!==undefined?(isOk?'ok':'err'):''}`;
+      card.id=`card-${q.id}`;
+
+      const optsH=q.opts.map((o,i)=>{
+        let cls='';
+        if(ans!==undefined){
+          if(i===q.ans) cls='cor dis';
+          else if(i===ans) cls='wrn dis';
+          else cls='dis';
+        }
+        return `<button class="opt ${cls}" onclick="pick(${q.id},${i})" ${ans!==undefined?'disabled':''}>
+          <span class="okey">${KEYS[i]}</span><span>${o}</span>
+        </button>`;
+      }).join('');
+
+      card.innerHTML=`
+        <div class="qmeta">
+          <span class="qnum">#${gi}</span>
+          <span class="qtag ${tag.cls}">${tag.lbl}</span>
+          ${ans!==undefined?`<span class="qstat" style="display:inline">${isOk?'✅':'❌'}</span>`:''}
+        </div>
+        <div class="qtext">${q.q}</div>
+        <div class="opts">${optsH}</div>
+        <div class="expl ${ans!==undefined?'vis':''}" id="ex-${q.id}">
+          <div class="expl-hd">⚡ Simple Explanation</div>
+          ${q.ex}
+        </div>`;
+      wrap.appendChild(card);
+    });
+  });
+  updateStats();
+}
+
+/* ── ANSWER ────────────────────────────────────── */
+function pick(qId,idx){
+  if(answers[qId]!==undefined) return;
+  answers[qId]=idx;
+  const q=questions.find(x=>x.id===qId);
+  const card=document.getElementById(`card-${qId}`);
+  const ok=idx===q.ans;
+
+  card.className=`qcard ${ok?'ok':'err'}`;
+
+  const meta=card.querySelector('.qmeta');
+  if(!meta.querySelector('.qstat')){
+    const s=document.createElement('span');
+    s.className='qstat';s.style.display='inline';meta.appendChild(s);
+  }
+  meta.querySelector('.qstat').textContent=ok?'✅':'❌';
+
+  card.querySelectorAll('.opt').forEach((b,i)=>{
+    b.disabled=true;b.classList.add('dis');
+    if(i===q.ans) b.classList.add('cor');
+    else if(i===idx&&!ok) b.classList.add('wrn');
+  });
+
+  document.getElementById(`ex-${qId}`).classList.add('vis');
+  updateStats();
+
+  const filt=getFiltered();
+  if(filt.every(x=>answers[x.id]!==undefined)) setTimeout(showResult,900);
+}
+
+/* ── STATS ─────────────────────────────────────── */
+function updateStats(){
+  const f=getFiltered();
+  const ans=f.filter(q=>answers[q.id]!==undefined);
+  const cor=ans.filter(q=>answers[q.id]===q.ans);
+  const pct=ans.length>0?Math.round((cor.length/ans.length)*100):null;
+  const prg=f.length>0?(ans.length/f.length)*100:0;
+
+  document.getElementById('totalQ').textContent=f.length;
+  document.getElementById('answeredQ').textContent=ans.length;
+  document.getElementById('correctQ').textContent=cor.length;
+  document.getElementById('pctQ').textContent=pct!==null?pct+'%':'—';
+  document.getElementById('progBar').style.width=prg+'%';
+  document.getElementById('progLabel').textContent=`${ans.length} of ${f.length} answered`;
+  document.getElementById('scoreLabel').textContent=pct!==null?`Score: ${pct}%`:'Score: —';
+}
+
+/* ── RESULT ────────────────────────────────────── */
+function showResult(){
+  const f=getFiltered();
+  const ans=f.filter(q=>answers[q.id]!==undefined);
+  const cor=ans.filter(q=>answers[q.id]===q.ans);
+  const bad=ans.length-cor.length;
+  const pct=ans.length>0?Math.round((cor.length/ans.length)*100):0;
+
+  document.getElementById('rCorrect').textContent=cor.length;
+  document.getElementById('rWrong').textContent=bad;
+  document.getElementById('rPct').textContent=pct+'%';
+
+  const sc=document.getElementById('rscore');
+  sc.textContent=pct+'%';
+
+  let trophy,verdict,msg,cls;
+  if(pct>=85){trophy='🏆';verdict='Compute Master!';msg='Excellent — you\'ve nailed Azure Compute';cls='rse';}
+  else if(pct>=70){trophy='👍';verdict='Solid Work!';msg='Good understanding — review weaker areas';cls='rsg';}
+  else if(pct>=50){trophy='📚';verdict='Keep Studying';msg='Getting there — more practice needed';cls='rsa';}
+  else{trophy='🔄';verdict='More Work Needed';msg='Study the explanations and retry';cls='rsp';}
+
+  document.getElementById('rtrophy').textContent=trophy;
+  document.getElementById('rverdict').textContent=verdict;
+  document.getElementById('rmsg').textContent=msg;
+  sc.className=`rscore ${cls}`;
+
+  const types=[
+    {key:'conceptual',icon:'💡',lbl:'Conceptual',col:'#00E5FF',fill:'#00B8D9'},
+    {key:'technical', icon:'⚙️',lbl:'Technical', col:'#C084FC',fill:'#A259FF'},
+    {key:'logical',   icon:'🧩',lbl:'Scenario',  col:'#39FF85',fill:'#22C55E'},
+  ];
+
+  document.getElementById('tbgrid').innerHTML=types.map(t=>{
+    const tq=f.filter(q=>q.type===t.key);
+    const ta=tq.filter(q=>answers[q.id]!==undefined);
+    const tc2=ta.filter(q=>answers[q.id]===q.ans);
+    const tp=ta.length>0?Math.round((tc2.length/ta.length)*100):0;
+    return `<div class="tbc">
+      <div class="tbc-ico">${t.icon}</div>
+      <div class="tbc-lbl">${t.lbl}</div>
+      <div class="tbc-val" style="color:${t.col}">${ta.length>0?tp+'%':'—'}</div>
+      <div class="tbc-bar"><div class="tbc-fill" style="width:${tp}%;background:${t.fill}"></div></div>
+    </div>`;
+  }).join('');
+
+  const panel=document.getElementById('resultPanel');
+  panel.classList.add('vis');
+  panel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ── CONTROLS ───────────────────────────────────── */
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+}
+
+function shuffleReset(){
+  answers={};
+  for(let i=questions.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [questions[i],questions[j]]=[questions[j],questions[i]];
+  }
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetAll(){
+  answers={};questions=[...QS];
+  document.getElementById('resultPanel').classList.remove('vis');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>

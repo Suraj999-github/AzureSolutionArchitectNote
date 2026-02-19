@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Configure & Manage Virtual Networks — AZ-104 Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Fira+Code:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --c1:#00E5FF;
+  --c2:#7B61FF;
+  --c3:#00FFB2;
+  --c4:#FF6B6B;
+  --c5:#FFB347;
+  --bg:#080C14;
+  --bg2:#0C1220;
+  --surf:#101828;
+  --surf2:#141F30;
+  --surf3:#1A2740;
+  --bdr:#1E2D45;
+  --bdr2:#263650;
+  --txt:#D8E8FF;
+  --txt2:#A8BEDC;
+  --muted:#5A7399;
+  --muted2:#7A93B8;
+  --correct:#00E5A0;
+  --wrong:#FF5A72;
+  --tag-c:#A78BFA;
+  --tag-t:#38BDF8;
+  --tag-l:#34D399;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;}
+
+/* animated background */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 800px 600px at 10% 0%,rgba(0,229,255,0.04) 0%,transparent 60%),
+    radial-gradient(ellipse 600px 500px at 90% 100%,rgba(123,97,255,0.05) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,229,255,0.02) 39px,rgba(0,229,255,0.02) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,229,255,0.02) 39px,rgba(0,229,255,0.02) 40px);
+  pointer-events:none;z-index:0;
+}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 22px 70px;position:relative;z-index:1;}
+
+/* ── HEADER ── */
+header{padding:52px 0 36px;border-bottom:1px solid var(--bdr);}
+.h-top{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;}
+.h-badge-col{display:flex;flex-direction:column;gap:10px;flex-shrink:0;}
+.hbadge{
+  width:56px;height:56px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  border:1px solid rgba(0,229,255,0.15);
+  box-shadow:0 0 20px rgba(0,229,255,0.08);
+}
+.hb1{background:linear-gradient(135deg,#051830,#0A2040);}
+.hb2{background:linear-gradient(135deg,#12052A,#1E0845);}
+.h-main{flex:1;}
+.exam-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:'Fira Code',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--c1);border:1px solid rgba(0,229,255,0.25);background:rgba(0,229,255,0.06);
+  border-radius:100px;padding:4px 14px;margin-bottom:16px;
+}
+.exam-tag::before{content:'◈';animation:spin 4s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)};}
+h1{
+  font-family:'Rajdhani',sans-serif;
+  font-size:clamp(28px,5vw,52px);font-weight:700;
+  line-height:1.08;letter-spacing:-0.01em;
+  background:linear-gradient(135deg,var(--txt) 0%,var(--c1) 50%,var(--c2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;
+}
+.h-sub{
+  font-family:'Fira Code',monospace;font-size:12px;
+  color:var(--muted2);line-height:2;
+}
+
+/* module scroll strip */
+.mod-strip{
+  display:flex;gap:8px;margin-top:24px;
+  overflow-x:auto;padding-bottom:4px;
+  scrollbar-width:none;
+}
+.mod-strip::-webkit-scrollbar{display:none;}
+.mb{
+  flex-shrink:0;display:flex;align-items:center;gap:7px;
+  padding:7px 14px;border-radius:9px;
+  border:1px solid var(--bdr2);background:var(--surf2);
+  font-family:'Fira Code',monospace;font-size:11px;font-weight:500;
+  color:var(--muted2);cursor:pointer;transition:all 0.2s;
+  white-space:nowrap;
+}
+.mb:hover{border-color:var(--c1);color:var(--c1);background:rgba(0,229,255,0.05);}
+.mb.active{background:rgba(0,229,255,0.1);border-color:var(--c1);color:var(--c1);
+  box-shadow:0 0 12px rgba(0,229,255,0.1);}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:28px 0 20px;}
+.sc{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:12px;
+  padding:16px 10px;text-align:center;
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+.sc:hover{border-color:var(--bdr2);box-shadow:0 0 16px rgba(0,229,255,0.06);}
+.sn{display:block;font-family:'Fira Code',monospace;font-size:26px;font-weight:500;color:var(--c1);}
+.sl{display:block;font-family:'Fira Code',monospace;font-size:10px;text-transform:uppercase;
+  letter-spacing:0.07em;color:var(--muted);margin-top:5px;}
+
+/* ── PROGRESS ── */
+.prog-card{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:12px;
+  padding:14px 18px;margin-bottom:22px;
+}
+.prog-top{display:flex;justify-content:space-between;
+  font-family:'Fira Code',monospace;font-size:11px;color:var(--muted);margin-bottom:10px;}
+.prog-score-live{color:var(--c3);font-weight:500;}
+.ptrack{height:6px;background:var(--surf3);border-radius:3px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3));
+  border-radius:3px;width:0%;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+
+/* ── CONTROLS ── */
+.ctrl{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
+.flt{
+  padding:7px 14px;border-radius:8px;
+  border:1px solid var(--bdr2);background:var(--surf2);
+  font-family:'Fira Code',monospace;font-size:11px;
+  color:var(--muted2);cursor:pointer;transition:all 0.18s;
+  text-transform:uppercase;letter-spacing:0.04em;
+}
+.flt:hover{border-color:var(--muted2);color:var(--txt);}
+.flt.active{background:var(--surf3);border-color:var(--muted2);color:var(--txt);}
+.flt.active.fc{background:rgba(167,139,250,0.1);border-color:var(--tag-c);color:var(--tag-c);}
+.flt.active.ft{background:rgba(56,189,248,0.1);border-color:var(--tag-t);color:var(--tag-t);}
+.flt.active.fl{background:rgba(52,211,153,0.1);border-color:var(--tag-l);color:var(--tag-l);}
+.gap{flex:1;}
+.abtn{
+  padding:9px 20px;border-radius:9px;border:none;
+  font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.03em;
+}
+.ap{background:linear-gradient(135deg,var(--c1),var(--c2));color:#050A14;
+  box-shadow:0 4px 14px rgba(0,229,255,0.2);}
+.ap:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,0.3);}
+.ag{background:var(--surf2);color:var(--muted2);border:1px solid var(--bdr2);}
+.ag:hover{color:var(--txt);border-color:var(--muted2);}
+
+/* ── SECTION DIVIDER ── */
+.sdiv{display:flex;align-items:center;gap:14px;margin:30px 0 18px;}
+.sdiv-line{flex:1;height:1px;background:var(--bdr);}
+.sdiv-pill{
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+  font-family:'Fira Code',monospace;font-size:11px;font-weight:500;
+  text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--muted2);background:var(--surf);
+  border:1px solid var(--bdr2);border-radius:100px;padding:6px 16px;
+}
+
+/* ── QUESTION CARD ── */
+.qcard{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:16px;padding:26px 28px;margin-bottom:13px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+  animation:fadeup 0.35s ease both;
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+@keyframes fadeup{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.qcard.ok{border-color:var(--correct);box-shadow:0 0 20px rgba(0,229,160,0.1);}
+.qcard.ng{border-color:var(--wrong);box-shadow:0 0 20px rgba(255,90,114,0.1);}
+
+.qmeta{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.qno{
+  font-family:'Fira Code',monospace;font-size:11px;
+  color:var(--muted);background:var(--surf2);
+  border:1px solid var(--bdr);border-radius:6px;padding:3px 9px;
+}
+.qtag{
+  font-family:'Fira Code',monospace;font-size:10px;font-weight:500;
+  padding:3px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:0.06em;
+}
+.qt-c{background:rgba(167,139,250,0.12);color:var(--tag-c);border:1px solid rgba(167,139,250,0.25);}
+.qt-t{background:rgba(56,189,248,0.12);color:var(--tag-t);border:1px solid rgba(56,189,248,0.25);}
+.qt-l{background:rgba(52,211,153,0.12);color:var(--tag-l);border:1px solid rgba(52,211,153,0.25);}
+.qsec{
+  margin-left:auto;font-family:'Fira Code',monospace;font-size:10px;
+  color:var(--muted);background:var(--surf2);
+  border:1px solid var(--bdr);border-radius:100px;padding:3px 12px;
+  max-width:220px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+.qtxt{font-size:16px;font-weight:500;line-height:1.6;color:var(--txt);margin-bottom:18px;}
+
+/* code block */
+.cblk{
+  background:#060D18;border:1px solid rgba(0,229,255,0.12);border-radius:10px;
+  padding:14px 18px;margin:10px 0 18px;
+  font-family:'Fira Code',monospace;font-size:12.5px;line-height:1.8;
+  color:#A8D4FF;overflow-x:auto;position:relative;
+}
+.cblk::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--c1),var(--c2));border-radius:10px 10px 0 0;
+}
+.cblk .cm{color:#3A5A6A;}.cblk .kw{color:#79C0FF;}.cblk .st{color:#FFD700;}
+.cblk .nm{color:#F8B67A;}.cblk .op{color:#C9D1D9;}.cblk .pm{color:#FFB347;}
+.cblk .fn{color:var(--c3);}.cblk .pr{color:#E39DB4;}
+
+/* Options */
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:13px 16px;border-radius:11px;
+  border:1px solid var(--bdr);background:var(--surf2);
+  cursor:pointer;transition:all 0.18s;
+  font-size:14px;line-height:1.55;color:var(--txt2);
+}
+.opt:hover:not(.lk){
+  border-color:var(--c1);background:rgba(0,229,255,0.05);
+  color:var(--txt);transform:translateX(4px);
+}
+.opt.lk{cursor:default;}
+.opt.oc{border-color:var(--correct)!important;background:rgba(0,229,160,0.07)!important;color:var(--correct)!important;font-weight:500;}
+.opt.ow{border-color:var(--wrong)!important;background:rgba(255,90,114,0.07)!important;color:var(--wrong)!important;}
+.oltr{
+  min-width:28px;height:28px;border-radius:8px;
+  border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fira Code',monospace;font-size:11px;font-weight:500;
+  color:var(--muted);flex-shrink:0;background:var(--surf3);
+  transition:all 0.18s;
+}
+.opt:hover:not(.lk) .oltr{border-color:var(--c1);background:var(--c1);color:#050A14;}
+.opt.oc .oltr{border-color:var(--correct);background:var(--correct);color:#050A14;}
+.opt.ow .oltr{border-color:var(--wrong);background:var(--wrong);color:#fff;}
+
+/* Explanation */
+.expl{
+  margin-top:14px;padding:14px 18px;border-radius:10px;
+  background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.15);
+  font-size:13px;line-height:1.75;color:var(--txt2);display:none;
+}
+.expl.vis{display:block;animation:fadeup 0.25s ease;}
+.expl strong{color:var(--c1);}
+.expl code{
+  font-family:'Fira Code',monospace;font-size:12px;
+  background:var(--surf3);border:1px solid var(--bdr2);
+  border-radius:4px;padding:1px 6px;color:var(--tag-t);
+}
+
+/* ── RESULT ── */
+.rpanel{
+  background:var(--surf);border:1px solid var(--bdr2);border-radius:20px;
+  padding:48px 40px;text-align:center;margin:32px 0;
+  box-shadow:0 8px 40px rgba(0,0,0,0.4);display:none;position:relative;overflow:hidden;
+}
+.rpanel::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 500px 300px at 50% 0%,rgba(0,229,255,0.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+.rpanel::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c5));
+}
+.rpanel.vis{display:block;animation:fadeup 0.5s ease;}
+
+.r-icon{font-size:56px;margin-bottom:16px;}
+.r-num{
+  font-family:'Rajdhani',sans-serif;font-size:82px;font-weight:700;
+  background:linear-gradient(135deg,var(--c1),var(--c2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;
+}
+.r-num.hi{background:linear-gradient(135deg,var(--c3),var(--c1));
+  -webkit-background-clip:text;background-clip:text;}
+.r-lbl{font-family:'Fira Code',monospace;font-size:12px;color:var(--muted);margin-top:6px;}
+.r-verdict{font-size:16px;font-weight:500;color:var(--txt2);margin:16px 0 30px;}
+
+.r-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.rcell{padding:18px 12px;border-radius:12px;background:var(--surf2);border:1px solid var(--bdr);}
+.rcell .rn{font-size:32px;font-weight:700;font-family:'Fira Code',monospace;}
+.rcell .rl{font-size:10px;font-family:'Fira Code',monospace;text-transform:uppercase;
+  letter-spacing:0.07em;color:var(--muted);margin-top:5px;}
+.rc-r .rn{color:var(--correct);}
+.rc-w .rn{color:var(--wrong);}
+.rc-p .rn{color:var(--c1);}
+
+.mbkd{margin:24px 0 28px;text-align:left;}
+.mbkd-title{font-family:'Fira Code',monospace;font-size:11px;text-transform:uppercase;
+  letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;}
+.mbrow{margin-bottom:12px;}
+.mbhead{display:flex;justify-content:space-between;font-family:'Fira Code',monospace;
+  font-size:11px;color:var(--txt2);margin-bottom:5px;font-weight:500;}
+.mbtrack{height:6px;background:var(--surf3);border-radius:3px;overflow:hidden;}
+.mbbar{height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--c1),var(--c2));
+  transition:width 0.7s cubic-bezier(0.34,1.56,0.64,1);}
+.mbbar.lo{background:linear-gradient(90deg,var(--c5),var(--c4));}
+
+.r-acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+footer{text-align:center;padding:36px 0;border-top:1px solid var(--bdr);margin-top:20px;}
+footer p{font-family:'Fira Code',monospace;font-size:11px;color:var(--muted);line-height:2;}
+
+@media(max-width:640px){
+  .stats{grid-template-columns:repeat(3,1fr);}
+  .r-grid{grid-template-columns:1fr;}
+  .qsec{display:none;}
+  .h-top{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="h-top">
+    <div class="h-badge-col">
+      <div class="hbadge hb1">🌐</div>
+      <div class="hbadge hb2">🛡️</div>
+    </div>
+    <div class="h-main">
+      <div class="exam-tag">AZ-104 · Configure &amp; Manage Virtual Networks</div>
+      <h1>Azure Networking<br/>Quiz Portal</h1>
+      <p class="h-sub">
+        VNets · NSGs · Azure DNS · VNet Peering · Route Tables<br/>
+        Load Balancer · Application Gateway · Network Watcher
+      </p>
+      <div class="mod-strip">
+        <button class="mb active" onclick="setSec('all',this)">📦 All Topics</button>
+        <button class="mb" onclick="setSec('Virtual Networks',this)">🌐 VNets</button>
+        <button class="mb" onclick="setSec('NSG',this)">🛡️ NSGs</button>
+        <button class="mb" onclick="setSec('Azure DNS',this)">📡 DNS</button>
+        <button class="mb" onclick="setSec('VNet Peering',this)">🔗 Peering</button>
+        <button class="mb" onclick="setSec('Route Tables',this)">🗺️ Routes</button>
+        <button class="mb" onclick="setSec('Load Balancer',this)">⚖️ Load Balancer</button>
+        <button class="mb" onclick="setSec('Application Gateway',this)">🔀 App Gateway</button>
+        <button class="mb" onclick="setSec('Network Watcher',this)">🔍 Watcher</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="sc"><span class="sn" id="sTotal">0</span><span class="sl">Questions</span></div>
+  <div class="sc"><span class="sn" id="sAns">0</span><span class="sl">Answered</span></div>
+  <div class="sc"><span class="sn" id="sCorr">0</span><span class="sl">Correct</span></div>
+  <div class="sc"><span class="sn" id="sWrng">0</span><span class="sl">Wrong</span></div>
+  <div class="sc"><span class="sn" id="sPct">—</span><span class="sl">Score</span></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-card">
+  <div class="prog-top">
+    <span id="pLbl">0 of 0 answered</span>
+    <span class="prog-score-live" id="pScore">Score: 0%</span>
+  </div>
+  <div class="ptrack"><div class="pfill" id="pBar"></div></div>
+</div>
+
+<!-- CONTROLS -->
+<div class="ctrl">
+  <button class="flt active" onclick="setType('all',this)">All</button>
+  <button class="flt fc" onclick="setType('conceptual',this)">💡 Conceptual</button>
+  <button class="flt ft" onclick="setType('technical',this)">⚙️ Technical</button>
+  <button class="flt fl" onclick="setType('logical',this)">🧩 Logical</button>
+  <div class="gap"></div>
+  <button class="abtn ap" onclick="doShuffle()">🔀 Shuffle &amp; Restart</button>
+  <button class="abtn ag" onclick="doReset()">↺ Reset</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quizBox"></div>
+
+<!-- RESULT -->
+<div class="rpanel" id="rPanel">
+  <div class="r-icon" id="rIco">🌐</div>
+  <div class="r-num" id="rNum">0%</div>
+  <div class="r-lbl">Final Score</div>
+  <div class="r-verdict" id="rVrd">Keep practising!</div>
+  <div class="r-grid">
+    <div class="rcell rc-r"><div class="rn" id="rR">0</div><div class="rl">Correct</div></div>
+    <div class="rcell rc-w"><div class="rn" id="rW">0</div><div class="rl">Wrong</div></div>
+    <div class="rcell rc-p"><div class="rn" id="rP">0%</div><div class="rl">Accuracy</div></div>
+  </div>
+  <div class="mbkd" id="mBkd"></div>
+  <div class="r-acts">
+    <button class="abtn ap" onclick="doShuffle()">🔀 Try Again (Shuffled)</button>
+    <button class="abtn ag" onclick="doReset()">↺ Review Answers</button>
+  </div>
+</div>
+
+<footer>
+  <p>AZ-104 · Configure and Manage Virtual Networks<br/>
+  VNets · NSGs · DNS · Peering · Routes · Load Balancer · App Gateway · Network Watcher</p>
+</footer>
+</div>
+
+<script>
+const Q=[
+
+// ══════════════════════════════════════════
+// SECTION 1 — CONFIGURE VIRTUAL NETWORKS
+// ══════════════════════════════════════════
+{s:"Virtual Networks",t:"conceptual",
+q:"What is an Azure Virtual Network (VNet) in simple terms?",
+o:["A VPN connection from your office to Azure","An isolated, private network in Azure where your resources can securely communicate with each other, the internet, and on-premises networks","A public-facing network for hosting websites","A shared network used by all Azure customers"],
+c:1,e:"A VNet is your own private network slice in Azure — like your on-premises LAN but in the cloud. Resources inside a VNet communicate privately, you define the IP address space, and you control all inbound/outbound traffic rules."},
+
+{s:"Virtual Networks",t:"conceptual",
+q:"What is a Subnet in an Azure Virtual Network?",
+o:["A separate VNet inside another VNet","A subdivision of a VNet's address space that groups and isolates resources — each subnet gets a range of IPs","A reserved IP address block in Azure","A firewall zone inside the VNet"],
+c:1,e:"Subnets divide your VNet into smaller segments. For example: a 'web' subnet for app servers and a 'db' subnet for databases. Azure reserves 5 IPs per subnet (first 4 + last). Subnets help apply different NSGs and route tables to different tiers."},
+
+{s:"Virtual Networks",t:"conceptual",
+q:"What CIDR notation represents a VNet address space of 65,536 IP addresses?",
+o:["10.0.0.0/24","10.0.0.0/16","192.168.0.0/28","172.16.0.0/8"],
+c:1,e:"/16 gives 65,536 addresses (2^16). /24 = 256 addresses. /28 = 16 addresses. Azure VNets support address spaces from /8 to /29. Common choice: 10.0.0.0/16 for the VNet, then /24 subnets (256 IPs each) within it."},
+
+{s:"Virtual Networks",t:"conceptual",
+q:"What is the difference between a Public IP and a Private IP in Azure?",
+o:["Public IPs are faster than Private IPs","Private IP is used for internal VNet communication; Public IP is a globally routable address used for internet-facing access","Public IPs are free, Private IPs are paid","Private IPs are only for VMs, Public IPs for all services"],
+c:1,e:"Private IPs (e.g. 10.0.1.4) are assigned from your VNet subnet and used for internal communication. Public IPs are globally unique, internet-reachable addresses assigned to resources like VMs, Load Balancers, and Application Gateways to allow external access."},
+
+{s:"Virtual Networks",t:"conceptual",
+q:"What is the purpose of a Service Endpoint in Azure networking?",
+o:["It creates a VPN connection to Azure services","It extends your VNet's private address space to Azure PaaS services (like Storage, SQL), routing traffic over the Azure backbone instead of the public internet","It gives PaaS services a private IP inside your VNet","It enables peering between two VNets"],
+c:1,e:"Service Endpoints allow your subnet to reach Azure PaaS services (Storage, SQL DB, Key Vault) over the Azure backbone network — keeping traffic private and off the internet. Unlike Private Endpoints, the service still has a public IP but your VNet traffic bypasses the internet."},
+
+{s:"Virtual Networks",t:"technical",
+q:"Which Azure CLI command creates a Virtual Network with address space 10.0.0.0/16 in resource group 'NetRG'?",
+code:`<span class="pm">$</span> <span class="kw">az network vnet create</span> \\
+  <span class="op">--name</span> MyVNet \\
+  <span class="op">--resource-group</span> NetRG \\
+  <span class="op">--address-prefix</span> <span class="st">"10.0.0.0/16"</span>`,
+o:["az vnet create --name MyVNet --prefix 10.0.0.0/16","az network vnet create --name MyVNet --resource-group NetRG --address-prefix '10.0.0.0/16'","az network create --vnet MyVNet --cidr 10.0.0.0/16","az vnet new --name MyVNet --address 10.0.0.0/16"],
+c:1,e:"The correct command is <code>az network vnet create</code> with <code>--address-prefix</code> for the CIDR. To add a subnet: <code>az network vnet subnet create --name WebSubnet --vnet-name MyVNet --resource-group NetRG --address-prefix 10.0.1.0/24</code>."},
+
+{s:"Virtual Networks",t:"technical",
+q:"How many IP addresses does Azure reserve in every subnet, and which are they?",
+o:["2 — first and last","4 — first four addresses","5 — network address, Azure gateway, DNS x2, and broadcast","3 — first, middle, and last"],
+c:2,e:"Azure reserves 5 IPs per subnet: .0 (network address), .1 (Azure gateway), .2 and .3 (Azure DNS), and .255 (broadcast). In a /24 subnet (256 IPs), you get 251 usable addresses. Plan your subnets knowing 5 are always taken."},
+
+{s:"Virtual Networks",t:"logical",
+q:"You need to host a web tier (needs internet access), an app tier, and a database tier in one VNet. What is the BEST subnet design?",
+o:["Put all resources in one subnet for simplicity","Create three separate subnets: WebSubnet (10.0.1.0/24), AppSubnet (10.0.2.0/24), DBSubnet (10.0.3.0/24) — apply different NSGs to each tier","Create one public and one private subnet","Use separate VNets for each tier"],
+c:1,e:"Three-tier subnet design is standard. Each tier gets its own subnet with its own NSG: WebSubnet allows HTTP/HTTPS from internet; AppSubnet allows traffic only from WebSubnet; DBSubnet allows only SQL traffic from AppSubnet. This enforces network segmentation."},
+
+{s:"Virtual Networks",t:"logical",
+q:"Your VNet uses 10.0.0.0/16. You need a subnet for 500 VMs. Which subnet prefix provides enough space?",
+o:["10.0.1.0/24 — 256 IPs (only 251 usable, not enough)","10.0.0.0/23 — 512 IPs (507 usable after Azure reserves 5, enough for 500 VMs)","10.0.0.0/25 — 128 IPs (not enough)","10.0.0.0/28 — 16 IPs (not enough)"],
+c:1,e:"/23 gives 512 addresses (507 usable). /24 gives only 251 usable — not enough. Always plan for growth: if you need 500 now, a /23 (507 usable) is the minimum. Consider /22 (1,019 usable) for future headroom."},
+
+// ══════════════════════════════════════════
+// SECTION 2 — CONFIGURE NETWORK SECURITY GROUPS
+// ══════════════════════════════════════════
+{s:"NSG",t:"conceptual",
+q:"What is a Network Security Group (NSG) in Azure?",
+o:["A VPN gateway for connecting networks","A set of inbound and outbound security rules that filter network traffic to and from Azure resources based on port, protocol, and IP address","A firewall appliance deployed inside a subnet","A tool for monitoring network bandwidth"],
+c:1,e:"An NSG acts like a stateful firewall. It contains Allow/Deny rules evaluated by priority (lower number = higher priority). NSGs can be attached to subnets (affects all resources in subnet) or individual NICs (affects only that VM). Rules specify: source/dest IP, port, protocol, and action."},
+
+{s:"NSG",t:"conceptual",
+q:"What default rules exist in every NSG and can they be deleted?",
+o:["No default rules exist — you start with a blank NSG","Three default inbound rules (AllowVnetInBound, AllowAzureLoadBalancerInBound, DenyAllInBound) and three outbound rules — they cannot be deleted but can be overridden with higher-priority rules","Default rules allow all traffic — you delete what you don't want","Only one default deny-all rule exists"],
+c:1,e:"Every NSG has 6 non-deletable default rules: Inbound: AllowVNetInBound (65000), AllowAzureLBInBound (65001), DenyAllInBound (65500). Outbound: AllowVNetOutBound, AllowInternetOutBound, DenyAllOutBound. Override them by adding rules with lower priority numbers (lower = higher priority)."},
+
+{s:"NSG",t:"conceptual",
+q:"What is the difference between applying an NSG to a subnet vs applying it to a NIC?",
+o:["No difference — both behave identically","Subnet NSG applies to ALL resources in the subnet; NIC NSG applies only to that specific VM — traffic must pass both NSGs if both are configured","NIC NSG is applied first, then subnet NSG","Subnet NSG only controls inbound traffic; NIC NSG only controls outbound"],
+c:1,e:"Traffic to a VM passes through the NSG chain in order: for inbound — Subnet NSG first, then NIC NSG. For outbound — NIC NSG first, then Subnet NSG. If either NSG denies the traffic, it's blocked. Subnet NSG for broad policy, NIC NSG for VM-specific exceptions."},
+
+{s:"NSG",t:"conceptual",
+q:"What are Application Security Groups (ASGs) in NSGs?",
+o:["A group of NSG rules for applications","Logical groupings of VMs that let you define NSG rules using group names instead of IP addresses — making rules easier to manage as VMs scale","A type of NSG for application gateways","Security groups inherited from Azure Active Directory"],
+c:1,e:"ASGs let you tag VMs (e.g. 'WebServers', 'DBServers') and write NSG rules using these group names. When you add a new web server VM and assign it to the WebServers ASG, it automatically inherits all NSG rules referencing that group — no IP address management needed."},
+
+{s:"NSG",t:"technical",
+q:"An NSG has these inbound rules. What happens to an HTTP request (port 80) from the internet to a web VM?",
+code:`Priority  Name              Port   Action
+<span class="nm">100</span>       AllowHTTP         <span class="st">80</span>     <span class="fn">Allow</span>
+<span class="nm">200</span>       AllowHTTPS        <span class="st">443</span>    <span class="fn">Allow</span>
+<span class="nm">65500</span>     DenyAllInBound    <span class="st">*</span>      <span class="kw">Deny</span>`,
+o:["Denied — no explicit internet source rule","Allowed — rule 100 (AllowHTTP priority 100) matches port 80 and allows it before the DenyAll rule at 65500 is reached","Denied — the DenyAllInBound rule always takes precedence","Allowed — all traffic is allowed by default"],
+c:1,e:"NSG rules are evaluated in priority order (lowest number first). The HTTP request hits rule 100 (Allow port 80) first — it matches and is allowed. Evaluation stops. The DenyAllInBound at priority 65500 is never reached for this traffic. Lower priority number = evaluated first."},
+
+{s:"NSG",t:"technical",
+q:"Which Azure CLI command creates an NSG rule to allow SSH (port 22) from a specific IP (203.0.113.5) with priority 110?",
+code:`<span class="pm">$</span> <span class="kw">az network nsg rule create</span> \\
+  <span class="op">--nsg-name</span> MyNSG <span class="op">--resource-group</span> NetRG \\
+  <span class="op">--name</span> AllowSSH <span class="op">--priority</span> <span class="nm">110</span> \\
+  <span class="op">--source-address-prefix</span> <span class="st">"203.0.113.5"</span> \\
+  <span class="op">--destination-port-range</span> <span class="st">"22"</span> <span class="op">--access</span> <span class="fn">Allow</span>`,
+o:["az nsg rule add --port 22 --source 203.0.113.5","az network nsg rule create --nsg-name MyNSG --resource-group NetRG --name AllowSSH --priority 110 --source-address-prefix '203.0.113.5' --destination-port-range '22' --access Allow","az network security rule create --name AllowSSH --port 22","az nsg add-rule --priority 110 --port 22 --source 203.0.113.5"],
+c:1,e:"<code>az network nsg rule create</code> is correct. Key parameters: <code>--priority</code> (100-4096, lower = higher priority), <code>--source-address-prefix</code> (IP, CIDR, or service tag like 'Internet'), <code>--destination-port-range</code>, and <code>--access</code> (Allow/Deny)."},
+
+{s:"NSG",t:"logical",
+q:"A VM in a subnet has both a subnet NSG and a NIC NSG. The subnet NSG allows port 443 inbound. The NIC NSG denies all inbound traffic. Can HTTPS traffic reach the VM?",
+o:["Yes — subnet NSG allow overrides NIC NSG deny","No — traffic must pass BOTH NSGs. The NIC NSG denies all inbound, so HTTPS is blocked even though the subnet NSG allows it","Yes — the most recent NSG rule wins","No — you can't attach both a subnet NSG and NIC NSG"],
+c:1,e:"Inbound traffic flows: internet → subnet NSG → NIC NSG → VM. Traffic passes the subnet NSG (port 443 allowed), then hits the NIC NSG (deny all) and is dropped. Both NSGs must permit the traffic. This layered approach is intentional — add a NIC NSG allow rule for port 443 to fix it."},
+
+{s:"NSG",t:"logical",
+q:"You have 50 web servers and 10 database servers. You want NSG rules so web servers can reach databases on port 1433, but nothing else can. What is the MOST scalable approach?",
+o:["Add 50 NSG rules — one per web server IP address","Create an ASG 'WebServers', assign all 50 web VMs to it, create an ASG 'DBServers', assign DB VMs, then write one NSG rule: source ASG=WebServers, dest ASG=DBServers, port 1433","Use a single rule allowing all internal traffic on port 1433","Create separate NSGs for each VM"],
+c:1,e:"ASGs are the answer. One rule referencing ASGs handles all 50 web servers without ever specifying IP addresses. When you add the 51st web server, just assign it to the WebServers ASG — the rule covers it automatically. IP-based rules break as you scale."},
+
+// ══════════════════════════════════════════
+// SECTION 3 — HOST YOUR DOMAIN ON AZURE DNS
+// ══════════════════════════════════════════
+{s:"Azure DNS",t:"conceptual",
+q:"What is Azure DNS?",
+o:["A service that assigns IP addresses to Azure VMs automatically","A hosting service for DNS domains that uses Azure's global infrastructure — providing name resolution with high availability and fast response times","A private network naming service for on-premises servers","A tool for registering domain names like GoDaddy"],
+c:1,e:"Azure DNS hosts DNS zones and manages DNS records using Azure infrastructure. It's NOT a domain registrar (you still buy domains from registrars like GoDaddy), but you delegate name resolution to Azure DNS's authoritative nameservers for fast, reliable, globally distributed DNS hosting."},
+
+{s:"Azure DNS",t:"conceptual",
+q:"What is an Azure Private DNS Zone?",
+o:["A DNS zone that costs less than a public zone","A DNS zone that resolves names only within Azure Virtual Networks — not accessible from the public internet — used for private resource naming","A zone for internal Microsoft services","A backup DNS zone for public zones"],
+c:1,e:"Azure Private DNS Zones provide internal name resolution inside VNets. VMs in linked VNets can resolve names like 'db.internal.contoso.com' to private IPs without exposing them publicly. This replaces custom DNS servers for most private resolution scenarios."},
+
+{s:"Azure DNS",t:"conceptual",
+q:"What DNS record type maps a hostname to an IPv4 address?",
+o:["CNAME — maps a hostname to another hostname","A Record — maps a hostname directly to an IPv4 address","MX — mail exchange record","NS — nameserver record"],
+c:1,e:"The A Record (Address Record) maps hostname → IPv4 address. AAAA maps to IPv6. CNAME maps alias → canonical hostname (can't use CNAME at zone apex). MX specifies mail servers. NS identifies authoritative nameservers for the zone. TXT stores arbitrary text (used for SPF, DKIM)."},
+
+{s:"Azure DNS",t:"conceptual",
+q:"What is an Alias Record in Azure DNS and when would you use it?",
+o:["An alias for a CNAME record","A special Azure DNS record type that directly references an Azure resource (like a Public IP, Load Balancer, or Traffic Manager) — automatically updating when the resource's IP changes","A record that points to another DNS zone","A record for email aliases"],
+c:1,e:"Azure Alias Records solve the 'CNAME at apex' problem. Standard DNS can't use CNAME at the zone root (contoso.com). An Alias Record at the apex can point to an Azure Traffic Manager, Front Door, or Public IP, and automatically follows IP changes — critical for root domain hosting."},
+
+{s:"Azure DNS",t:"technical",
+q:"Which Azure CLI command creates an A record 'www' pointing to 203.0.113.10 in DNS zone 'contoso.com'?",
+code:`<span class="pm">$</span> <span class="kw">az network dns record-set a add-record</span> \\
+  <span class="op">--resource-group</span> DNSRG \\
+  <span class="op">--zone-name</span> contoso.com \\
+  <span class="op">--record-set-name</span> <span class="st">www</span> \\
+  <span class="op">--ipv4-address</span> <span class="nm">203.0.113.10</span>`,
+o:["az dns record create --type A --name www --ip 203.0.113.10","az network dns record-set a add-record --resource-group DNSRG --zone-name contoso.com --record-set-name www --ipv4-address 203.0.113.10","az network dns add --zone contoso.com --record www --value 203.0.113.10","az dns a-record create --zone contoso.com --name www --address 203.0.113.10"],
+c:1,e:"The command structure: <code>az network dns record-set [type] add-record</code>. For CNAME: replace 'a' with 'cname' and use <code>--cname</code> instead of <code>--ipv4-address</code>. Create the zone first with <code>az network dns zone create</code>, then delegate to Azure nameservers at your registrar."},
+
+{s:"Azure DNS",t:"technical",
+q:"How do you link a Private DNS Zone to a VNet so VMs can auto-register their names?",
+o:["Add the VNet IP range to the DNS zone","Create a Virtual Network Link with auto-registration enabled — VMs in the linked VNet automatically register their hostnames in the private zone","Configure the VM's DNS settings manually","Use a custom DNS server pointing to the private zone"],
+c:1,e:"A Virtual Network Link connects the Private DNS Zone to the VNet. Enabling auto-registration means VMs in that VNet automatically get A records created (and deleted) in the private zone. VMs can then resolve each other by hostname. A zone can be linked to multiple VNets."},
+
+{s:"Azure DNS",t:"logical",
+q:"Your company bought 'contoso.com' from GoDaddy. You want Azure DNS to handle name resolution. What steps are needed?",
+o:["Transfer domain ownership to Microsoft","Create an Azure DNS public zone for contoso.com, note the 4 Azure nameservers assigned, then update the NS records at GoDaddy to point to those Azure nameservers","Install Azure DNS agent on your web servers","Create a CNAME record at GoDaddy pointing to Azure DNS"],
+c:1,e:"DNS delegation process: (1) Create Azure DNS zone for contoso.com — Azure assigns 4 NS records. (2) Log into GoDaddy, replace their default nameservers with the 4 Azure ones. Now all DNS queries for contoso.com are answered by Azure DNS. You manage all records in Azure, not GoDaddy."},
+
+// ══════════════════════════════════════════
+// SECTION 4 — AZURE VIRTUAL NETWORK PEERING
+// ══════════════════════════════════════════
+{s:"VNet Peering",t:"conceptual",
+q:"What is Azure VNet Peering?",
+o:["Connecting two VNets with a VPN gateway","A mechanism to connect two Azure Virtual Networks seamlessly, routing traffic between them over the Azure backbone — without gateways, internet transit, or encryption overhead","A way to share IP addresses between VNets","Copying all resources from one VNet to another"],
+c:1,e:"VNet Peering creates a direct, low-latency connection between VNets over the Azure backbone. Traffic stays on Microsoft's network, never touching the internet. It's faster and cheaper than VPN Gateway for VNet-to-VNet connectivity within Azure. Peering can be within a region (VNet Peering) or across regions (Global VNet Peering)."},
+
+{s:"VNet Peering",t:"conceptual",
+q:"What is a key requirement for VNet Peering to work?",
+o:["Both VNets must be in the same region","The IP address spaces of the two VNets must NOT overlap — peering fails if address ranges conflict","Both VNets must be in the same subscription","Both VNets must use the same DNS server"],
+c:1,e:"Non-overlapping address spaces are mandatory. If VNet-A uses 10.0.0.0/16 and VNet-B uses 10.0.1.0/24 — they overlap and can't be peered. Plan your IP addressing strategy before deploying to avoid this common mistake. VNets can be in different subscriptions, tenants, and regions."},
+
+{s:"VNet Peering",t:"conceptual",
+q:"Is VNet Peering transitive by default?",
+o:["Yes — if A peers with B, and B peers with C, then A can reach C automatically","No — VNet Peering is NOT transitive. If A-B and B-C are peered, A cannot reach C without a separate A-C peering or a hub VNet with gateway transit enabled","Yes but only within the same region","Yes but only for outbound traffic"],
+c:1,e:"VNet Peering is NOT transitive. A→B and B→C peerings do not allow A→C communication. Solutions: (1) Create a direct A↔C peering. (2) Hub-and-Spoke topology — use Azure Firewall or NVA in a hub VNet with 'Allow Gateway Transit' enabled to route spoke-to-spoke traffic through the hub."},
+
+{s:"VNet Peering",t:"technical",
+q:"What two peering connections must you create to peer VNet-A with VNet-B?",
+code:`<span class="cm"># Step 1: Peer A → B</span>
+<span class="kw">az network vnet peering create</span> <span class="op">--name</span> A-to-B \\
+  <span class="op">--vnet-name</span> VNetA <span class="op">--remote-vnet</span> VNetB
+<span class="cm"># Step 2: Peer B → A</span>
+<span class="kw">az network vnet peering create</span> <span class="op">--name</span> B-to-A \\
+  <span class="op">--vnet-name</span> VNetB <span class="op">--remote-vnet</span> VNetA`,
+o:["Only one peering from A to B is needed","Two peerings are required — one from A to B AND one from B to A. Both must show 'Connected' status for traffic to flow","Three peerings: A→B, B→A, and a confirmation peering","One peering with bidirectional flag enabled"],
+c:1,e:"VNet Peering is bidirectional but requires two peering objects — one at each end. Both must be in 'Connected' state. If you delete one side, traffic stops in both directions. The status shows: Initiated (one side done), Connected (both sides done), Disconnected (peer deleted)."},
+
+{s:"VNet Peering",t:"logical",
+q:"Your company has a Hub VNet with Azure Firewall, a Dev VNet, and a Prod VNet all peered to the Hub. Dev needs to reach Prod for testing. What's the issue and solution?",
+o:["No issue — hub-and-spoke allows spoke-to-spoke communication automatically","VNet Peering is NOT transitive. Dev→Hub and Hub→Prod exist, but Dev cannot reach Prod directly. Solution: enable 'Allow Forwarded Traffic' and 'Use Remote Gateway' on peerings, and configure Azure Firewall in the Hub to route Dev↔Prod traffic","Create direct Dev↔Prod peering","Move Dev and Prod into the Hub VNet"],
+c:1,e:"Hub-and-spoke requires explicit routing for spoke-to-spoke. Enable 'Allow Forwarded Traffic' on all peerings so traffic can flow through the Hub. Configure Azure Firewall route tables (UDRs) with 0.0.0.0/0 next-hop = Azure Firewall in the Hub. The Firewall then routes and inspects Dev↔Prod traffic."},
+
+// ══════════════════════════════════════════
+// SECTION 5 — ROUTE TABLES & TRAFFIC FLOW
+// ══════════════════════════════════════════
+{s:"Route Tables",t:"conceptual",
+q:"What is a Route Table (User-Defined Route) in Azure?",
+o:["A DNS routing configuration","A resource containing custom IP routing rules that override Azure's default system routes — directing traffic to a specific next hop like Azure Firewall, NVA, or VNet gateway","A load balancing configuration","A list of all VMs and their IP addresses"],
+c:1,e:"Azure VNets have system routes by default (traffic routes automatically within VNet, to internet, etc.). Route Tables let you override these with custom routes. Example: force all internet-bound traffic through Azure Firewall instead of going directly out. Route Tables are associated with subnets."},
+
+{s:"Route Tables",t:"conceptual",
+q:"What are the 'next hop' types available in Azure User-Defined Routes?",
+o:["Only Virtual Appliance and Internet","Virtual Network, Virtual Network Gateway, Internet, Virtual Appliance (NVA), and None (black-hole/drop traffic)","Only Internet and VPN Gateway","VNet, Subnet, and Internet only"],
+c:1,e:"Next hop types: (1) Virtual Network — route within the VNet. (2) Virtual Network Gateway — send to VPN/ExpressRoute. (3) Internet — route to public internet. (4) Virtual Appliance — send to an NVA (e.g. Azure Firewall) at a specific IP. (5) None — drop the traffic (black hole)."},
+
+{s:"Route Tables",t:"conceptual",
+q:"What is a 'None' next hop in a route table used for?",
+o:["Routing traffic to the default gateway","Intentionally dropping (black-holing) traffic to specific destinations — useful for blocking communication to certain IP ranges","Routing to the internet as a fallback","Auto-detecting the next hop"],
+c:1,e:"'None' is Azure's equivalent of a null route. Traffic matching that prefix is silently dropped. Use case: prevent VMs from reaching a specific external IP range, or ensure no traffic escapes to unexpected destinations. Combine with Azure Firewall DENY rules for layered blocking."},
+
+{s:"Route Tables",t:"technical",
+q:"How do you force ALL outbound internet traffic from a subnet through Azure Firewall at IP 10.0.0.4?",
+code:`<span class="cm"># Create route table</span>
+<span class="kw">az network route-table create</span> <span class="op">--name</span> FW-RT <span class="op">--resource-group</span> NetRG
+
+<span class="cm"># Add default route → Azure Firewall</span>
+<span class="kw">az network route-table route create</span> \\
+  <span class="op">--route-table-name</span> FW-RT <span class="op">--name</span> DefaultToFW \\
+  <span class="op">--address-prefix</span> <span class="st">0.0.0.0/0</span> \\
+  <span class="op">--next-hop-type</span> VirtualAppliance \\
+  <span class="op">--next-hop-ip-address</span> <span class="nm">10.0.0.4</span>
+
+<span class="cm"># Associate with subnet</span>
+<span class="kw">az network vnet subnet update</span> \\
+  <span class="op">--vnet-name</span> MyVNet <span class="op">--name</span> WorkloadSubnet \\
+  <span class="op">--route-table</span> FW-RT`,
+o:["Add an NSG rule denying all outbound traffic except to 10.0.0.4","Create a Route Table with route 0.0.0.0/0 → next-hop-type VirtualAppliance → next-hop-ip 10.0.0.4, then associate the route table with the workload subnet","Enable Azure Firewall and it automatically captures all traffic","Modify the default gateway setting on each VM"],
+c:1,e:"UDR pattern for forced tunneling: route 0.0.0.0/0 (default route) next-hop = Azure Firewall private IP. All internet-bound traffic from the subnet hits this route, gets sent to the Firewall for inspection/filtering. Remember: Azure Firewall's own subnet (AzureFirewallSubnet) must NOT have a route table — it needs to reach the internet directly."},
+
+{s:"Route Tables",t:"logical",
+q:"A VM in SubnetA is trying to reach a VM in SubnetB within the same VNet. Traffic is being dropped. You have a route table on SubnetA with 0.0.0.0/0 → Azure Firewall. What is likely causing the drop?",
+o:["VNet Peering is not configured","The firewall is blocking inter-subnet traffic because the 0.0.0.0/0 route sends ALL traffic (including intra-VNet) through the Firewall — add a Firewall application rule to allow SubnetA→SubnetB, or add a more specific VNet route that bypasses the Firewall","The subnet NSG is blocking traffic","Azure VNets don't allow inter-subnet communication"],
+c:1,e:"When 0.0.0.0/0 → Firewall is set, even VNet-internal traffic goes through the Firewall. You need either: (1) Add an Azure Firewall network rule allowing SubnetA CIDR → SubnetB CIDR. (2) Add a more specific route for SubnetB's CIDR → VirtualNetwork next-hop to bypass the Firewall for intra-VNet traffic. Route specificity wins over default routes."},
+
+// ══════════════════════════════════════════
+// SECTION 6 — AZURE LOAD BALANCER
+// ══════════════════════════════════════════
+{s:"Load Balancer",t:"conceptual",
+q:"What is Azure Load Balancer and at which OSI layer does it operate?",
+o:["A DNS-based traffic distributor working at Layer 7","A managed service that distributes inbound network traffic across multiple backend VMs — operating at Layer 4 (TCP/UDP) using 5-tuple hashing","A content delivery network for static files","A VPN gateway for multiple connections"],
+c:1,e:"Azure Load Balancer is a Layer 4 (Transport Layer) load balancer. It distributes traffic based on: source IP, source port, destination IP, destination port, protocol (5-tuple hash). It doesn't inspect HTTP content, can't route by URL path, and supports any TCP/UDP application."},
+
+{s:"Load Balancer",t:"conceptual",
+q:"What is the difference between a Public Load Balancer and an Internal Load Balancer?",
+o:["No functional difference — just naming conventions","Public Load Balancer has a public IP for internet-facing traffic; Internal (Private) Load Balancer uses a private IP for load balancing internal traffic between Azure resources","Public LB supports TCP only; Internal LB supports TCP and UDP","Internal LB is always more expensive"],
+c:1,e:"Public LB: internet-facing, has a public IP, distributes external traffic to backend VMs. Internal LB: private IP within a VNet, distributes traffic between internal tiers (e.g. app tier to database tier). Use both together for a classic 3-tier app: Public LB → Web VMs → Internal LB → App VMs."},
+
+{s:"Load Balancer",t:"conceptual",
+q:"What is a Health Probe in Azure Load Balancer?",
+o:["A network diagnostic tool for tracing packets","A periodic check sent to backend VMs — if a VM fails the probe, the Load Balancer stops sending traffic to it until it recovers","A monitoring agent installed on VMs","A performance benchmark for backend VMs"],
+c:1,e:"Health Probes prevent traffic from reaching unhealthy VMs. The LB sends TCP, HTTP, or HTTPS probes at configurable intervals. If a VM misses N consecutive probes, it's marked unhealthy and removed from rotation. When it starts responding again, it's automatically added back."},
+
+{s:"Load Balancer",t:"conceptual",
+q:"What is SKU difference between Basic and Standard Azure Load Balancer?",
+o:["Basic is free; Standard costs per hour","Standard LB supports Availability Zones, SLA, outbound rules, multiple frontend IPs, and HA ports — Basic is for dev/test only, has no SLA, no zone redundancy, and limited features","Basic LB supports more backends than Standard","Standard only supports TCP, Basic supports all protocols"],
+c:1,e:"Standard LB is production-grade: zone-redundant, 99.99% SLA, up to 1000 backend instances, HA ports (load balance ALL ports), outbound rules, multiple frontends. Basic LB: no SLA, 300 backend limit, no zone support, no HA ports. Basic will be retired — use Standard for all new deployments."},
+
+{s:"Load Balancer",t:"technical",
+q:"What are the three key components you configure in Azure Load Balancer to distribute traffic?",
+code:`Frontend IP Config  → Public or Private IP address
+Backend Pool        → Group of VMs receiving traffic
+Load Balancing Rule → Maps Frontend IP:Port → Backend Pool:Port
+Health Probe        → Checks if backend VMs are healthy`,
+o:["Firewall rules, subnets, and VMs","Frontend IP Configuration (the IP users connect to), Backend Pool (the VMs), and Load Balancing Rules (mapping port to backend) — plus Health Probes to monitor VM health","NSG rules, route tables, and VM availability sets","DNS names, SSL certificates, and VM scale sets"],
+c:1,e:"LB config: (1) Frontend IP — the address clients connect to. (2) Backend Pool — the VMs receiving traffic (add by VM, NIC, or IP). (3) Health Probe — TCP/HTTP check to verify VM health. (4) Load Balancing Rule — maps frontend port 80 → backend port 80. The rule ties all components together."},
+
+{s:"Load Balancer",t:"technical",
+q:"What is the 'HA Ports' feature in Standard Load Balancer used for?",
+o:["Load balancing on port 443 only","A single rule that load balances ALL TCP and UDP ports simultaneously — used for Network Virtual Appliances (NVAs) where you don't know which ports to explicitly configure","A high availability configuration for the LB itself","Load balancing between Availability Zones"],
+c:1,e:"HA Ports (protocol: All, port: 0) creates a catch-all rule that routes ALL traffic to the backend NVAs. This is critical for NVA deployments (firewalls, routers) where you want ALL traffic load balanced without listing every port. Only available on Standard SKU Internal Load Balancer."},
+
+{s:"Load Balancer",t:"logical",
+q:"You have 3 web VMs behind a Load Balancer. One VM's disk is filling up and responses are timing out. What does the Load Balancer do, and what should you fix?",
+o:["LB continues sending 1/3 of traffic to the failing VM — users get errors","Health Probe detects the VM is not responding, removes it from the backend pool, and distributes traffic only to the 2 healthy VMs. Fix the disk issue on the failing VM and it will automatically rejoin when health probes pass","LB shuts down the other VMs to reduce load","LB triggers an alert but keeps sending traffic"],
+c:1,e:"Health Probes are the LB's intelligence. When the failing VM stops responding to probes (typically after 2 consecutive failures), LB removes it from rotation. Traffic goes to the remaining 2 VMs. After fixing the disk, the VM passes health probes again and is automatically added back — no manual intervention needed."},
+
+{s:"Load Balancer",t:"logical",
+q:"Your app requires that a user's session always goes to the SAME backend VM (session persistence). How do you configure this in Azure Load Balancer?",
+o:["Enable sticky sessions in the VM operating system","Set Session Persistence (Affinity) on the Load Balancing Rule to 'Client IP' or 'Client IP and Protocol' — the LB always routes the same source IP to the same backend VM","Use a custom cookie in the application","Configure DNS TTL to pin users to specific IPs"],
+c:1,e:"Session persistence (affinity) options: None (default, 5-tuple hash — best distribution), Client IP (2-tuple hash — same source IP → same VM), Client IP and Protocol (3-tuple). Note: Basic LB supports client IP affinity; Standard LB also does. For cookie-based affinity, use Application Gateway instead."},
+
+// ══════════════════════════════════════════
+// SECTION 7 — AZURE APPLICATION GATEWAY
+// ══════════════════════════════════════════
+{s:"Application Gateway",t:"conceptual",
+q:"What is Azure Application Gateway and how does it differ from Azure Load Balancer?",
+o:["They are identical — just different names","Application Gateway is a Layer 7 (HTTP/HTTPS) load balancer that understands web traffic — enables URL-based routing, SSL termination, cookie affinity, and WAF. Load Balancer is Layer 4 (TCP/UDP) and cannot inspect HTTP content","Application Gateway only works with HTTPS; Load Balancer handles all protocols","Application Gateway is for internal traffic; Load Balancer is for external"],
+c:1,e:"Application Gateway operates at Layer 7 — it reads HTTP headers and URLs. This enables: URL path routing (/api/* → API servers, /images/* → media servers), host-based routing (app1.contoso.com → different backend), SSL termination, Web Application Firewall (WAF), cookie-based session affinity, and HTTP health checks."},
+
+{s:"Application Gateway",t:"conceptual",
+q:"What is a Web Application Firewall (WAF) in Application Gateway?",
+o:["A network-layer firewall for blocking IP addresses","An Application Gateway feature that inspects HTTP traffic and blocks OWASP Top 10 attacks like SQL injection, cross-site scripting (XSS), and command injection — before they reach your web servers","A DDoS protection service","An SSL certificate manager"],
+c:1,e:"WAF on Application Gateway uses OWASP rule sets (CRS 3.x) to detect and block web attacks. Two modes: Detection (log only, don't block) and Prevention (block matching requests). WAF protects against SQL injection, XSS, path traversal, protocol violations, and more. Use WAF v2 for the latest rule sets and autoscaling."},
+
+{s:"Application Gateway",t:"conceptual",
+q:"What is URL path-based routing in Application Gateway?",
+o:["Routing traffic based on the user's geographic location","Directing HTTP requests to different backend pools based on the URL path — for example /api/* → API servers, /video/* → media servers, /* → web servers","Routing based on the HTTP method (GET/POST)","Load balancing based on server CPU usage"],
+c:1,e:"Path-based routing lets one Application Gateway serve multiple backend services. A listener receives all traffic; routing rules match path patterns and forward to specific backend pools. This is more cost-effective than deploying separate load balancers per service and enables clean microservices architecture."},
+
+{s:"Application Gateway",t:"conceptual",
+q:"What is SSL Termination in Application Gateway?",
+o:["Disabling SSL on the Application Gateway","The Application Gateway decrypts HTTPS traffic (terminates SSL), processes it, and can forward either as HTTP (backend offload) or re-encrypt for HTTPS to the backend (end-to-end SSL)","Renewing SSL certificates automatically","Converting HTTP to HTTPS"],
+c:1,e:"SSL Termination offloads decryption from backend VMs to the Application Gateway. VMs receive plain HTTP, reducing their CPU load. For compliance scenarios requiring end-to-end encryption, configure 'SSL passthrough' or 're-encrypt' to forward HTTPS to backends. The Gateway handles cert management centrally."},
+
+{s:"Application Gateway",t:"technical",
+q:"What are the three main Application Gateway v2 components for routing?",
+code:`Listener     → Where traffic arrives (port, hostname, protocol)
+Routing Rule → Links Listener → Backend Pool + HTTP Settings
+Backend Pool → Target servers (VMs, VMSS, App Service, IPs)`,
+o:["Frontend, Middleware, Backend","Listener (receives traffic on port/hostname), Routing Rule (maps listener to backend), Backend Pool (target servers) — plus HTTP Settings (timeout, cookie affinity, backend protocol)","Frontend IP, NSG, and VMs","DNS Zone, Public IP, and VM Scale Set"],
+c:1,e:"App Gateway flow: Client → Frontend IP → Listener (matches port 443, host header) → Routing Rule (URL path match) → Backend Pool (specific server group) → HTTP Settings (backend port 80, cookie affinity on, 60s timeout). The multi-site listener enables different hostnames on the same gateway."},
+
+{s:"Application Gateway",t:"logical",
+q:"A company has one Application Gateway handling traffic for api.contoso.com and web.contoso.com, each going to different backend server pools. What Application Gateway feature enables this?",
+o:["URL path-based routing","Multi-site (host-based) routing — configure two listeners, one for each hostname, each with its own routing rule pointing to different backend pools","Two separate Application Gateways","DNS CNAME records to separate the domains"],
+c:1,e:"Multi-site hosting uses the HTTP Host header to distinguish traffic. Create Listener 1: host=api.contoso.com → Routing Rule 1 → API Backend Pool. Listener 2: host=web.contoso.com → Routing Rule 2 → Web Backend Pool. One gateway, one public IP, multiple domains — saves cost vs deploying separate gateways."},
+
+{s:"Application Gateway",t:"logical",
+q:"A web application is experiencing SQL injection attacks through a web form. The developer says fixing the code will take weeks. What immediate protection can you deploy?",
+o:["Add NSG rules to block all port 80 traffic","Deploy Azure Application Gateway with WAF in Prevention mode — it detects and blocks SQL injection patterns before they reach the application server","Install antivirus on the web servers","Block the attacker's IP in Azure Firewall"],
+c:1,e:"WAF Prevention mode is the right immediate fix. It inspects HTTP request bodies, headers, and URLs against OWASP rules. SQL injection attempts are blocked at the Application Gateway layer — the attack never reaches your application code. This buys time for developers to fix the underlying vulnerability."},
+
+// ══════════════════════════════════════════
+// SECTION 8 — AZURE NETWORK WATCHER
+// ══════════════════════════════════════════
+{s:"Network Watcher",t:"conceptual",
+q:"What is Azure Network Watcher?",
+o:["A firewall monitoring service","A regional Azure service providing tools to monitor, diagnose, and gain insights into Azure network infrastructure — including packet capture, flow logs, connectivity checking, and topology visualization","A billing tool for network resources","An automated network configuration service"],
+c:1,e:"Network Watcher is your network diagnostic toolkit. It's automatically enabled per region when you create resources. Key tools: IP Flow Verify (test NSG rules), Next Hop (trace routing), Packet Capture (record traffic), NSG Flow Logs (audit all traffic), Connection Troubleshoot (test VM-to-VM connectivity), and Network Topology (visualize your network)."},
+
+{s:"Network Watcher",t:"conceptual",
+q:"What does the 'IP Flow Verify' tool in Network Watcher do?",
+o:["It measures network latency between two VMs","It tests whether a specific packet (source IP, destination IP, port, protocol, direction) would be ALLOWED or DENIED by the NSG rules on a VM — and tells you WHICH rule made the decision","It captures all packets to/from a VM","It verifies DNS resolution for an IP address"],
+c:1,e:"IP Flow Verify answers: 'If a packet from 203.0.113.5 to my VM on port 443 arrives, does the NSG allow or deny it?' It tests without sending actual traffic and tells you exactly which NSG rule (including the priority) is responsible. Invaluable for debugging NSG misconfigurations."},
+
+{s:"Network Watcher",t:"conceptual",
+q:"What are NSG Flow Logs in Azure Network Watcher?",
+o:["Real-time alerts when NSG rules are triggered","Logs that record all inbound and outbound IP traffic flows through NSGs — capturing source/destination IPs, ports, protocol, and allow/deny decisions — stored in Azure Storage","A list of all NSG rules currently active","Logs of NSG configuration changes"],
+c:1,e:"NSG Flow Logs capture: source IP, dest IP, source port, dest port, protocol, direction, decision (allow/deny), and throughput. Stored in Azure Storage as JSON. Use Traffic Analytics (built on Log Analytics) to visualize hotspots, detect anomalies, and identify top talkers. Essential for security auditing and compliance."},
+
+{s:"Network Watcher",t:"conceptual",
+q:"What does the 'Next Hop' tool in Network Watcher tell you?",
+o:["The next Azure region traffic will route to","For a given source VM and destination IP, it shows which route will be used and what the next hop type and IP is — revealing whether traffic goes through a firewall, gateway, or directly","The next DNS server in the resolution chain","The next scheduled network maintenance window"],
+c:1,e:"Next Hop answers: 'When my VM at 10.0.1.4 sends traffic to 10.0.2.5, which route wins and where does the packet go?' It shows the effective route: VirtualAppliance (10.0.0.4) means it goes through a firewall. Internet means it goes direct. None means it's black-holed. Critical for debugging UDR (route table) issues."},
+
+{s:"Network Watcher",t:"technical",
+q:"Which Network Watcher tool lets you capture packets on a VM to a Storage Account for offline analysis?",
+code:`<span class="pm">$</span> <span class="kw">az network watcher packet-capture create</span> \\
+  <span class="op">--resource-group</span> NetRG \\
+  <span class="op">--vm</span> MyVM \\
+  <span class="op">--name</span> CaptureSession1 \\
+  <span class="op">--storage-account</span> mydiagstorageacct \\
+  <span class="op">--time-limit</span> <span class="nm">300</span>`,
+o:["Connection Monitor — tracks ongoing connectivity","Packet Capture — records packets at a VM's NIC and saves the .cap file to a Storage Account or local VM disk for analysis in Wireshark or Network Monitor","Traffic Analytics — analyzes flow log patterns","IP Flow Verify — tests NSG rule evaluation"],
+c:1,e:"Packet Capture saves a .cap file (Wireshark-compatible) to Azure Storage or the VM's local disk. Filter by protocol, IP, or port. Useful for: debugging application protocols, capturing SSL handshakes, recording unexpected traffic patterns. Requires Network Watcher Agent VM extension on the target VM."},
+
+{s:"Network Watcher",t:"technical",
+q:"What is Connection Monitor in Azure Network Watcher?",
+o:["A tool that monitors NSG rule changes","A continuous monitoring service that tests network connectivity between sources (VMs, on-premises) and destinations (endpoints, ports) — alerting you when latency exceeds thresholds or connectivity fails","A packet capture scheduled to run every hour","A tool that monitors VNet peering status"],
+c:1,e:"Connection Monitor runs end-to-end connectivity tests on a schedule (every 30 seconds to 30 minutes). It measures latency, packet loss, and reachability. It identifies the failing hop in the path — is the issue the NSG, the OS firewall, the application, or the network? Replaces the older Connection Troubleshoot tool."},
+
+{s:"Network Watcher",t:"logical",
+q:"An admin reports that a VM cannot connect to a database on port 1433. You need to quickly identify if NSG rules are the cause. Which Network Watcher tool do you use FIRST?",
+o:["Packet Capture — start capturing all VM traffic","IP Flow Verify — test the specific source IP, destination IP, and port 1433 to instantly see if the NSG allows or denies it and which rule is responsible","NSG Flow Logs — search through logs for denied traffic","Connection Monitor — set up a new test"],
+c:1,e:"IP Flow Verify is the fastest first step — it gives an instant yes/no answer and identifies the exact NSG rule responsible, without needing to analyze logs or capture packets. If IP Flow Verify shows it's allowed by NSG but the connection still fails, the problem is elsewhere (OS firewall, application, SQL Server not running, etc.)."},
+
+{s:"Network Watcher",t:"logical",
+q:"Your security team needs an audit of all traffic (allowed AND denied) that passed through NSGs in the last 30 days for compliance. Which Network Watcher feature provides this?",
+o:["Azure Monitor activity logs","NSG Flow Logs — enable them on each NSG, logs are stored in Azure Storage and can be analyzed with Traffic Analytics for visual reports of all traffic flows","Packet Capture archives","Azure Firewall logs"],
+c:1,e:"NSG Flow Logs are purpose-built for traffic auditing. Enable on each NSG, configure retention in Azure Storage, then use Traffic Analytics (Azure Monitor) for dashboards showing top source IPs, blocked traffic, geographic traffic patterns, and anomalies. This satisfies compliance requirements for network traffic audit trails."},
+
+{s:"Network Watcher",t:"logical",
+q:"A VM's route table was recently changed and now traffic to 10.2.0.0/16 seems to be going the wrong way. Which tool diagnoses exactly which route is being used?",
+o:["IP Flow Verify — test if the NSG allows traffic","Next Hop — enter the source VM and destination 10.2.0.0/16 to see the exact route being used, next hop type, and next hop IP","NSG Flow Logs — search for 10.2.0.0/16 traffic","Packet Capture — capture and inspect packets"],
+c:1,e:"Next Hop is specifically designed for route debugging. It evaluates the effective routes on the VM's NIC (system routes + UDR) and tells you exactly which route wins and where packets go. After a route table change, Next Hop immediately shows if traffic is going to a VirtualAppliance, Internet, or VirtualNetwork — confirming if the change had the intended effect."}
+
+];
+
+// ── STATE ──
+let filtered=[...Q],answers={},answered=0,correct=0;
+let activeSec='all',activeType='all';
+
+const MODS=["Virtual Networks","NSG","Azure DNS","VNet Peering","Route Tables","Load Balancer","Application Gateway","Network Watcher"];
+const MOD_ICONS={"Virtual Networks":"🌐","NSG":"🛡️","Azure DNS":"📡","VNet Peering":"🔗","Route Tables":"🗺️","Load Balancer":"⚖️","Application Gateway":"🔀","Network Watcher":"🔍"};
+const LTR=['A','B','C','D'];
+
+function shuf(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function applyF(doShuf){let q=Q;if(activeSec!=='all')q=q.filter(x=>x.s===activeSec);if(activeType!=='all')q=q.filter(x=>x.t===activeType);filtered=doShuf?shuf(q):[...q];}
+
+function setSec(sec,btn){activeSec=sec;document.querySelectorAll('.mb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');resetS();}
+function setType(typ,btn){activeType=typ;document.querySelectorAll('.flt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');resetS();}
+function resetS(){answers={};answered=0;correct=0;document.getElementById('rPanel').classList.remove('vis');applyF(false);render();}
+function doShuffle(){answers={};answered=0;correct=0;document.getElementById('rPanel').classList.remove('vis');applyF(true);render();window.scrollTo({top:0,behavior:'smooth'});}
+function doReset(){answers={};answered=0;correct=0;document.getElementById('rPanel').classList.remove('vis');applyF(false);render();window.scrollTo({top:0,behavior:'smooth'});}
+
+function answer(qi,oi){
+  if(answers[qi]!==undefined)return;
+  const ok=oi===filtered[qi].c;
+  answers[qi]={chosen:oi,ok};answered++;if(ok)correct++;
+  updateStats();refreshCard(qi);
+  if(answered===filtered.length)setTimeout(showResult,500);
+}
+
+function updateStats(){
+  const tot=filtered.length,pct=answered>0?Math.round(correct/answered*100):0,prg=tot>0?answered/tot*100:0;
+  document.getElementById('sTotal').textContent=tot;
+  document.getElementById('sAns').textContent=answered;
+  document.getElementById('sCorr').textContent=correct;
+  document.getElementById('sWrng').textContent=answered-correct;
+  document.getElementById('sPct').textContent=answered>0?pct+'%':'—';
+  document.getElementById('pBar').style.width=prg+'%';
+  document.getElementById('pLbl').textContent=`${answered} of ${tot} answered`;
+  document.getElementById('pScore').textContent=`Score: ${answered>0?pct+'%':'0%'}`;
+}
+
+function showResult(){
+  const tot=filtered.length,pct=Math.round(correct/tot*100);
+  let ico='😤',vrd='Keep going — Azure Networking takes practice!';
+  if(pct>=90){ico='🏆';vrd='Outstanding! Azure Networking Expert!';}
+  else if(pct>=75){ico='🎓';vrd='Great work! Almost exam-ready!';}
+  else if(pct>=60){ico='📈';vrd='Good progress — review the weaker topics.';}
+  document.getElementById('rIco').textContent=ico;
+  document.getElementById('rNum').textContent=pct+'%';
+  document.getElementById('rNum').className='r-num'+(pct>=70?' hi':'');
+  document.getElementById('rVrd').textContent=vrd;
+  document.getElementById('rR').textContent=correct;
+  document.getElementById('rW').textContent=tot-correct;
+  document.getElementById('rP').textContent=pct+'%';
+
+  const bHtml=MODS.map(mod=>{
+    const mqs=filtered.filter(q=>q.s===mod);if(!mqs.length)return'';
+    const idx=mqs.map(q=>filtered.indexOf(q));
+    const done=idx.filter(i=>answers[i]!==undefined).length;
+    const right=idx.filter(i=>answers[i]?.ok).length;
+    const sp=done>0?Math.round(right/done*100):0;
+    const ico=MOD_ICONS[mod]||'📌';
+    return`<div class="mbrow"><div class="mbhead"><span>${ico} ${mod}</span><span>${right}/${done} · ${sp}%</span></div>
+    <div class="mbtrack"><div class="mbbar${sp<60?' lo':''}" style="width:${sp}%"></div></div></div>`;
+  }).join('');
+  document.getElementById('mBkd').innerHTML=`<div class="mbkd-title">Score by Module</div>${bHtml}`;
+  document.getElementById('rPanel').classList.add('vis');
+  document.getElementById('rPanel').scrollIntoView({behavior:'smooth'});
+}
+
+function tIcon(t){return t==='conceptual'?'💡':t==='technical'?'⚙️':'🧩';}
+
+function refreshCard(qi){
+  const card=document.getElementById(`qc${qi}`);if(!card)return;
+  const q=filtered[qi],ans=answers[qi];
+  card.classList.toggle('ok',ans.ok);card.classList.toggle('ng',!ans.ok);
+  const oH=q.o.map((o,i)=>{
+    let cls='opt lk';
+    if(i===q.c)cls+=' oc';else if(i===ans.chosen&&!ans.ok)cls+=' ow';
+    return`<div class="${cls}"><div class="oltr">${LTR[i]}</div><span>${o}</span></div>`;
+  }).join('');
+  card.querySelector('.opts').innerHTML=oH;
+  let ex=card.querySelector('.expl');
+  if(!ex){ex=document.createElement('div');ex.className='expl';card.appendChild(ex);}
+  ex.innerHTML=`<strong>💡 Explanation:</strong> ${q.e}`;ex.classList.add('vis');
+}
+
+function render(){
+  applyF(false);updateStats();
+  document.getElementById('rPanel').classList.remove('vis');
+  let prevSec='';
+  const html=filtered.map((q,i)=>{
+    let div='';
+    if(activeSec==='all'&&q.s!==prevSec){
+      prevSec=q.s;
+      const ico=MOD_ICONS[q.s]||'📌';
+      div=`<div class="sdiv"><div class="sdiv-line"></div><div class="sdiv-pill">${ico} ${q.s}</div><div class="sdiv-line"></div></div>`;
+    }
+    const cb=q.code?`<div class="cblk">${q.code}</div>`:'';
+    const oH=q.o.map((o,j)=>`<div class="opt" onclick="answer(${i},${j})"><div class="oltr">${LTR[j]}</div><span>${o}</span></div>`).join('');
+    const tagCls=q.t==='conceptual'?'qt-c':q.t==='technical'?'qt-t':'qt-l';
+    const ico=MOD_ICONS[q.s]||'📌';
+    return`${div}<div class="qcard" id="qc${i}" style="animation-delay:${Math.min(i,30)*0.025}s">
+      <div class="qmeta">
+        <span class="qno">Q${i+1}</span>
+        <span class="qtag ${tagCls}">${tIcon(q.t)} ${q.t}</span>
+        <span class="qsec">${ico} ${q.s}</span>
+      </div>
+      <div class="qtxt">${q.q}</div>
+      ${cb}
+      <div class="opts">${oH}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('quizBox').innerHTML=html;
+}
+
+render();
+</script>
+</body>
+</html>

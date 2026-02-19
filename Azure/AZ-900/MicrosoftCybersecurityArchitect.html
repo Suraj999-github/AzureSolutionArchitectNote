@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coming soon · Azure notes</title>
+  <!-- Bootstrap 5 darkly (same dark theme as dashboard) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/darkly/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome icons (simple) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #1a1a2b;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
+    .coming-card {
+      background-color: #24243c;
+      border: none;
+      border-radius: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      max-width: 700px;
+      width: 100%;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .icon-lg {
+      font-size: 5rem;
+      color: #00bc8c;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+    h1 {
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.5rem;
+    }
+    .badge-soon {
+      background-color: #2f2f4a;
+      color: #b5c5d4;
+      font-size: 0.9rem;
+      padding: 0.4rem 1.2rem;
+      border-radius: 50px;
+      border: 1px solid #3e3e62;
+      display: inline-block;
+      margin-bottom: 1.8rem;
+    }
+    .message {
+      color: #b5c5d4;
+      font-size: 1.2rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 2rem 0 2.2rem;
+    }
+    .feature-item {
+      background: #1e1e32;
+      border-radius: 60px;
+      padding: 0.5rem 1.5rem;
+      color: #9bb0c7;
+      border: 1px solid #35355a;
+      font-size: 0.95rem;
+    }
+    .feature-item i {
+      color: #00bc8c;
+      margin-right: 8px;
+    }
+    .btn-return {
+      background-color: transparent;
+      border: 2px solid #00bc8c;
+      color: #00bc8c;
+      border-radius: 40px;
+      padding: 0.7rem 2.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-return:hover {
+      background-color: #00bc8c;
+      color: #14141f;
+      border-color: #00bc8c;
+    }
+    .footer-note {
+      margin-top: 2.2rem;
+      color: #4f6382;
+      font-size: 0.85rem;
+    }
+    .footer-note i {
+      color: #00bc8c;
+    }
+  </style>
+</head>
+<body>
+  <div class="coming-card">
+    <!-- simple large icon -->
+    <div class="icon-lg">
+      <i class="fas fa-feather-alt"></i>
+    </div>
+    
+    <!-- badge indicates notes section -->
+    <span class="badge-soon"><i class="far fa-clock me-2"></i>in progress</span>
+    
+    <h1>Notes coming soon</h1>
+    
+    <!-- short, clean message -->
+    <div class="message">
+      <i class="fas fa-pen-fancy me-2" style="color: #00bc8c;"></i>
+      I'm writing detailed notes for this module.<br>
+      <span style="font-size: 1rem;">They will be available shortly.</span>
+    </div>
+    
+    <!-- minimal feature list (simple, not overwhelming) -->
+    <div class="features">
+      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-900</span>
+      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-104</span>
+      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-305</span>
+    </div>
+    
+    <!-- return button (same style as dashboard, points back to hub) -->
+    <a href="../../Home.html" class="btn-return">
+      <i class="fas fa-arrow-left me-2"></i> Back to Home Page
+      </a>
+    <!-- subtle footer with folder hint -->
+    <div class="footer-note">
+      <i class="far fa-folder-open me-1"></i> notes will appear in <code>Azure/AZ-xxx/</code>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Microsoft Cybersecurity Architect — SC-100 Quiz Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #FF3B5C;
+    --red-dim: #C0263F;
+    --orange: #FF8C42;
+    --yellow: #FFD166;
+    --green: #06D6A0;
+    --teal: #17E3C3;
+    --bg: #070A10;
+    --surface: #0E1420;
+    --surface2: #141C2E;
+    --border: #1C2840;
+    --border2: #243050;
+    --text: #E2EEFF;
+    --muted: #5B6E95;
+    --muted2: #8899BB;
+    --tag-conceptual: #9B5DE5;
+    --tag-technical: #0096FF;
+    --tag-logical: #06D6A0;
+  }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255,59,92,0.008) 2px,
+      rgba(255,59,92,0.008) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glows */
+  .glow-red {
+    position: fixed;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,59,92,0.07) 0%, transparent 65%);
+    top: -250px; left: -200px;
+    pointer-events: none; z-index: 0;
+  }
+  .glow-teal {
+    position: fixed;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(23,227,195,0.05) 0%, transparent 65%);
+    bottom: 0; right: -100px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  header { padding: 52px 0 36px; text-align: center; }
+
+  .shield-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, rgba(255,59,92,0.2), rgba(23,227,195,0.1));
+    border: 1px solid rgba(255,59,92,0.3);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+
+  .exam-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,59,92,0.1);
+    border: 1px solid rgba(255,59,92,0.25);
+    border-radius: 100px;
+    padding: 5px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: #FF7090;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .exam-badge::before { content: '▲'; font-size: 8px; color: var(--red); animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  h1 {
+    font-size: clamp(26px, 5vw, 50px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    background: linear-gradient(140deg, #fff 20%, var(--teal) 60%, var(--red) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    color: var(--muted2);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
+    line-height: 1.8;
+  }
+
+  /* ── SECTION TABS ── */
+  .section-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 32px 0 16px;
+    flex-wrap: wrap;
+  }
+
+  .stab {
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .stab:hover { border-color: var(--muted); color: var(--text); }
+  .stab.active { background: var(--red); border-color: var(--red); color: #fff; }
+
+  /* ── STATS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 20px 0 28px;
+  }
+
+  .scard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+
+  .scard:hover { border-color: var(--border2); }
+
+  .snum {
+    display: block;
+    font-size: 24px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--teal);
+  }
+
+  .slbl {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── PROGRESS ── */
+  .prog-bar-wrap {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .prog-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--orange), var(--teal));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  .prog-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .prog-score { color: var(--teal); font-weight: 600; }
+
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .flt {
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .flt:hover, .flt.active { background: var(--surface2); border-color: var(--muted2); color: var(--text); }
+  .flt.active.conceptual { background: rgba(155,93,229,0.2); border-color: var(--tag-conceptual); color: #C4A0FF; }
+  .flt.active.technical  { background: rgba(0,150,255,0.15); border-color: var(--tag-technical);  color: #7AC8FF; }
+  .flt.active.logical    { background: rgba(6,214,160,0.12); border-color: var(--tag-logical);    color: var(--teal); }
+
+  .flex1 { flex: 1; }
+
+  .btn-action {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-red:hover { background: var(--red-dim); transform: translateY(-1px); }
+  .btn-ghost { background: var(--surface2); color: var(--muted2); border: 1px solid var(--border2); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px;
+    margin-bottom: 14px;
+    animation: appear 0.35s ease both;
+    transition: border-color 0.3s;
+  }
+
+  @keyframes appear {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-card.ans-correct { border-color: var(--green); background: rgba(6,214,160,0.04); }
+  .q-card.ans-wrong   { border-color: var(--red);   background: rgba(255,59,92,0.04); }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .q-idx {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 5px;
+  }
+
+  .qtag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .qtag-conceptual { background: rgba(155,93,229,0.18); color: #C4A0FF; border: 1px solid rgba(155,93,229,0.3); }
+  .qtag-technical  { background: rgba(0,150,255,0.15);  color: #7AC8FF; border: 1px solid rgba(0,150,255,0.3); }
+  .qtag-logical    { background: rgba(6,214,160,0.12);  color: var(--teal); border: 1px solid rgba(6,214,160,0.3); }
+
+  .q-sec {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: auto;
+    max-width: 220px;
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  .q-text {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+
+  .opts { display: flex; flex-direction: column; gap: 9px; }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .opt:hover:not(.locked) {
+    border-color: var(--red);
+    background: rgba(255,59,92,0.07);
+    transform: translateX(4px);
+  }
+
+  .opt.opt-correct { border-color: var(--green) !important; background: rgba(6,214,160,0.1) !important; color: var(--green); }
+  .opt.opt-wrong   { border-color: var(--red) !important;   background: rgba(255,59,92,0.1) !important;  color: var(--red); }
+  .opt.locked { cursor: default; }
+
+  .opt-ltr {
+    min-width: 26px; height: 26px;
+    border-radius: 7px;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+
+  .opt:hover:not(.locked) .opt-ltr { background: var(--red); color: #fff; }
+  .opt.opt-correct .opt-ltr { background: var(--green); color: #000; }
+  .opt.opt-wrong .opt-ltr   { background: var(--red); color: #fff; }
+
+  .explain {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: rgba(23,227,195,0.06);
+    border: 1px solid rgba(23,227,195,0.18);
+    font-size: 13px;
+    line-height: 1.65;
+    color: #99EEE0;
+    font-family: 'JetBrains Mono', monospace;
+    display: none;
+  }
+
+  .explain.vis { display: block; animation: appear 0.25s ease; }
+  .explain strong { color: #fff; font-family: 'Outfit', sans-serif; }
+
+  /* ── RESULT ── */
+  .result-panel {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 48px 40px;
+    text-align: center;
+    margin: 32px 0;
+    display: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center top, rgba(255,59,92,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .result-panel.vis { display: block; animation: appear 0.5s ease; }
+
+  .r-emoji { font-size: 52px; margin-bottom: 16px; }
+
+  .r-score {
+    font-size: 80px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    background: linear-gradient(135deg, var(--orange), var(--red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .r-score.high {
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .r-title { font-size: 16px; color: var(--muted2); margin: 8px 0 32px; font-weight: 400; }
+
+  .r-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .r-cell {
+    padding: 18px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .r-cell .rn { font-size: 32px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .r-cell .rl { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px; }
+  .rc-right .rn { color: var(--green); }
+  .rc-wrong .rn  { color: var(--red); }
+  .rc-pct .rn   { color: var(--teal); }
+
+  .r-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  /* Section progress bars */
+  .sec-breakdown {
+    margin-top: 24px;
+    text-align: left;
+  }
+
+  .sec-row {
+    margin-bottom: 12px;
+  }
+
+  .sec-row-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted2);
+    margin-bottom: 5px;
+  }
+
+  .sec-bar-wrap {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .sec-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--red), var(--orange));
+    transition: width 0.6s ease;
+  }
+
+  .sec-bar.good { background: linear-gradient(90deg, var(--teal), var(--green)); }
+
+  footer {
+    padding: 40px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    margin-top: 32px;
+  }
+
+  footer p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 640px) {
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .r-grid { grid-template-columns: 1fr; }
+    .q-sec { display: none; }
+    .section-tabs { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-red"></div>
+<div class="glow-teal"></div>
+
+<div class="wrap">
+
+  <header>
+    <div class="shield-icon">🛡️</div>
+    <div class="exam-badge">SC-100 · Cybersecurity Architect</div>
+    <h1>Microsoft Cybersecurity<br/>Architect Quiz</h1>
+    <p class="subtitle">
+      Security Best Practices &nbsp;·&nbsp; Security Operations, Identity &amp; Compliance<br/>
+      Application &amp; Data Security &nbsp;·&nbsp; Infrastructure Security
+    </p>
+  </header>
+
+  <!-- SECTION FILTER TABS -->
+  <div class="section-tabs">
+    <button class="stab active" onclick="setSection('all', this)">All Sections</button>
+    <button class="stab" onclick="setSection('Security Best Practices', this)">🎯 Best Practices</button>
+    <button class="stab" onclick="setSection('Security Operations, Identity & Compliance', this)">🔐 Ops, Identity &amp; Compliance</button>
+    <button class="stab" onclick="setSection('Application & Data Security', this)">💾 App &amp; Data Security</button>
+    <button class="stab" onclick="setSection('Infrastructure Security', this)">🏗️ Infrastructure</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="scard"><span class="snum" id="statTotal">0</span><span class="slbl">Questions</span></div>
+    <div class="scard"><span class="snum" id="statAnswered">0</span><span class="slbl">Answered</span></div>
+    <div class="scard"><span class="snum" id="statCorrect">0</span><span class="slbl">Correct</span></div>
+    <div class="scard"><span class="snum" id="statWrong">0</span><span class="slbl">Wrong</span></div>
+    <div class="scard"><span class="snum" id="statPct">—</span><span class="slbl">Score</span></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="prog-bar-wrap"><div class="prog-bar" id="progBar"></div></div>
+  <div class="prog-meta">
+    <span id="progLbl">0 of 0 answered</span>
+    <span class="prog-score" id="progScore">Score: 0%</span>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="flt active" onclick="setType('all', this)">All Types</button>
+    <button class="flt conceptual" onclick="setType('conceptual', this)">💡 Conceptual</button>
+    <button class="flt technical"  onclick="setType('technical', this)">⚙️ Technical</button>
+    <button class="flt logical"    onclick="setType('logical', this)">🧩 Logical</button>
+    <div class="flex1"></div>
+    <button class="btn-action btn-red" onclick="doShuffle()">🔀 Shuffle &amp; Restart</button>
+    <button class="btn-action btn-ghost" onclick="doReset()">↺ Reset</button>
+  </div>
+
+  <!-- QUIZ CONTAINER -->
+  <div id="quizBox"></div>
+
+  <!-- RESULT PANEL -->
+  <div class="result-panel" id="resultPanel">
+    <div class="r-emoji" id="rEmoji">🎯</div>
+    <div class="r-score" id="rScore">0%</div>
+    <div class="r-title" id="rTitle">Keep practising to ace SC-100!</div>
+    <div class="r-grid">
+      <div class="r-cell rc-right"><div class="rn" id="rRight">0</div><div class="rl">Correct</div></div>
+      <div class="r-cell rc-wrong"><div class="rn" id="rWrong">0</div><div class="rl">Wrong</div></div>
+      <div class="r-cell rc-pct"><div class="rn" id="rPct">0%</div><div class="rl">Accuracy</div></div>
+    </div>
+    <div class="sec-breakdown" id="secBreakdown"></div>
+    <div class="r-actions" style="margin-top:28px;">
+      <button class="btn-action btn-red" onclick="doShuffle()">🔀 Try Again (Shuffled)</button>
+      <button class="btn-action btn-ghost" onclick="doReset()">↺ Review Answers</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>Microsoft Cybersecurity Architect · SC-100 Exam Prep<br/>
+    Security Best Practices · Identity &amp; Compliance · App/Data Security · Infrastructure Security</p>
+  </footer>
+
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // ── SECURITY BEST PRACTICES ──
+  { section:"Security Best Practices", type:"conceptual", question:"What is Zero Trust in simple terms?", options:["Trust everyone inside your corporate network","Never trust any user, device, or network by default — always verify before granting access","Use a single strong firewall at the perimeter","Only allow admin users to access sensitive data"], correct:1, explanation:"Zero Trust means 'never trust, always verify'. Even internal users must authenticate and be authorized for every resource. It assumes the network is already breached and validates every request explicitly." },
+  { section:"Security Best Practices", type:"conceptual", question:"What are the three core principles of Zero Trust?", options:["Encrypt, Backup, Monitor","Verify explicitly, Use least privilege, Assume breach","Authenticate, Authorize, Audit","Detect, Respond, Recover"], correct:1, explanation:"Microsoft's Zero Trust model: (1) Verify explicitly — always authenticate using all available data points. (2) Use least privilege — limit access with JIT/JEA. (3) Assume breach — minimize blast radius and segment access." },
+  { section:"Security Best Practices", type:"conceptual", question:"What is the principle of 'Least Privilege'?", options:["Give all users admin access so they can work freely","Grant users only the minimum permissions required to do their job — nothing more","Restrict access to senior employees only","Allow access based on department hierarchy"], correct:1, explanation:"Least privilege limits damage if an account is compromised. A marketing user shouldn't have database admin rights. Combine with Just-In-Time (JIT) access to further reduce risk." },
+  { section:"Security Best Practices", type:"conceptual", question:"What is 'Defense in Depth' in cybersecurity?", options:["Using one very strong firewall","Layering multiple security controls so that if one fails, others still protect the system","Encrypting all data at rest","Monitoring network traffic 24/7"], correct:1, explanation:"Defense in Depth uses multiple layers: physical security → network → host → application → data. If an attacker bypasses the firewall, they still face identity controls, endpoint protection, and data encryption." },
+  { section:"Security Best Practices", type:"conceptual", question:"What is a Security Baseline?", options:["The minimum hardware requirements for a server","A documented set of security configuration standards that every system must meet","The initial firewall rule set","A backup of security logs"], correct:1, explanation:"A security baseline defines minimum security configuration for systems (e.g., 'MFA must be enabled', 'OS must be patched within 30 days'). Microsoft Defender for Cloud provides baseline templates." },
+  { section:"Security Best Practices", type:"conceptual", question:"What is the Microsoft Cloud Adoption Framework (CAF) Secure methodology?", options:["A tool for monitoring cloud costs","Guidance for integrating security across all cloud adoption stages — from strategy to operations","A compliance certification program","A network configuration standard"], correct:1, explanation:"The CAF Secure methodology provides security guidance at every stage of cloud adoption — covering roles, responsibilities, security operations, asset protection, and governance." },
+  { section:"Security Best Practices", type:"conceptual", question:"What is the Microsoft Security Development Lifecycle (SDL)?", options:["A process for deploying Azure resources securely","A set of practices that developers follow to build more secure software and reduce vulnerabilities","A penetration testing framework","A compliance standard for financial institutions"], correct:1, explanation:"SDL integrates security into every phase of software development: requirements → design → implementation → verification → release → response. It helps find and fix vulnerabilities early when they're cheapest to fix." },
+  { section:"Security Best Practices", type:"conceptual", question:"What is a 'Shared Responsibility' model in cloud security?", options:["Microsoft handles all security in the cloud","Customers handle all security in the cloud","Security responsibilities are divided between Microsoft and the customer based on the service model (IaaS/PaaS/SaaS)","Security is handled by a third-party auditor"], correct:2, explanation:"In IaaS, customers secure the OS, apps, and data. In PaaS, Microsoft secures the platform. In SaaS, Microsoft secures almost everything. But customers ALWAYS own their data, identities, and access management." },
+  { section:"Security Best Practices", type:"technical", question:"Which framework measures your organization's security posture as a numeric score and provides prioritized improvement actions?", options:["Azure Policy","Microsoft Secure Score","Azure Blueprints","Microsoft Sentinel"], correct:1, explanation:"Microsoft Secure Score measures security posture as a numeric score. It provides actionable recommendations and tracks improvement over time across Microsoft 365 and Azure services." },
+  { section:"Security Best Practices", type:"technical", question:"Which Azure service provides a centralized view of security posture and compliance across your Azure resources?", options:["Azure Monitor","Microsoft Defender for Cloud","Azure Policy","Azure Sentinel"], correct:1, explanation:"Microsoft Defender for Cloud provides unified security management, threat protection, and a compliance dashboard. It calculates a Secure Score and gives prioritized remediation steps." },
+  { section:"Security Best Practices", type:"technical", question:"What is Just-In-Time (JIT) VM access in Azure?", options:["Automatically patching VMs at scheduled times","Locking down VM management ports (RDP/SSH) and only opening them for a limited time when requested","Taking a VM snapshot before maintenance","Cloning a VM for disaster recovery"], correct:1, explanation:"JIT VM access (in Microsoft Defender for Cloud) locks management ports (RDP 3389, SSH 22) by default. When an admin needs access, they request it for a limited time window — drastically reducing the attack surface." },
+  { section:"Security Best Practices", type:"logical", question:"A user in Finance requests read access to an HR database 'just in case they need it someday'. What should the architect recommend?", options:["Grant the access since it's only read-only","Deny the access — grant permissions only when there is a justified business need (Least Privilege)","Grant access and audit it monthly","Create a shared read account for Finance and HR"], correct:1, explanation:"'Just in case' violates the principle of least privilege. Access should be granted only when there's a specific, justified business need. Use JIT access for temporary needs instead of permanent standing permissions." },
+  { section:"Security Best Practices", type:"logical", question:"A company's perimeter firewall was bypassed and an attacker got inside the network. Which security strategy would MINIMIZE the damage?", options:["Add more firewall rules","Defense in Depth — additional layers like network segmentation, identity controls, and data encryption limit the attacker's reach","Increase firewall bandwidth","Deploy more antivirus software"], correct:1, explanation:"Defense in Depth means the attacker hitting one layer (firewall) still faces identity verification, network segmentation (can't move laterally), endpoint protection, and encrypted data. The breach is contained." },
+  { section:"Security Best Practices", type:"logical", question:"Your organization wants to measure how secure it is and track improvement over time. Which tool gives the BEST consolidated view?", options:["Azure Cost Management","Microsoft Secure Score","Azure Resource Graph","Azure Advisor"], correct:1, explanation:"Microsoft Secure Score quantifies your security posture as a score. It shows what actions will increase your score the most, letting you prioritize and track security improvements over time." },
+
+  // ── SECURITY OPERATIONS, IDENTITY & COMPLIANCE ──
+  { section:"Security Operations, Identity & Compliance", type:"conceptual", question:"What is SIEM in simple terms?", options:["A tool for creating virtual machines","A system that collects security logs from across your environment and helps detect threats by analyzing them centrally","A network firewall product","A compliance certification"], correct:1, explanation:"SIEM (Security Information and Event Management) aggregates logs from servers, firewalls, apps, and identity systems. It correlates events to spot threats — like noticing a user logged in from 3 countries in 10 minutes." },
+  { section:"Security Operations, Identity & Compliance", type:"conceptual", question:"What is SOAR in cybersecurity?", options:["A backup and recovery system","Security Orchestration, Automation and Response — automating repetitive security tasks and incident response","A network monitoring protocol","A cloud storage encryption standard"], correct:1, explanation:"SOAR automates security workflows. When SIEM detects a threat, SOAR can automatically block an IP, disable a compromised account, or alert the SOC — reducing response time from hours to seconds." },
+  { section:"Security Operations, Identity & Compliance", type:"conceptual", question:"What is Multi-Factor Authentication (MFA)?", options:["Using a very long password","Requiring two or more verification methods — something you know (password), have (phone), or are (fingerprint)","Changing your password every 30 days","Using different passwords for different systems"], correct:1, explanation:"MFA adds a second layer beyond just a password. Even if an attacker steals your password, they can't log in without the second factor (authenticator app, SMS, biometric). MFA blocks over 99.9% of account compromise attacks." },
+  { section:"Security Operations, Identity & Compliance", type:"conceptual", question:"What is Privileged Identity Management (PIM)?", options:["A tool for resetting admin passwords","A feature that provides just-in-time privileged access — admins request elevated roles only when needed, for a limited time","A monitoring tool for privileged accounts","A multi-factor authentication service"], correct:1, explanation:"PIM (in Microsoft Entra ID) eliminates standing admin access. Instead of always being a Global Admin, you request activation for 1-8 hours when needed. This reduces the window of exposure if the account is compromised." },
+  { section:"Security Operations, Identity & Compliance", type:"conceptual", question:"What is Conditional Access in Microsoft Entra ID?", options:["Blocking all access from outside the office","A policy engine that makes access decisions based on signals like user location, device compliance, and risk level","A password complexity requirement","A tool for resetting forgotten passwords"], correct:1, explanation:"Conditional Access evaluates signals (who is the user, what device, where, what's the risk score) and decides: allow, block, or require MFA. It's the 'if-then' policy engine for Zero Trust." },
+  { section:"Security Operations, Identity & Compliance", type:"conceptual", question:"What is Identity Governance?", options:["Tracking how many users exist in the system","Ensuring the right users have the right access at the right time — and reviewing and removing access regularly","Setting password expiry policies","Monitoring failed login attempts"], correct:1, explanation:"Identity Governance covers access lifecycle: provisioning (give access when hired), access reviews (check periodically if still needed), and deprovisioning (remove access when someone leaves or changes roles)." },
+  { section:"Security Operations, Identity & Compliance", type:"conceptual", question:"What is GDPR in simple terms?", options:["A Microsoft cloud service","A European Union regulation that requires organizations to protect personal data of EU residents and gives individuals rights over their data","A cybersecurity certification","A network security protocol"], correct:1, explanation:"GDPR mandates: collect only necessary data, secure it, notify users of breaches within 72 hours, and honor requests to access or delete personal data. Non-compliance = fines up to 4% of global revenue." },
+  { section:"Security Operations, Identity & Compliance", type:"conceptual", question:"What does a SOC (Security Operations Center) do?", options:["Manages cloud billing","A team/facility that monitors, detects, analyzes, and responds to cybersecurity incidents around the clock","Develops new security software","Manages user accounts and passwords"], correct:1, explanation:"The SOC is the frontline of cyber defense. Using SIEM tools like Microsoft Sentinel, SOC analysts hunt for threats, investigate alerts, contain incidents, and drive continuous security improvement." },
+  { section:"Security Operations, Identity & Compliance", type:"technical", question:"Which Azure service is Microsoft's cloud-native SIEM and SOAR solution?", options:["Microsoft Defender for Cloud","Microsoft Sentinel","Azure Monitor","Azure Security Center"], correct:1, explanation:"Microsoft Sentinel is cloud-native SIEM + SOAR. It ingests data from Microsoft and third-party sources, uses AI to detect threats, and includes playbooks (Logic Apps) to automate incident response." },
+  { section:"Security Operations, Identity & Compliance", type:"technical", question:"What is a Sentinel Playbook used for?", options:["Documenting incident response procedures manually","Automatically triggering response actions (like blocking a user or sending alerts) when an incident is detected","Creating firewall rules","Generating compliance reports"], correct:1, explanation:"Sentinel Playbooks are Azure Logic Apps triggered by incidents. Example: When a high-severity alert fires, the playbook automatically blocks the IP, disables the user in Entra ID, and emails the SOC team." },
+  { section:"Security Operations, Identity & Compliance", type:"technical", question:"Which Microsoft Entra ID feature detects risky sign-ins and compromised users automatically?", options:["Conditional Access","Identity Protection","Privileged Identity Management","Access Reviews"], correct:1, explanation:"Microsoft Entra Identity Protection uses ML to detect anomalies like impossible travel, anonymous IP usage, and leaked credentials. It assigns risk levels and can auto-block or require MFA via Conditional Access." },
+  { section:"Security Operations, Identity & Compliance", type:"technical", question:"What is the purpose of Microsoft Entra Access Reviews?", options:["Reviewing login activity for suspicious behavior","Periodically verifying that users still need their assigned roles and permissions — removing unnecessary access","Auditing failed login attempts","Reviewing Conditional Access policies"], correct:1, explanation:"Access Reviews prompt managers to certify that users still need access. If uncertified, access is automatically removed. This enforces least privilege and helps with compliance (SOX, ISO 27001, etc.)." },
+  { section:"Security Operations, Identity & Compliance", type:"technical", question:"Which Microsoft compliance tool helps organizations understand their compliance posture across regulations like ISO 27001, NIST, and GDPR?", options:["Microsoft Purview Compliance Manager","Azure Policy","Microsoft Defender for Cloud","Azure Blueprints"], correct:0, explanation:"Microsoft Purview Compliance Manager provides a compliance score, maps controls to regulations, tracks improvement actions, and gives a unified compliance posture dashboard." },
+  { section:"Security Operations, Identity & Compliance", type:"logical", question:"A Global Admin account is used daily for regular work like email and browsing. What security risk does this create and what's the fix?", options:["No risk — admins need high-level access for their work","High risk — if the account is phished, the attacker has global control. Fix: Use PIM for JIT admin access and a separate regular account for daily tasks","Medium risk — add MFA to the admin account","Low risk — use a strong password on the admin account"], correct:1, explanation:"Using a Global Admin account daily vastly increases exposure. Best practice: admins have a separate low-privilege account for daily tasks and request admin elevation via PIM only when needed, with MFA required for activation." },
+  { section:"Security Operations, Identity & Compliance", type:"logical", question:"Your SOC receives 5,000 alerts per day and analysts are overwhelmed. Which Sentinel capability would MOST reduce this workload?", options:["Adding more SOC analysts","SOAR Playbooks to automatically handle low-severity alerts, and AI-driven incident correlation to reduce alert noise","Disabling low-priority alert rules","Exporting logs to Excel for manual review"], correct:1, explanation:"Sentinel's AI correlates thousands of alerts into fewer high-fidelity incidents. Playbooks handle low-severity alerts automatically. This lets analysts focus on real, complex threats." },
+  { section:"Security Operations, Identity & Compliance", type:"logical", question:"An employee signs in from New York. 30 minutes later, a sign-in is attempted from Russia. Which Entra ID feature would detect and flag this automatically?", options:["Conditional Access location policy","Microsoft Entra Identity Protection — 'impossible travel' risk detection","MFA enforcement","Azure Monitor alert"], correct:1, explanation:"Entra Identity Protection's 'impossible travel' detection flags sign-ins from geographically distant locations within a timeframe that makes physical travel impossible. It raises user risk and can trigger a Conditional Access block." },
+
+  // ── APPLICATION & DATA SECURITY ──
+  { section:"Application & Data Security", type:"conceptual", question:"What is the OWASP Top 10?", options:["A list of the top 10 cloud providers","A list of the 10 most critical web application security risks, published by a nonprofit to help developers build safer apps","A Microsoft security certification","A list of 10 Azure security services"], correct:1, explanation:"OWASP Top 10 lists the most critical web application vulnerabilities — SQL Injection, Broken Access Control, XSS, etc. Architects use it to prioritize security controls in application design." },
+  { section:"Application & Data Security", type:"conceptual", question:"What is Encryption at Rest vs Encryption in Transit?", options:["At Rest = encrypting laptops; In Transit = encrypting USB drives","At Rest = encrypting data stored on disk/database; In Transit = encrypting data moving over a network (e.g., TLS/HTTPS)","At Rest = encrypting backups only; In Transit = encrypting emails only","Both mean the same thing — end-to-end encryption"], correct:1, explanation:"At Rest: protects stored data in Azure Blob, SQL DB, etc. (AES-256). In Transit: protects data moving between client-server or service-to-service (TLS 1.2+). Both are required for comprehensive data protection." },
+  { section:"Application & Data Security", type:"conceptual", question:"What is a Managed Identity in Azure?", options:["A user account managed by Microsoft","An automatically managed identity for Azure services to authenticate to other Azure services — without storing credentials in code","A shared admin account for managing Azure resources","A guest user account from another organization"], correct:1, explanation:"Managed Identity eliminates the need to store secrets in code or config files. Your Azure App Service gets an identity and can access Azure Key Vault or SQL Database using that identity — Azure handles the token lifecycle." },
+  { section:"Application & Data Security", type:"conceptual", question:"What is Azure Key Vault?", options:["A backup storage for virtual machines","A centralized, secure store for secrets (passwords, API keys), encryption keys, and certificates","A network encryption service","A tool for managing Azure subscriptions"], correct:1, explanation:"Azure Key Vault stores secrets, keys, and certificates securely — away from application code. Apps retrieve secrets at runtime using Managed Identity. This prevents hard-coded credentials and centralizes rotation and auditing." },
+  { section:"Application & Data Security", type:"conceptual", question:"What is Data Classification?", options:["Organizing files alphabetically","Labeling data based on its sensitivity level (e.g., Public, Internal, Confidential, Highly Confidential) to apply appropriate protection","Backing up data by type","Compressing data to save storage"], correct:1, explanation:"Data classification identifies and labels data by sensitivity. Classified data triggers policies: Confidential data might be encrypted and watermarked; Highly Confidential data might be blocked from external sharing." },
+  { section:"Application & Data Security", type:"conceptual", question:"What is SQL Injection and how is it prevented?", options:["A database performance issue; prevented by adding indexes","An attack where malicious SQL code is inserted into input fields to manipulate database queries; prevented by parameterized queries and input validation","A network attack on SQL Server ports; prevented by firewall rules","An encryption algorithm for SQL databases"], correct:1, explanation:"SQL Injection exploits apps that build SQL queries from user input. Attackers type SQL code into a form field and can read, modify, or delete data. Prevention: parameterized queries, input validation, and WAF rules." },
+  { section:"Application & Data Security", type:"conceptual", question:"What is Microsoft Purview Information Protection?", options:["A backup service for Microsoft 365 data","A solution that discovers, classifies, and protects sensitive data (like credit card numbers, health records) across Microsoft 365 and Azure","A network traffic inspection tool","A tool for managing compliance documents"], correct:1, explanation:"Microsoft Purview Information Protection automatically scans for sensitive data, applies sensitivity labels, and enforces protection policies like encryption and access restrictions — even if the file is shared externally." },
+  { section:"Application & Data Security", type:"technical", question:"Which Azure service provides a Web Application Firewall (WAF) to protect against OWASP Top 10 attacks?", options:["Azure NSG","Azure Application Gateway with WAF or Azure Front Door with WAF","Azure Firewall","Azure DDoS Protection"], correct:1, explanation:"Azure WAF (on Application Gateway or Front Door) inspects HTTP/HTTPS traffic and blocks OWASP Top 10 attacks like SQL injection, XSS, and command injection. NSG and Azure Firewall operate at lower layers." },
+  { section:"Application & Data Security", type:"technical", question:"Which Azure service scans container images and registries for vulnerabilities?", options:["Azure Container Instances","Microsoft Defender for Containers","Azure Kubernetes Service","Azure Container Registry Basic tier"], correct:1, explanation:"Microsoft Defender for Containers scans images in Azure Container Registry for known CVEs, alerts on Kubernetes misconfigurations, and provides runtime threat detection for containerized workloads." },
+  { section:"Application & Data Security", type:"technical", question:"What does Azure Transparent Data Encryption (TDE) protect?", options:["Data in transit between the app and SQL server","Data at rest — automatically encrypting the database files, backups, and transaction logs","Data displayed in the application UI","API keys stored in the application"], correct:1, explanation:"TDE encrypts SQL Database, SQL Managed Instance, and Synapse Analytics data at rest using AES-256. It's enabled by default and protects against physical theft of storage media." },
+  { section:"Application & Data Security", type:"technical", question:"Which DevSecOps practice involves scanning code for security vulnerabilities during the CI/CD pipeline?", options:["Code Review","Static Application Security Testing (SAST) and Software Composition Analysis (SCA)","Load Testing","Integration Testing"], correct:1, explanation:"SAST scans source code for security bugs (hard-coded secrets, buffer overflows) without running it. SCA checks open-source dependencies for known CVEs. Both run in CI/CD (GitHub Advanced Security, Azure DevOps)." },
+  { section:"Application & Data Security", type:"logical", question:"A developer hard-coded a database password in source code committed to GitHub. What is the CORRECT remediation?", options:["Make the GitHub repository private","Rotate the compromised password, store it in Azure Key Vault, update the app to retrieve it via Managed Identity, and implement secret scanning in CI/CD","Delete the commit from GitHub history","Change the password and update the code file"], correct:1, explanation:"The password is compromised the moment it's committed. Rotate immediately. Then: store in Key Vault, use Managed Identity to retrieve it, and implement GitHub Secret Scanning to prevent recurrence." },
+  { section:"Application & Data Security", type:"logical", question:"A web application accepts user input and constructs SQL queries directly from it. Users report unexpected data appearing from other accounts. What vulnerability is this?", options:["Broken Authentication — implement MFA","SQL Injection — fix by using parameterized queries and deploying WAF rules to block malicious input","CSRF — fix by adding anti-forgery tokens","Data leakage — fix by encrypting the database"], correct:1, explanation:"This is SQL Injection — attackers manipulate queries to read other users' data. Fixes: (1) Parameterized queries prevent SQL code injection. (2) WAF provides additional detection. (3) Least privilege DB account limits damage." },
+  { section:"Application & Data Security", type:"logical", question:"A financial services company stores customer SSNs and credit card numbers in Azure SQL. What combination of controls is MOST comprehensive?", options:["Strong passwords and firewall rules only","TDE (encryption at rest) + TLS (in transit) + Always Encrypted (column-level) + Defender for SQL (threat detection) + data classification labels","Backup the database daily","Allow access only from the office IP address"], correct:1, explanation:"Comprehensive data protection needs layers: TDE protects files on disk, TLS protects data moving to the app, Always Encrypted means even DBAs can't see SSNs in plaintext, Defender detects attack patterns, and classification ensures policies are applied." },
+
+  // ── INFRASTRUCTURE SECURITY ──
+  { section:"Infrastructure Security", type:"conceptual", question:"What is network segmentation and why is it important?", options:["Splitting a network cable to increase speed","Dividing a network into smaller zones so that if one is compromised, attackers can't freely move to other zones (limiting lateral movement)","Using multiple ISPs for redundancy","Assigning separate IP ranges to different VLANs"], correct:1, explanation:"Network segmentation creates security boundaries. If an attacker compromises a web server in the DMZ, they can't automatically reach the database tier — they face another security boundary. NSGs, Azure Firewall, and subnets implement this in Azure." },
+  { section:"Infrastructure Security", type:"conceptual", question:"What is Azure DDoS Protection?", options:["Protection against insider threats","A service that defends Azure resources against Distributed Denial of Service attacks — overwhelming traffic floods designed to take services offline","A web application firewall","A tool for blocking malicious IP addresses manually"], correct:1, explanation:"DDoS Protection monitors traffic at the network edge and automatically mitigates volumetric attacks, protocol attacks, and application-layer attacks. Standard tier provides adaptive tuning and SLA guarantees." },
+  { section:"Infrastructure Security", type:"conceptual", question:"What is Azure Bastion?", options:["A network load balancer","A managed service that provides secure, browser-based RDP/SSH access to VMs without exposing them to the public internet","A VPN gateway for site-to-site connectivity","A DDoS protection service"], correct:1, explanation:"Azure Bastion allows RDP/SSH into VMs directly from the Azure portal over TLS — without the VM having a public IP or open RDP/SSH ports. It eliminates exposure of management ports to the internet." },
+  { section:"Infrastructure Security", type:"conceptual", question:"What is a Private Endpoint in Azure?", options:["A VPN connection to Azure","A private IP address in your VNet that connects to an Azure PaaS service (like Storage, SQL), keeping traffic off the public internet","A dedicated server for private use","A firewall rule blocking public access"], correct:1, explanation:"Private Endpoint brings Azure PaaS services (Blob Storage, SQL Database, Key Vault, etc.) into your VNet with a private IP. Traffic never leaves the Microsoft network. Combined with disabling public access, it eliminates internet exposure." },
+  { section:"Infrastructure Security", type:"conceptual", question:"What is Azure Firewall?", options:["A free basic firewall included with every Azure subscription","A managed, cloud-native network security service that provides stateful packet inspection, threat intelligence, and FQDN filtering for Azure VNets","A web application firewall for HTTP traffic","A firewall for VMs only"], correct:1, explanation:"Azure Firewall is a fully managed Layer 3/4/7 network firewall. It filters traffic using rules, FQDN-based filtering, and Microsoft Threat Intelligence to block known malicious IPs and domains." },
+  { section:"Infrastructure Security", type:"conceptual", question:"What is Endpoint Detection and Response (EDR)?", options:["A tool for managing network endpoints (IP addresses)","Security software on devices that continuously monitors for malicious behavior and can automatically respond — isolating infected devices","A backup solution for endpoint devices","A patch management system for servers and workstations"], correct:1, explanation:"EDR (like Microsoft Defender for Endpoint) monitors devices in real-time, detects advanced threats that bypass antivirus, and can automatically isolate a compromised device from the network while the SOC investigates." },
+  { section:"Infrastructure Security", type:"conceptual", question:"What is Vulnerability Management in infrastructure security?", options:["Fixing bugs in application code","Continuously identifying, prioritizing, and remediating security weaknesses in systems — patching OS, software, and configurations","Managing network bandwidth","Tracking server uptime"], correct:1, explanation:"Vulnerability Management is an ongoing cycle: scan (find weaknesses) → prioritize (by severity/exploitability) → remediate (patch or mitigate) → verify (confirm fix). Microsoft Defender for Cloud supports this in Azure." },
+  { section:"Infrastructure Security", type:"conceptual", question:"What is a Hub-and-Spoke network topology in Azure?", options:["A circular network with no central point","A central VNet (Hub) containing shared services like firewall and DNS, connected to multiple Spoke VNets for workloads — traffic routes through the hub for inspection","A network with multiple internet connections","A VPN topology for branch offices"], correct:1, explanation:"Hub-and-Spoke is the recommended Azure network architecture for enterprises. The Hub holds Azure Firewall, VPN/ExpressRoute gateways, and monitoring. Spokes contain workloads connected via VNet Peering — all outbound traffic routes through the hub firewall." },
+  { section:"Infrastructure Security", type:"technical", question:"Which Microsoft Defender plan protects Azure virtual machines by providing vulnerability assessment, behavioral monitoring, and threat detection?", options:["Microsoft Defender for Containers","Microsoft Defender for Servers","Microsoft Defender for SQL","Microsoft Defender for Storage"], correct:1, explanation:"Microsoft Defender for Servers (Plan 1 or Plan 2) integrates with Microsoft Defender for Endpoint to provide EDR on VMs, vulnerability scanning, JIT VM access, adaptive application controls, and file integrity monitoring." },
+  { section:"Infrastructure Security", type:"technical", question:"What is Azure Firewall Premium's key capability over Azure Firewall Standard?", options:["Higher bandwidth","TLS inspection and IDPS (Intrusion Detection and Prevention System) for detecting threats inside encrypted traffic","More IP addresses","Automatic DDoS mitigation"], correct:1, explanation:"Azure Firewall Premium adds TLS inspection (decrypt, inspect, re-encrypt HTTPS traffic) and IDPS — detecting and blocking known attack signatures in real-time. Standard doesn't inspect encrypted traffic." },
+  { section:"Infrastructure Security", type:"technical", question:"Which Azure service provides centralized security policy and monitoring across hybrid environments (Azure + on-premises + multi-cloud)?", options:["Azure Monitor","Microsoft Defender for Cloud (with Azure Arc)","Azure Policy","Azure Security Center Classic"], correct:1, explanation:"Microsoft Defender for Cloud + Azure Arc extends security posture management to on-premises and multi-cloud (AWS, GCP) servers. Azure Arc enrolls non-Azure machines, and Defender for Cloud applies security policies uniformly." },
+  { section:"Infrastructure Security", type:"technical", question:"What does Microsoft Defender for DNS provide?", options:["Encrypted DNS resolution","Detection of DNS-based attacks like DNS tunneling, phishing domains, and C2 communication via DNS","A private DNS zone for Azure resources","DNS load balancing for Azure services"], correct:1, explanation:"Attackers use DNS for data exfiltration and command-and-control communication. Defender for DNS monitors all Azure DNS queries to detect these threats — without requiring agents on VMs." },
+  { section:"Infrastructure Security", type:"technical", question:"Which Azure service secures remote worker access to resources without a traditional VPN client?", options:["Azure VPN Gateway","Azure Virtual Desktop with Entra ID Conditional Access","Azure Bastion","ExpressRoute"], correct:1, explanation:"Azure Virtual Desktop provides browser-based or thin-client access to virtual desktops. Combined with Conditional Access (require compliant device, MFA, known location), it secures remote access while keeping data off local devices." },
+  { section:"Infrastructure Security", type:"logical", question:"An attacker gained access to a web server VM and is trying to connect to the database VM on port 1433. What control would PREVENT this lateral movement?", options:["Antivirus on the web server","Network Segmentation — NSG rules denying direct VM-to-VM traffic on database ports, allowing only app tier to DB tier on required ports","MFA on the web server admin account","Encrypting the database"], correct:1, explanation:"Proper network segmentation places web tier and DB tier in separate subnets with NSG rules allowing ONLY specific app-to-DB traffic. An attacker on the web VM can't directly reach the DB. Azure Firewall between tiers provides additional inspection." },
+  { section:"Infrastructure Security", type:"logical", question:"Your company's VMs are being accessed via RDP directly from the internet. Auditors flagged this as critical risk. What is the recommended solution?", options:["Use a stronger RDP password","Remove public IPs from VMs, use Azure Bastion for browser-based RDP access, and enable JIT VM access for temporary port opening when needed","Restrict RDP to port 3390 instead of 3389","Add NSG rules allowing RDP from the company IP only"], correct:1, explanation:"Public RDP is a major attack vector (brute force, RDP vulnerabilities). Best solution: remove public IPs, use Azure Bastion (no open RDP ports exposed), and JIT VM access for any legitimate admin needs." },
+  { section:"Infrastructure Security", type:"logical", question:"Your organization needs to design a network for 5 workload environments (dev, test, staging, prod, DMZ) sharing a central firewall and VPN gateway. What Azure architecture fits BEST?", options:["5 separate VNets with no peering","One large VNet with subnets for each environment","Hub-and-Spoke topology — central Hub VNet with Azure Firewall and VPN Gateway, each workload in its own Spoke VNet peered to the Hub","Flat network with NSGs controlling all traffic"], correct:2, explanation:"Hub-and-Spoke is purpose-built for this. The Hub centralizes shared infrastructure (firewall, VPN, DNS). Each environment is an isolated Spoke VNet. All traffic routes through the hub firewall — providing security, segmentation, and efficiency." },
+  { section:"Infrastructure Security", type:"logical", question:"An Azure Storage account contains sensitive compliance data with a public endpoint. Which controls would BEST restrict access to internal Azure resources only?", options:["Add a firewall rule to allow company IP only","Disable public endpoint, create a Private Endpoint in the VNet, use Managed Identity for app authentication, and restrict network access to VNet only","Use HTTPS only and encrypt the data","Change the storage account access tier to Archive"], correct:1, explanation:"Private Endpoint removes public internet exposure — the storage account gets a private IP in your VNet. Disabling the public endpoint ensures no external access. Managed Identity eliminates credential management. Layered security." },
+  { section:"Infrastructure Security", type:"logical", question:"You need to enforce that all outbound internet traffic from Azure VMs goes through Azure Firewall for inspection. How do you achieve this?", options:["Add an NSG rule blocking outbound traffic","Create a User-Defined Route (UDR) with a default route (0.0.0.0/0) pointing to Azure Firewall as the next hop, applied to all workload subnets","Enable DDoS Protection Standard","Configure DNS to use Azure Firewall IP"], correct:1, explanation:"Without a UDR, VMs route internet traffic directly. A UDR with 0.0.0.0/0 → Azure Firewall as next hop forces ALL outbound internet traffic through the firewall for logging, threat intelligence filtering, and FQDN-based rules." }
+];
+
+// ── STATE ──
+let filtered = [...ALL_QUESTIONS];
+let answers  = {};
+let answered = 0;
+let correct  = 0;
+let activeSection = 'all';
+let activeType    = 'all';
+
+const SECTIONS = [
+  "Security Best Practices",
+  "Security Operations, Identity & Compliance",
+  "Application & Data Security",
+  "Infrastructure Security"
+];
+
+function shuffle(a) {
+  const arr = [...a];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function applyFilters(doShuffle) {
+  let q = ALL_QUESTIONS;
+  if (activeSection !== 'all') q = q.filter(x => x.section === activeSection);
+  if (activeType    !== 'all') q = q.filter(x => x.type    === activeType);
+  filtered = doShuffle ? shuffle(q) : q;
+}
+
+function setSection(sec, btn) {
+  activeSection = sec;
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  resetState();
+}
+
+function setType(type, btn) {
+  activeType = type;
+  document.querySelectorAll('.flt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  resetState();
+}
+
+function resetState() {
+  answers = {}; answered = 0; correct = 0;
+  document.getElementById('resultPanel').classList.remove('vis');
+  applyFilters(false);
+  render();
+}
+
+function doShuffle() {
+  answers = {}; answered = 0; correct = 0;
+  document.getElementById('resultPanel').classList.remove('vis');
+  applyFilters(true);
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function doReset() {
+  answers = {}; answered = 0; correct = 0;
+  document.getElementById('resultPanel').classList.remove('vis');
+  applyFilters(false);
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answer(qi, oi) {
+  if (answers[qi] !== undefined) return;
+  const q = filtered[qi];
+  const ok = oi === q.correct;
+  answers[qi] = { chosen: oi, ok };
+  answered++;
+  if (ok) correct++;
+  updateStats();
+  refreshCard(qi);
+  if (answered === filtered.length) setTimeout(showResult, 500);
+}
+
+function updateStats() {
+  const total = filtered.length;
+  const pct   = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  const prog  = total  > 0 ? (answered / total) * 100 : 0;
+
+  document.getElementById('statTotal').textContent    = total;
+  document.getElementById('statAnswered').textContent = answered;
+  document.getElementById('statCorrect').textContent  = correct;
+  document.getElementById('statWrong').textContent    = answered - correct;
+  document.getElementById('statPct').textContent      = answered > 0 ? pct + '%' : '—';
+  document.getElementById('progBar').style.width      = prog + '%';
+  document.getElementById('progLbl').textContent      = `${answered} of ${total} answered`;
+  document.getElementById('progScore').textContent    = `Score: ${answered > 0 ? pct + '%' : '0%'}`;
+}
+
+function showResult() {
+  const total = filtered.length;
+  const pct   = Math.round((correct / total) * 100);
+  const panel = document.getElementById('resultPanel');
+
+  document.getElementById('rScore').textContent = pct + '%';
+  document.getElementById('rScore').className   = 'r-score' + (pct >= 70 ? ' high' : '');
+  document.getElementById('rRight').textContent = correct;
+  document.getElementById('rWrong').textContent = total - correct;
+  document.getElementById('rPct').textContent   = pct + '%';
+
+  let emoji = '😤', title = 'Keep practising — you can do it!';
+  if (pct >= 90) { emoji = '🏆'; title = 'Outstanding! You\'re ready for SC-100!'; }
+  else if (pct >= 75) { emoji = '🎯'; title = 'Great work! Almost exam-ready!'; }
+  else if (pct >= 60) { emoji = '📈'; title = 'Good progress — keep going!'; }
+  document.getElementById('rEmoji').textContent = emoji;
+  document.getElementById('rTitle').textContent = title;
+
+  // Section breakdown
+  const secHtml = SECTIONS.map(sec => {
+    const secQs  = filtered.filter(q => q.section === sec);
+    if (!secQs.length) return '';
+    const indices = secQs.map(q => filtered.indexOf(q));
+    const done    = indices.filter(i => answers[i] !== undefined).length;
+    const right   = indices.filter(i => answers[i]?.ok).length;
+    const sPct    = done > 0 ? Math.round((right / done) * 100) : 0;
+    const barCls  = sPct >= 70 ? 'sec-bar good' : 'sec-bar';
+    const shortSec = sec.length > 35 ? sec.substring(0, 32) + '…' : sec;
+    return `<div class="sec-row">
+      <div class="sec-row-head"><span>${shortSec}</span><span>${right}/${done} · ${sPct}%</span></div>
+      <div class="sec-bar-wrap"><div class="${barCls}" style="width:${sPct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('secBreakdown').innerHTML = secHtml;
+  panel.classList.add('vis');
+  panel.scrollIntoView({ behavior: 'smooth' });
+}
+
+function typeIcon(t) {
+  return t === 'conceptual' ? '💡' : t === 'technical' ? '⚙️' : '🧩';
+}
+
+function refreshCard(qi) {
+  const card = document.getElementById(`c${qi}`);
+  if (!card) return;
+  const q   = filtered[qi];
+  const ans = answers[qi];
+
+  card.classList.toggle('ans-correct', ans.ok);
+  card.classList.toggle('ans-wrong',   !ans.ok);
+
+  const letters = ['A','B','C','D'];
+  const optsHTML = q.options.map((o, i) => {
+    let cls = 'opt locked';
+    if (i === q.correct) cls += ' opt-correct';
+    else if (i === ans.chosen && !ans.ok) cls += ' opt-wrong';
+    return `<div class="${cls}"><div class="opt-ltr">${letters[i]}</div><span>${o}</span></div>`;
+  }).join('');
+
+  card.querySelector('.opts').innerHTML = optsHTML;
+
+  let exp = card.querySelector('.explain');
+  if (!exp) {
+    exp = document.createElement('div');
+    exp.className = 'explain';
+    card.appendChild(exp);
+  }
+  exp.innerHTML = `<strong>💡 Explanation:</strong> ${q.explanation}`;
+  exp.classList.add('vis');
+}
+
+function render() {
+  applyFilters(false);
+  updateStats();
+  const letters = ['A','B','C','D'];
+
+  document.getElementById('quizBox').innerHTML = filtered.map((q, i) => {
+    const typeShort = q.section.length > 30 ? q.section.substring(0, 27) + '…' : q.section;
+    const optsHTML  = q.options.map((o, j) =>
+      `<div class="opt" onclick="answer(${i},${j})">
+        <div class="opt-ltr">${letters[j]}</div>
+        <span>${o}</span>
+      </div>`
+    ).join('');
+
+    return `<div class="q-card" id="c${i}" style="animation-delay:${Math.min(i,20)*0.03}s">
+      <div class="q-meta">
+        <span class="q-idx">Q${i+1}</span>
+        <span class="qtag qtag-${q.type}">${typeIcon(q.type)} ${q.type}</span>
+        <span class="q-sec">${typeShort}</span>
+      </div>
+      <div class="q-text">${q.question}</div>
+      <div class="opts">${optsHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>

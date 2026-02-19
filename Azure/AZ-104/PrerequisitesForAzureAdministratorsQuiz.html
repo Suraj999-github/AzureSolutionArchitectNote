@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Azure Administrator Prerequisites — Cloud Shell & ARM Templates</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --emerald: #00C896;
+    --emerald-dim: #00A07A;
+    --emerald-glow: rgba(0,200,150,0.12);
+    --amber: #F59E0B;
+    --amber-dim: #D97706;
+    --sky: #38BDF8;
+    --coral: #FB7185;
+    --bg: #F7F8FA;
+    --bg2: #EEF0F5;
+    --surface: #FFFFFF;
+    --surface2: #F3F5F9;
+    --border: #E2E6EF;
+    --border2: #CDD3E0;
+    --text: #1A2035;
+    --text2: #3D4A65;
+    --muted: #8492AD;
+    --muted2: #6B7A99;
+    --tag-conceptual: #7C3AED;
+    --tag-technical: #0369A1;
+    --tag-logical: #059669;
+    --shell: #0F1A2E;
+    --shell-text: #7EE8A2;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.45;
+    pointer-events: none; z-index: 0;
+  }
+
+  .page-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 56px 0 40px;
+    position: relative;
+  }
+
+  .header-inner {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  .header-icon-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .hicon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  .hicon-shell { background: var(--shell); border: 1px solid rgba(126,232,162,0.2); }
+  .hicon-arm   { background: linear-gradient(135deg, #1B4FD8, #0369A1); }
+
+  .header-text { flex: 1; }
+
+  .pre-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--emerald-dim);
+    background: rgba(0,200,150,0.1);
+    border: 1px solid rgba(0,200,150,0.25);
+    border-radius: 100px;
+    padding: 4px 14px;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 4.5vw, 46px);
+    font-weight: 400;
+    line-height: 1.12;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--emerald-dim);
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted2);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.7;
+  }
+
+  /* ── MODULE PILLS ── */
+  .module-pills {
+    display: flex;
+    gap: 10px;
+    margin: 32px 0 0;
+    flex-wrap: wrap;
+  }
+
+  .mpill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border2);
+    background: var(--surface);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .mpill:hover { border-color: var(--emerald); color: var(--emerald-dim); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,200,150,0.12); }
+  .mpill.active { background: var(--text); border-color: var(--text); color: #fff; box-shadow: 0 4px 16px rgba(26,32,53,0.2); }
+  .mpill.active.shell { background: var(--shell); border-color: var(--shell); }
+  .mpill.active.arm   { background: #1B4FD8; border-color: #1B4FD8; }
+
+  /* ── STATS ── */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 28px 0;
+  }
+
+  .sc {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    transition: all 0.2s;
+  }
+
+  .sc:hover { border-color: var(--border2); box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
+
+  .sc-num {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .sc-lbl {
+    display: block;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-top: 5px;
+  }
+
+  /* ── PROGRESS ── */
+  .prog-wrap {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  }
+
+  .prog-top {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .prog-score { color: var(--emerald-dim); font-weight: 500; }
+
+  .pbar-track {
+    height: 8px;
+    background: var(--bg2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .pbar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--emerald), var(--sky));
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ── CONTROLS ── */
+  .ctrl-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .fbt {
+    padding: 7px 15px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border2);
+    background: var(--surface);
+    color: var(--muted2);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .fbt:hover { border-color: var(--text2); color: var(--text); }
+  .fbt.active { background: var(--text); border-color: var(--text); color: #fff; }
+  .fbt.active.c { background: var(--tag-conceptual); border-color: var(--tag-conceptual); }
+  .fbt.active.t { background: var(--tag-technical);  border-color: var(--tag-technical); }
+  .fbt.active.l { background: var(--tag-logical);    border-color: var(--tag-logical); }
+
+  .gap1 { flex: 1; }
+
+  .abtn {
+    padding: 9px 20px;
+    border-radius: 9px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .abtn-primary {
+    background: var(--text);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(26,32,53,0.25);
+  }
+
+  .abtn-primary:hover { background: #2D3A58; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,32,53,0.3); }
+
+  .abtn-ghost {
+    background: var(--surface);
+    color: var(--muted2);
+    border: 1.5px solid var(--border2);
+  }
+
+  .abtn-ghost:hover { color: var(--text); border-color: var(--text2); }
+
+  /* ── QUESTION CARD ── */
+  .qcard {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 28px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    animation: fadeUp 0.35s ease both;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .qcard.state-correct {
+    border-color: var(--emerald);
+    box-shadow: 0 2px 16px rgba(0,200,150,0.12);
+    background: rgba(0,200,150,0.02);
+  }
+
+  .qcard.state-wrong {
+    border-color: var(--coral);
+    box-shadow: 0 2px 16px rgba(251,113,133,0.1);
+    background: rgba(251,113,133,0.02);
+  }
+
+  /* Code block in question */
+  .code-block {
+    background: var(--shell);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--shell-text);
+    overflow-x: auto;
+    border: 1px solid rgba(126,232,162,0.12);
+    position: relative;
+  }
+
+  .code-block .cmt { color: #5D8A6A; }
+  .code-block .key { color: #79C0FF; }
+  .code-block .str { color: #F0C080; }
+  .code-block .num { color: #F2A365; }
+  .code-block .kwd { color: #FF8AAE; }
+  .code-block .tag { color: var(--shell-text); }
+  .code-block .prompt { color: #FFD166; font-weight: 500; }
+
+  .code-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .qmeta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .qnum {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--bg2);
+    padding: 3px 9px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .qtag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border: 1px solid transparent;
+  }
+
+  .qt-conceptual { background: rgba(124,58,237,0.08); color: #7C3AED; border-color: rgba(124,58,237,0.2); }
+  .qt-technical  { background: rgba(3,105,161,0.08);  color: #0369A1; border-color: rgba(3,105,161,0.2); }
+  .qt-logical    { background: rgba(5,150,105,0.08);  color: #059669; border-color: rgba(5,150,105,0.2); }
+
+  .qsec {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .qsec span {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+  }
+
+  .qtext {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+
+  /* Options */
+  .opts { display: flex; flex-direction: column; gap: 9px; }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border-radius: 11px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--text2);
+  }
+
+  .opt:hover:not(.locked) {
+    border-color: var(--emerald);
+    background: var(--emerald-glow);
+    color: var(--text);
+    transform: translateX(4px);
+  }
+
+  .opt.locked { cursor: default; }
+  .opt.opt-right { border-color: var(--emerald) !important; background: rgba(0,200,150,0.08) !important; color: var(--emerald-dim) !important; font-weight: 500; }
+  .opt.opt-wrong { border-color: var(--coral)   !important; background: rgba(251,113,133,0.08) !important; color: #E11D48 !important; }
+
+  .oltr {
+    min-width: 28px; height: 28px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.18s;
+    background: var(--surface);
+  }
+
+  .opt:hover:not(.locked) .oltr { border-color: var(--emerald); background: var(--emerald); color: #fff; }
+  .opt.opt-right .oltr { border-color: var(--emerald); background: var(--emerald); color: #fff; }
+  .opt.opt-wrong .oltr { border-color: var(--coral); background: var(--coral); color: #fff; }
+
+  /* Explanation */
+  .explain {
+    margin-top: 14px;
+    padding: 14px 18px;
+    border-radius: 11px;
+    background: rgba(56,189,248,0.06);
+    border: 1.5px solid rgba(56,189,248,0.2);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text2);
+    display: none;
+  }
+
+  .explain.vis { display: block; animation: fadeUp 0.25s ease; }
+
+  .explain strong { color: var(--text); font-weight: 600; }
+
+  .explain .tip-code {
+    display: inline;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--tag-technical);
+  }
+
+  /* ── RESULT PANEL ── */
+  .result-panel {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    text-align: center;
+    margin: 32px 0;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    display: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--emerald), var(--sky), var(--amber));
+  }
+
+  .result-panel.vis { display: block; animation: fadeUp 0.5s ease; }
+
+  .r-grade {
+    width: 80px; height: 80px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--emerald), var(--sky));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 8px 24px rgba(0,200,150,0.25);
+  }
+
+  .r-score-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 72px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .r-score-label { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: 'DM Mono', monospace; }
+  .r-verdict { font-size: 17px; font-weight: 600; color: var(--text2); margin: 16px 0 32px; }
+
+  .r-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .rcell {
+    padding: 18px 12px;
+    border-radius: 12px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+  }
+
+  .rcell .rn { font-size: 30px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .rcell .rl { font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-top: 4px; }
+  .rc-r .rn { color: var(--emerald-dim); }
+  .rc-w .rn { color: #E11D48; }
+  .rc-p .rn { color: var(--tag-technical); }
+
+  /* Per-module breakdown */
+  .module-breakdown { margin: 24px 0 28px; text-align: left; }
+
+  .mb-title { font-size: 12px; font-weight: 600; color: var(--muted2); margin-bottom: 14px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.07em; }
+
+  .mb-row { margin-bottom: 14px; }
+  .mb-head { display: flex; justify-content: space-between; font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text2); margin-bottom: 5px; font-weight: 500; }
+  .mb-track { height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+  .mb-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--emerald), var(--sky)); transition: width 0.7s cubic-bezier(0.34,1.56,0.64,1); }
+  .mb-bar.low { background: linear-gradient(90deg, var(--amber), var(--coral)); }
+
+  .r-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  /* ── SECTION DIVIDERS ── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 32px 0 18px;
+  }
+
+  .sd-line { flex: 1; height: 1px; background: var(--border); }
+
+  .sd-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    white-space: nowrap;
+  }
+
+  footer {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 620px) {
+    .header-inner { flex-direction: column; }
+    .stats-strip { grid-template-columns: repeat(3, 1fr); }
+    .r-grid { grid-template-columns: 1fr; }
+    .qsec { display: none; }
+    .header-icon-stack { flex-direction: row; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="header-inner">
+      <div class="header-icon-stack">
+        <div class="hicon hicon-shell">🖥️</div>
+        <div class="hicon hicon-arm">📋</div>
+      </div>
+      <div class="header-text">
+        <div class="pre-label">AZ-104 Prerequisites</div>
+        <h1>Azure Administrator<br/><em>Foundations Quiz</em></h1>
+        <p class="subtitle">
+          Introduction to Azure Cloud Shell &nbsp;·&nbsp; Deploy Infrastructure via JSON ARM Templates
+        </p>
+        <div class="module-pills">
+          <button class="mpill active" onclick="setSection('all',this)">📦 All Topics</button>
+          <button class="mpill shell" onclick="setSection('Cloud Shell',this)">🖥️ Cloud Shell</button>
+          <button class="mpill arm" onclick="setSection('ARM Templates',this)">📋 ARM Templates</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── STATS ── -->
+  <div class="stats-strip">
+    <div class="sc"><span class="sc-num" id="sTotal">0</span><span class="sc-lbl">Questions</span></div>
+    <div class="sc"><span class="sc-num" id="sAnswered">0</span><span class="sc-lbl">Answered</span></div>
+    <div class="sc"><span class="sc-num" id="sCorrect">0</span><span class="sc-lbl">Correct</span></div>
+    <div class="sc"><span class="sc-num" id="sWrong">0</span><span class="sc-lbl">Wrong</span></div>
+    <div class="sc"><span class="sc-num" id="sPct">—</span><span class="sc-lbl">Score</span></div>
+  </div>
+
+  <!-- ── PROGRESS ── -->
+  <div class="prog-wrap">
+    <div class="prog-top">
+      <span id="pLabel">0 of 0 answered</span>
+      <span class="prog-score" id="pScore">Score: 0%</span>
+    </div>
+    <div class="pbar-track"><div class="pbar-fill" id="pBar"></div></div>
+  </div>
+
+  <!-- ── CONTROLS ── -->
+  <div class="ctrl-row">
+    <button class="fbt active" onclick="setType('all',this)">All</button>
+    <button class="fbt c" onclick="setType('conceptual',this)">💡 Conceptual</button>
+    <button class="fbt t" onclick="setType('technical',this)">⚙️ Technical</button>
+    <button class="fbt l" onclick="setType('logical',this)">🧩 Logical</button>
+    <div class="gap1"></div>
+    <button class="abtn abtn-primary" onclick="doShuffle()">🔀 Shuffle &amp; Restart</button>
+    <button class="abtn abtn-ghost"   onclick="doReset()">↺ Reset</button>
+  </div>
+
+  <!-- ── QUIZ BOX ── -->
+  <div id="quizBox"></div>
+
+  <!-- ── RESULT ── -->
+  <div class="result-panel" id="resultPanel">
+    <div class="r-grade" id="rGrade">🎓</div>
+    <div class="r-score-num" id="rScoreNum">0%</div>
+    <div class="r-score-label">Final Score</div>
+    <div class="r-verdict" id="rVerdict">Keep going — you're building the foundation!</div>
+    <div class="r-grid">
+      <div class="rcell rc-r"><div class="rn" id="rR">0</div><div class="rl">Correct</div></div>
+      <div class="rcell rc-w"><div class="rn" id="rW">0</div><div class="rl">Wrong</div></div>
+      <div class="rcell rc-p"><div class="rn" id="rP">0%</div><div class="rl">Accuracy</div></div>
+    </div>
+    <div class="module-breakdown" id="modBreakdown"></div>
+    <div class="r-actions">
+      <button class="abtn abtn-primary" onclick="doShuffle()">🔀 Try Again (Shuffled)</button>
+      <button class="abtn abtn-ghost"   onclick="doReset()">↺ Review Answers</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>Azure Administrator Prerequisites · AZ-104 Exam Prep<br/>
+    Azure Cloud Shell &nbsp;·&nbsp; JSON ARM Template Deployments</p>
+  </footer>
+</div>
+
+<script>
+const ALL_Q = [
+
+  // ══════════════════════════════════════════════
+  // MODULE 1 — INTRODUCTION TO AZURE CLOUD SHELL
+  // ══════════════════════════════════════════════
+
+  // ── CONCEPTUAL ──
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "What is Azure Cloud Shell in simple terms?",
+    options: [
+      "A desktop application installed on Windows for managing Azure",
+      "A browser-based, authenticated command-line environment in the Azure portal for managing Azure resources",
+      "A local terminal that connects to Azure via VPN",
+      "A GUI dashboard for creating Azure resources"
+    ],
+    correct: 1,
+    explanation: "Azure Cloud Shell is a free, browser-based shell pre-installed with tools like Azure CLI, Azure PowerShell, Git, and editors. It runs from any browser — no local installation needed. Accessible from portal.azure.com, shell.azure.com, or the mobile app."
+  },
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "Which two shell environments does Azure Cloud Shell support?",
+    options: [
+      "Python and Ruby",
+      "Bash and PowerShell",
+      "CMD and PowerShell",
+      "Bash and Zsh"
+    ],
+    correct: 1,
+    explanation: "Cloud Shell offers Bash (Linux-based, uses Azure CLI with 'az' commands) and PowerShell (uses Azure PowerShell with 'Get-Az*' cmdlets). You can switch between them at any time from the same session."
+  },
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "Why does Azure Cloud Shell require an Azure Storage Account?",
+    options: [
+      "To store temporary session logs only",
+      "To persist your files, scripts, and configuration across sessions — Cloud Shell is stateless without it",
+      "To cache commands for faster execution",
+      "To store billing information for Cloud Shell usage"
+    ],
+    correct: 1,
+    explanation: "Cloud Shell mounts a 5GB Azure File Share in your Storage Account as your home directory (~). This persists your scripts, SSH keys, and .bashrc/.profile settings between sessions. Without it, everything is lost when the session ends."
+  },
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "Is Azure Cloud Shell free to use?",
+    options: [
+      "Yes, completely free including storage",
+      "The Cloud Shell compute is free, but the underlying Azure Storage Account (for persistence) incurs normal storage charges",
+      "No, it costs per minute of usage",
+      "Free for the first 30 days, then charged per session"
+    ],
+    correct: 1,
+    explanation: "Cloud Shell compute is free — no charge for running commands. However, the Azure File Share (typically 5GB) created for persistence is billed at standard Azure Storage rates. The cost is very low (pennies per month for 5GB)."
+  },
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "What happens if Azure Cloud Shell is idle for 20 minutes?",
+    options: [
+      "Nothing — it stays active indefinitely",
+      "The session times out and the container is deallocated — but files in the mounted storage are preserved",
+      "The storage account is deleted",
+      "You are automatically logged out of Azure entirely"
+    ],
+    correct: 1,
+    explanation: "Cloud Shell sessions time out after 20 minutes of inactivity to save resources. The container is removed but your files in the Azure File Share are safe. On reconnect, a new container mounts your storage and your files are still there."
+  },
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "What is the Azure Cloud Shell editor?",
+    options: [
+      "A full Visual Studio IDE embedded in the browser",
+      "A lightweight Monaco-based code editor (same engine as VS Code) accessible via 'code .' in Cloud Shell for editing files",
+      "A tool to create ARM templates graphically",
+      "A text editor only for JSON files"
+    ],
+    correct: 1,
+    explanation: "Typing 'code filename.json' in Cloud Shell opens the Monaco editor (VS Code's editor engine) in the browser. It supports syntax highlighting, IntelliSense, and saving files directly to your Cloud Shell storage — great for editing ARM templates."
+  },
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "Which Azure Cloud Shell feature allows you to upload files from your local machine?",
+    options: [
+      "Azure File Sync",
+      "The Upload/Download files button in the Cloud Shell toolbar",
+      "Azure Blob Storage transfer",
+      "Git clone only"
+    ],
+    correct: 1,
+    explanation: "The Cloud Shell toolbar has an Upload/Download button. Uploaded files land in your home directory (~) in the Cloud Shell. You can also map your local drive via the Cloud Shell drive. Downloads let you retrieve files to your local machine."
+  },
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "What does it mean that Cloud Shell is 'pre-authenticated'?",
+    options: [
+      "You don't need a password to access Azure at all",
+      "Cloud Shell automatically uses the credentials of your logged-in Azure account — no 'az login' or 'Connect-AzAccount' needed",
+      "Your session never expires",
+      "Multi-factor authentication is disabled"
+    ],
+    correct: 1,
+    explanation: "When you open Cloud Shell from the Azure portal, it inherits your portal session's authentication. Commands like 'az vm list' work immediately — you're already authenticated to your subscription. This is a major convenience over local CLI setup."
+  },
+  {
+    section: "Cloud Shell",
+    type: "conceptual",
+    question: "What pre-installed tools are available in Azure Cloud Shell by default?",
+    options: [
+      "Only Azure CLI",
+      "Azure CLI, Azure PowerShell, Terraform, Ansible, kubectl, Helm, Git, Python, Node.js, and the Monaco editor",
+      "Only PowerShell and Notepad",
+      "Azure CLI and a basic text editor"
+    ],
+    correct: 1,
+    explanation: "Cloud Shell comes packed with Azure CLI, Azure PowerShell, Terraform, Ansible, kubectl, Helm, Git, Python, Node.js, .NET, Java, and the Monaco code editor — all maintained and updated by Microsoft. No installation needed."
+  },
+
+  // ── TECHNICAL ──
+  {
+    section: "Cloud Shell",
+    type: "technical",
+    question: "Which Azure CLI command lists all resource groups in your current subscription in Cloud Shell?",
+    code: `<span class="prompt">$</span> <span class="key">az</span> group list <span class="cmt">--output table</span>`,
+    options: [
+      "az subscription list",
+      "az group list --output table",
+      "Get-AzResourceGroup",
+      "az resources list --type group"
+    ],
+    correct: 1,
+    explanation: "In Bash Cloud Shell, 'az group list' lists all resource groups. '--output table' formats it as a readable table. In PowerShell Cloud Shell, the equivalent is 'Get-AzResourceGroup'."
+  },
+  {
+    section: "Cloud Shell",
+    type: "technical",
+    question: "Which PowerShell cmdlet creates a new Azure Resource Group in Cloud Shell?",
+    code: `<span class="key">New-AzResourceGroup</span> <span class="str">-Name</span> <span class="num">"MyRG"</span> <span class="str">-Location</span> <span class="num">"EastUS"</span>`,
+    options: [
+      "az group create --name MyRG --location EastUS",
+      "New-AzResourceGroup -Name 'MyRG' -Location 'EastUS'",
+      "Create-AzGroup -ResourceGroup MyRG",
+      "New-AzureRmResourceGroup -Name MyRG"
+    ],
+    correct: 1,
+    explanation: "In PowerShell Cloud Shell, 'New-AzResourceGroup' creates a resource group. The Bash/CLI equivalent is 'az group create --name MyRG --location EastUS'. Both work from Cloud Shell — choose the shell that matches your workflow."
+  },
+  {
+    section: "Cloud Shell",
+    type: "technical",
+    question: "How do you set a specific Azure subscription as active in Cloud Shell using Azure CLI?",
+    code: `<span class="prompt">$</span> <span class="key">az account set</span> <span class="str">--subscription</span> <span class="num">"subscription-id-or-name"</span>`,
+    options: [
+      "az subscription set --id 'subscription-id'",
+      "az account set --subscription 'subscription-id-or-name'",
+      "Set-AzContext --SubscriptionId 'subscription-id'",
+      "az login --subscription 'subscription-id'"
+    ],
+    correct: 1,
+    explanation: "'az account set --subscription' switches the active subscription context for all subsequent CLI commands. In PowerShell, use 'Set-AzContext -SubscriptionId'. Always verify with 'az account show' after switching."
+  },
+  {
+    section: "Cloud Shell",
+    type: "technical",
+    question: "In Azure Cloud Shell, which command opens the built-in Monaco code editor for a file named 'template.json'?",
+    code: `<span class="prompt">$</span> <span class="key">code</span> <span class="str">template.json</span>`,
+    options: [
+      "edit template.json",
+      "code template.json",
+      "nano template.json",
+      "open template.json"
+    ],
+    correct: 1,
+    explanation: "'code filename' opens the Monaco editor in Cloud Shell. You can also use classic editors: 'vim', 'nano', or 'emacs' are all pre-installed. Monaco is recommended for JSON/ARM templates because of its syntax highlighting and validation."
+  },
+  {
+    section: "Cloud Shell",
+    type: "technical",
+    question: "What is the Azure Cloud Shell home directory and what is its storage limit?",
+    options: [
+      "/root with 1GB limit",
+      "~/ (your Azure File Share) with a default 5GB limit — persisted in an Azure Storage Account",
+      "/tmp with 10GB limit",
+      "/home/user with 20GB limit"
+    ],
+    correct: 1,
+    explanation: "Cloud Shell mounts a 5GB Azure File Share as your home directory (~). Everything you save here persists across sessions. The share is hosted in an Azure Storage Account you own. You can increase the quota from the portal if needed."
+  },
+  {
+    section: "Cloud Shell",
+    type: "technical",
+    question: "Which command in Cloud Shell displays the currently active Azure subscription and account details?",
+    code: `<span class="prompt">$</span> <span class="key">az account show</span>`,
+    options: [
+      "az subscription show",
+      "az account show",
+      "Get-AzContext",
+      "az login --status"
+    ],
+    correct: 1,
+    explanation: "'az account show' returns the current subscription name, ID, tenant, and user. In PowerShell, 'Get-AzContext' serves the same purpose. Always check this first to confirm you're working in the right subscription."
+  },
+
+  // ── LOGICAL ──
+  {
+    section: "Cloud Shell",
+    type: "logical",
+    question: "A junior admin needs to run Azure CLI scripts on a shared computer where installing software is not allowed. What is the BEST solution?",
+    options: [
+      "Ask IT to install Azure CLI on the machine",
+      "Use Azure Cloud Shell from any browser — no installation required, fully authenticated via the portal",
+      "Use Azure Portal GUI only",
+      "Email the scripts to an admin with Azure CLI installed"
+    ],
+    correct: 1,
+    explanation: "Cloud Shell runs entirely in the browser — no software installation needed. The junior admin can access it from any machine at portal.azure.com. Their files persist in Azure Storage, and they're automatically authenticated."
+  },
+  {
+    section: "Cloud Shell",
+    type: "logical",
+    question: "You wrote a 200-line Bash script in Cloud Shell. The session timed out. What happened to your script file?",
+    options: [
+      "It was deleted — Cloud Shell is stateless",
+      "It was saved — if you saved it to your home directory (~), it persists in the Azure File Share across sessions",
+      "It was emailed to your Azure account",
+      "It was stored in Azure Blob Storage automatically"
+    ],
+    correct: 1,
+    explanation: "Files saved to your Cloud Shell home directory (~) are stored in the Azure File Share and persist across sessions and timeouts. Temporary files in /tmp are lost. This is why Cloud Shell requires a Storage Account — it's your persistent workspace."
+  },
+  {
+    section: "Cloud Shell",
+    type: "logical",
+    question: "A developer is unsure which shell to use in Cloud Shell — Bash or PowerShell. They primarily use Linux and prefer 'az' commands. Which should they choose?",
+    options: [
+      "PowerShell — it's more powerful",
+      "Bash — it uses Azure CLI ('az' commands) which is Linux-native and cross-platform, matching their preference",
+      "It doesn't matter — both use the same commands",
+      "CMD — it's more compatible"
+    ],
+    correct: 1,
+    explanation: "Bash Cloud Shell uses the Azure CLI (az commands) which is Python-based and feels natural for Linux users. PowerShell uses Get-Az cmdlets with .NET syntax. Both can accomplish the same tasks — choose based on your background and scripting preference."
+  },
+  {
+    section: "Cloud Shell",
+    type: "logical",
+    question: "You need to quickly edit an ARM template JSON file stored in your Cloud Shell home directory. What is the fastest approach?",
+    options: [
+      "Download it, edit in Notepad, re-upload",
+      "Use 'code template.json' to open it in the Monaco editor directly in Cloud Shell, edit, save, and deploy",
+      "Delete and recreate it from scratch",
+      "Use git to push it to GitHub and edit there"
+    ],
+    correct: 1,
+    explanation: "'code template.json' opens Monaco editor inline in Cloud Shell. It provides JSON syntax highlighting, validation, and bracket matching. After editing, press Ctrl+S to save, close the editor, and immediately deploy with 'az deployment group create' — all without leaving the browser."
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // MODULE 2 — DEPLOY AZURE INFRASTRUCTURE USING JSON ARM TEMPLATES
+  // ════════════════════════════════════════════════════════════
+
+  // ── CONCEPTUAL ──
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What is an ARM Template in simple terms?",
+    options: [
+      "A step-by-step manual for setting up Azure resources using the portal",
+      "A JSON file that declaratively describes the Azure infrastructure you want to deploy — Azure creates exactly what's defined",
+      "A PowerShell script that creates Azure resources imperatively",
+      "A diagram tool for designing Azure architecture"
+    ],
+    correct: 1,
+    explanation: "ARM (Azure Resource Manager) Templates are JSON files that describe your desired Azure infrastructure. You define WHAT you want — Azure figures out HOW to create it. This is Infrastructure as Code (IaC) — repeatable, version-controllable, consistent deployments."
+  },
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What are the six main sections of an ARM template?",
+    options: [
+      "start, variables, resources, outputs, deploy, end",
+      "schema, contentVersion, parameters, variables, resources, outputs",
+      "header, body, parameters, resources, footer, metadata",
+      "schema, version, inputs, resources, conditions, logs"
+    ],
+    correct: 1,
+    explanation: "ARM templates have these sections: $schema (template version URL), contentVersion (your version number), parameters (inputs), variables (reusable values), resources (what to deploy), and outputs (values to return after deployment). Only $schema and resources are required."
+  },
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What does 'declarative' mean in the context of ARM templates?",
+    options: [
+      "You write step-by-step commands telling Azure HOW to create resources",
+      "You define WHAT state you want the infrastructure to be in — Azure handles the HOW automatically",
+      "You declare variables before using them in scripts",
+      "You declare your subscription and tenant in the template header"
+    ],
+    correct: 1,
+    explanation: "Declarative means you state the desired end state — 'I want a VM with these specs in this region'. You don't write code to create it step by step. Azure's Resource Manager figures out the steps, handles dependencies, and reconciles current vs desired state."
+  },
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What is the purpose of 'parameters' in an ARM template?",
+    options: [
+      "To store hardcoded resource names",
+      "To make templates reusable by accepting input values at deployment time — like resource names, SKUs, and locations",
+      "To define the Azure region for the deployment",
+      "To declare template dependencies"
+    ],
+    correct: 1,
+    explanation: "Parameters make templates flexible and reusable. Instead of hardcoding 'East US', you use a parameter. When deploying, you supply different values for dev vs prod. You can also set allowed values, defaults, and descriptions for each parameter."
+  },
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What is the purpose of 'variables' in an ARM template?",
+    options: [
+      "To accept user input during deployment",
+      "To store and reuse values defined once in the template — avoiding repetition and making templates easier to maintain",
+      "To define output values after deployment",
+      "To specify resource dependencies"
+    ],
+    correct: 1,
+    explanation: "Variables store values you compute once and reference multiple times. Example: concatenating a prefix + environment name to form a resource name. Unlike parameters, variables are defined IN the template and not provided by the user at deployment."
+  },
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What is the purpose of 'outputs' in an ARM template?",
+    options: [
+      "To log errors during deployment",
+      "To return values after deployment completes — like connection strings, resource IDs, or public IPs — for use in pipelines or scripts",
+      "To output the JSON template for download",
+      "To display deployment cost estimates"
+    ],
+    correct: 1,
+    explanation: "Outputs expose values from deployed resources. Example: output the public IP of a VM or the connection string of a database. This is critical in CI/CD pipelines where subsequent steps need values from the current deployment."
+  },
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What is idempotency in ARM template deployments?",
+    options: [
+      "The template can only be deployed once",
+      "Deploying the same template multiple times produces the same result — Azure checks existing state and only makes necessary changes",
+      "The template deploys instantly every time",
+      "All resources are deleted and recreated on each deployment"
+    ],
+    correct: 1,
+    explanation: "Idempotency is a key ARM template benefit. If you deploy a template that creates a Storage Account and it already exists with the same config, Azure does nothing. If the config changed, Azure updates it. This makes templates safe to re-run for updates."
+  },
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What is the difference between ARM Templates and Bicep?",
+    options: [
+      "Bicep is Microsoft's cloud cost management tool",
+      "Bicep is a domain-specific language (DSL) that compiles to ARM JSON — cleaner syntax, less verbose, same capabilities as ARM Templates",
+      "ARM Templates are newer and more powerful than Bicep",
+      "Bicep only works for Azure Kubernetes Service"
+    ],
+    correct: 1,
+    explanation: "Bicep is ARM's evolution — a simpler DSL that compiles to ARM JSON. Bicep has cleaner syntax (no quotes on property names, no nested brackets), supports modules, and is the Microsoft-recommended approach. Both describe the same underlying ARM resources."
+  },
+  {
+    section: "ARM Templates",
+    type: "conceptual",
+    question: "What is a 'Linked Template' in ARM?",
+    options: [
+      "A template stored in Azure Blob Storage",
+      "A technique to modularize ARM deployments by calling other template files from a main template — enabling reuse and separation of concerns",
+      "A template that links two resource groups",
+      "A shared template visible to all Azure subscriptions"
+    ],
+    correct: 1,
+    explanation: "Linked Templates (also called Nested Templates) split large deployments into modular files. A main template calls sub-templates via URI. This enables teams to own their modules, promotes reuse, and keeps individual files manageable."
+  },
+
+  // ── TECHNICAL ──
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "What is the minimum required structure of a valid ARM template?",
+    code: `{
+  <span class="key">"$schema"</span>: <span class="str">"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#"</span>,
+  <span class="key">"contentVersion"</span>: <span class="str">"1.0.0.0"</span>,
+  <span class="key">"resources"</span>: []
+}`,
+    options: [
+      "$schema, contentVersion, parameters, resources",
+      "$schema, contentVersion, and resources — all other sections are optional",
+      "Only the resources array is required",
+      "$schema, resources, and outputs"
+    ],
+    correct: 1,
+    explanation: "A valid ARM template requires $schema (defines the template format), contentVersion (your version tracking), and resources (what to deploy). Parameters, variables, functions, and outputs are optional. An empty resources array is technically valid."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "How do you reference a parameter value inside an ARM template resource definition?",
+    code: `<span class="key">"location"</span>: <span class="str">"[parameters('location')]"</span>`,
+    options: [
+      "${parameters.location}",
+      "[parameters('location')]",
+      "{{parameters.location}}",
+      "@{parameters['location']}"
+    ],
+    correct: 1,
+    explanation: "ARM template expressions are wrapped in square brackets [ ]. To reference a parameter: [parameters('parameterName')]. To reference a variable: [variables('varName')]. The expression engine evaluates these strings at deployment time."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "Which Azure CLI command deploys an ARM template to a resource group?",
+    code: `<span class="prompt">$</span> <span class="key">az deployment group create</span> \\
+  <span class="str">--resource-group</span> MyRG \\
+  <span class="str">--template-file</span> template.json \\
+  <span class="str">--parameters</span> parameters.json`,
+    options: [
+      "az template deploy --group MyRG --file template.json",
+      "az deployment group create --resource-group MyRG --template-file template.json --parameters parameters.json",
+      "az arm deploy --resource-group MyRG --template template.json",
+      "az group deploy --name MyRG --template template.json"
+    ],
+    correct: 1,
+    explanation: "'az deployment group create' is the correct command for resource group-scoped deployments. '--template-file' points to your local JSON file. '--parameters' can reference a parameters.json file or inline key=value pairs. For subscription-level use 'az deployment sub create'."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "What does the 'dependsOn' property do in an ARM template?",
+    code: `<span class="key">"dependsOn"</span>: [
+  <span class="str">"[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"</span>
+]`,
+    options: [
+      "Specifies which subscription to deploy to",
+      "Defines explicit deployment order — Azure waits for the listed resources to finish before deploying this resource",
+      "Creates a soft link between resources",
+      "Specifies the resource group dependency"
+    ],
+    correct: 1,
+    explanation: "ARM deploys resources in parallel by default. 'dependsOn' forces sequential ordering — 'deploy the VNet first, then this subnet'. ARM also infers implicit dependencies from [reference()] and [resourceId()] expressions, so explicit dependsOn is only needed when implicit detection can't capture the dependency."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "What is a parameter file in ARM template deployments?",
+    code: `{
+  <span class="key">"$schema"</span>: <span class="str">"https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#"</span>,
+  <span class="key">"contentVersion"</span>: <span class="str">"1.0.0.0"</span>,
+  <span class="key">"parameters"</span>: {
+    <span class="key">"location"</span>: { <span class="key">"value"</span>: <span class="str">"eastus"</span> },
+    <span class="key">"vmSize"</span>:   { <span class="key">"value"</span>: <span class="str">"Standard_D2s_v3"</span> }
+  }
+}`,
+    options: [
+      "A file that stores the ARM template schema",
+      "A separate JSON file that supplies parameter values for a template — enabling the same template to be used for dev, test, and prod with different values",
+      "A file that stores output values after deployment",
+      "A file that defines variable values inside the template"
+    ],
+    correct: 1,
+    explanation: "A parameter file (deploymentParameters.json) separates environment-specific values from the template. You create one parameter file per environment (dev.parameters.json, prod.parameters.json) and reuse the same ARM template. This is the ARM template equivalent of environment configuration."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "How do you use the ARM template function 'concat' to build a dynamic storage account name?",
+    code: `<span class="key">"variables"</span>: {
+  <span class="key">"storageName"</span>: <span class="str">"[concat('stor', parameters('env'), uniqueString(resourceGroup().id))]"</span>
+}`,
+    options: [
+      "Use string addition: parameters('prefix') + parameters('env')",
+      "[concat('stor', parameters('env'), uniqueString(resourceGroup().id))]",
+      "[join(parameters('prefix'), parameters('env'))]",
+      "[format('{0}{1}', parameters('prefix'), parameters('env'))]"
+    ],
+    correct: 1,
+    explanation: "'concat()' joins strings together. 'uniqueString(resourceGroup().id)' generates a deterministic hash of the resource group ID — producing the same suffix every time for the same resource group. This creates storage account names that are unique globally but repeatable per resource group."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "What ARM template function retrieves a deployed resource's property — like a storage account key?",
+    code: `<span class="key">"outputs"</span>: {
+  <span class="key">"storageKey"</span>: {
+    <span class="key">"type"</span>: <span class="str">"string"</span>,
+    <span class="key">"value"</span>: <span class="str">"[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2021-02-01').keys[0].value]"</span>
+  }
+}`,
+    options: [
+      "getProperties()",
+      "listKeys() — used to retrieve keys or access credentials from deployed resources as part of outputs or cross-resource references",
+      "reference().primaryKey",
+      "getKey(resourceId)"
+    ],
+    correct: 1,
+    explanation: "'listKeys()' is an ARM function that calls the resource's list API at deploy time. It's used to retrieve storage account keys, service bus connection strings, etc. The 'reference()' function retrieves read-only properties. Both are evaluated during deployment."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "What is 'What-if' analysis in ARM template deployments?",
+    code: `<span class="prompt">$</span> <span class="key">az deployment group what-if</span> \\
+  <span class="str">--resource-group</span> MyRG \\
+  <span class="str">--template-file</span> template.json`,
+    options: [
+      "A dry-run that shows what changes will be made to resources without actually deploying — Create, Modify, Delete, No-change",
+      "A cost estimation tool for the template",
+      "A syntax validator for JSON templates",
+      "A command that deploys to a test environment first"
+    ],
+    correct: 0,
+    explanation: "'az deployment group what-if' previews changes without deploying. It compares the template against current resource state and shows each resource as: Create (new), Modify (config change), Delete (will be removed), Ignore (unmanaged resource), or No-change. Critical for validating before deploying to production."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "Which ARM template function generates a unique, deterministic string based on an input — commonly used for globally unique resource names?",
+    options: [
+      "newGuid()",
+      "uniqueString(baseString) — produces a consistent 13-character hash of the input, same input always gives same output",
+      "randomString(length)",
+      "guid(seed)"
+    ],
+    correct: 1,
+    explanation: "'uniqueString(resourceGroup().id)' generates the same 13-char string for a given resource group every time — making storage account names globally unique but repeatable per resource group. Unlike 'newGuid()' which is random each deployment, 'uniqueString' is deterministic and idempotent."
+  },
+  {
+    section: "ARM Templates",
+    type: "technical",
+    question: "What deployment mode removes resources in the resource group that are NOT defined in the ARM template?",
+    code: `<span class="prompt">$</span> <span class="key">az deployment group create</span> \\
+  <span class="str">--mode</span> Complete \\
+  <span class="str">--resource-group</span> MyRG \\
+  <span class="str">--template-file</span> template.json`,
+    options: [
+      "Incremental mode — adds new resources only",
+      "Complete mode — deploys only what's in the template and DELETES any existing resources in the group not in the template",
+      "Strict mode — validates then deploys",
+      "Replace mode — replaces all resources unconditionally"
+    ],
+    correct: 1,
+    explanation: "ARM has two deployment modes: Incremental (default) — only adds/updates resources in the template, leaves others untouched. Complete — treats the template as the FULL desired state and deletes any resource in the group not in the template. Use Complete mode carefully — it can delete unintended resources."
+  },
+
+  // ── LOGICAL ──
+  {
+    section: "ARM Templates",
+    type: "logical",
+    question: "Your team deploys the same ARM template to 3 environments (dev, test, prod) with different VM sizes and regions. What is the BEST approach to manage this?",
+    options: [
+      "Create 3 separate ARM templates with hardcoded values for each environment",
+      "Create one ARM template with parameters, and three separate parameter files (dev.parameters.json, test.parameters.json, prod.parameters.json)",
+      "Manually change the template before each deployment",
+      "Use 3 different resource groups with identical templates deployed manually"
+    ],
+    correct: 1,
+    explanation: "One template + multiple parameter files is the ARM template best practice. The template defines structure; parameter files provide environment-specific values. When you update the template, all environments benefit. Version-control both the template and parameter files."
+  },
+  {
+    section: "ARM Templates",
+    type: "logical",
+    question: "A VNet must be created before the subnet, and the subnet before the VM's NIC. How do you enforce this deployment order in an ARM template?",
+    options: [
+      "Manually deploy them one by one using separate CLI commands",
+      "Use 'dependsOn' to declare explicit dependencies — NIC depends on Subnet, Subnet depends on VNet — ARM handles the ordering",
+      "Sort the resources section in the correct order — ARM deploys them top to bottom",
+      "Set a 'priority' property on each resource"
+    ],
+    correct: 1,
+    explanation: "ARM deploys resources in parallel by default. 'dependsOn' enforces order. Alternatively, using [reference()] or [resourceId()] to reference another resource's properties creates an implicit dependency that ARM automatically respects. Best practice: use [reference()] over explicit dependsOn where possible."
+  },
+  {
+    section: "ARM Templates",
+    type: "logical",
+    question: "You're about to deploy an ARM template to a production resource group. The template was modified by a teammate. What should you do BEFORE deploying?",
+    options: [
+      "Deploy immediately — ARM templates are safe",
+      "Run 'az deployment group what-if' to preview all changes (creates, modifies, deletes) before committing the deployment",
+      "Read through the JSON manually to check for changes",
+      "Deploy to prod and roll back if something goes wrong"
+    ],
+    correct: 1,
+    explanation: "'What-if' is your safety net. It shows exactly what will change: new resources (Create), modified resources (Modify with old vs new values), deleted resources (Delete). Reviewing this before production deployment prevents accidental deletions or configuration changes."
+  },
+  {
+    section: "ARM Templates",
+    type: "logical",
+    question: "An ARM template was deployed but a critical resource was accidentally included in an existing resource group and not in the template. The team runs Complete mode redeployment. What happens?",
+    options: [
+      "The extra resource is ignored — Complete mode only adds new resources",
+      "The extra resource is DELETED — Complete mode treats the template as the authoritative desired state and removes resources not in the template",
+      "The deployment fails because of the extra resource",
+      "The extra resource is moved to another resource group"
+    ],
+    correct: 1,
+    explanation: "This is the key danger of Complete mode. Any resource in the resource group NOT in the template is deleted. Always use 'what-if' before Complete mode deployments. In most cases, Incremental mode is safer — it only manages resources explicitly defined in the template."
+  },
+  {
+    section: "ARM Templates",
+    type: "logical",
+    question: "You want to create a storage account name that is globally unique, but produces the same name every time the template is deployed to the same resource group. Which approach works?",
+    options: [
+      "[newGuid()] — generates a unique name every deployment",
+      "[concat('stor', uniqueString(resourceGroup().id))] — deterministic hash of resource group ID, same group always gets same name",
+      "Hardcode the storage account name in the template",
+      "[randomString(13)] — random every time"
+    ],
+    correct: 1,
+    explanation: "'uniqueString(resourceGroup().id)' generates a deterministic 13-char hash. Same resource group = same suffix every time = idempotent deployment. 'newGuid()' is random each time and would break idempotency, creating a new storage account on every deployment."
+  },
+  {
+    section: "ARM Templates",
+    type: "logical",
+    question: "A new Azure admin wants to learn ARM templates but finds JSON verbose and hard to read. What modern Microsoft-recommended approach should they consider?",
+    options: [
+      "Use Terraform instead — Microsoft no longer supports ARM",
+      "Learn Bicep — a simpler DSL that compiles to ARM JSON with cleaner syntax, better tooling, and full ARM capabilities",
+      "Use Azure CLI scripts instead of templates",
+      "Use YAML-based ARM templates"
+    ],
+    correct: 1,
+    explanation: "Bicep is the modern, Microsoft-recommended alternative to raw ARM JSON. It's cleaner (no quotes on property names, no nested expressions), compiles to ARM JSON for deployment, has excellent VS Code tooling, and supports all ARM features. For new learners, Bicep is the recommended path forward."
+  },
+  {
+    section: "ARM Templates",
+    type: "logical",
+    question: "Your CI/CD pipeline deploys an ARM template to dev every commit, and to prod on release. The prod deployment must always match dev's template version. How do you manage this?",
+    options: [
+      "Email the template file between deployments",
+      "Store the ARM template and parameter files in a Git repository — CI/CD pipeline deploys from the same repo tag for consistency",
+      "Manually copy the template to a shared folder",
+      "Re-create the template for prod from scratch each time"
+    ],
+    correct: 1,
+    explanation: "ARM templates are code — treat them like code. Store in Git with version control. CI/CD pipelines (Azure DevOps, GitHub Actions) checkout the same template version for all environments, ensuring dev and prod use identical infrastructure definitions. Parameter files supply environment-specific values."
+  }
+
+]; // end ALL_Q
+
+// ── STATE ──
+let filtered = [...ALL_Q];
+let answers  = {};
+let answered = 0;
+let correct  = 0;
+let activeSec  = 'all';
+let activeType = 'all';
+
+const MODULES = ["Cloud Shell","ARM Templates"];
+const LETTERS = ['A','B','C','D'];
+
+function shuffle(a){
+  const r=[...a];
+  for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}
+  return r;
+}
+
+function applyFilters(doShuffle){
+  let q=ALL_Q;
+  if(activeSec!=='all')  q=q.filter(x=>x.section===activeSec);
+  if(activeType!=='all') q=q.filter(x=>x.type===activeType);
+  filtered=doShuffle?shuffle(q):[...q];
+}
+
+function setSection(sec,btn){
+  activeSec=sec;
+  document.querySelectorAll('.mpill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  resetState();
+}
+
+function setType(type,btn){
+  activeType=type;
+  document.querySelectorAll('.fbt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  resetState();
+}
+
+function resetState(){
+  answers={}; answered=0; correct=0;
+  document.getElementById('resultPanel').classList.remove('vis');
+  applyFilters(false);
+  render();
+}
+
+function doShuffle(){
+  answers={}; answered=0; correct=0;
+  document.getElementById('resultPanel').classList.remove('vis');
+  applyFilters(true);
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function doReset(){
+  answers={}; answered=0; correct=0;
+  document.getElementById('resultPanel').classList.remove('vis');
+  applyFilters(false);
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function answer(qi,oi){
+  if(answers[qi]!==undefined)return;
+  const ok=oi===filtered[qi].correct;
+  answers[qi]={chosen:oi,ok};
+  answered++; if(ok)correct++;
+  updateStats();
+  refreshCard(qi);
+  if(answered===filtered.length)setTimeout(showResult,500);
+}
+
+function updateStats(){
+  const total=filtered.length;
+  const pct=answered>0?Math.round((correct/answered)*100):0;
+  const prog=total>0?(answered/total)*100:0;
+  document.getElementById('sTotal').textContent=total;
+  document.getElementById('sAnswered').textContent=answered;
+  document.getElementById('sCorrect').textContent=correct;
+  document.getElementById('sWrong').textContent=answered-correct;
+  document.getElementById('sPct').textContent=answered>0?pct+'%':'—';
+  document.getElementById('pBar').style.width=prog+'%';
+  document.getElementById('pLabel').textContent=`${answered} of ${total} answered`;
+  document.getElementById('pScore').textContent=`Score: ${answered>0?pct+'%':'0%'}`;
+}
+
+function showResult(){
+  const total=filtered.length;
+  const pct=Math.round((correct/total)*100);
+  let emoji='😤',verdict='Keep practising — you\'re building the foundation!';
+  if(pct>=90){emoji='🏆';verdict='Outstanding! You\'ve mastered these prerequisites!';}
+  else if(pct>=75){emoji='🎓';verdict='Great work! You\'re well prepared!';}
+  else if(pct>=60){emoji='📈';verdict='Good progress — review the explanations to solidify your knowledge.';}
+  document.getElementById('rGrade').textContent=emoji;
+  document.getElementById('rScoreNum').textContent=pct+'%';
+  document.getElementById('rVerdict').textContent=verdict;
+  document.getElementById('rR').textContent=correct;
+  document.getElementById('rW').textContent=total-correct;
+  document.getElementById('rP').textContent=pct+'%';
+
+  const bHtml=MODULES.map(mod=>{
+    const mqs=filtered.filter(q=>q.section===mod);
+    if(!mqs.length)return '';
+    const idx=mqs.map(q=>filtered.indexOf(q));
+    const done=idx.filter(i=>answers[i]!==undefined).length;
+    const right=idx.filter(i=>answers[i]?.ok).length;
+    const sp=done>0?Math.round((right/done)*100):0;
+    const cls=sp>=70?'mb-bar':'mb-bar low';
+    return `<div class="mb-row">
+      <div class="mb-head"><span>${mod}</span><span>${right}/${done} · ${sp}%</span></div>
+      <div class="mb-track"><div class="${cls}" style="width:${sp}%"></div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modBreakdown').innerHTML=`<div class="mb-title">Score by Module</div>${bHtml}`;
+  document.getElementById('resultPanel').classList.add('vis');
+  document.getElementById('resultPanel').scrollIntoView({behavior:'smooth'});
+}
+
+function typeIcon(t){return t==='conceptual'?'💡':t==='technical'?'⚙️':'🧩';}
+
+function refreshCard(qi){
+  const card=document.getElementById(`qc${qi}`);
+  if(!card)return;
+  const q=filtered[qi],ans=answers[qi];
+  card.classList.toggle('state-correct',ans.ok);
+  card.classList.toggle('state-wrong',!ans.ok);
+  const optsHTML=q.options.map((o,i)=>{
+    let cls='opt locked';
+    if(i===q.correct)cls+=' opt-right';
+    else if(i===ans.chosen&&!ans.ok)cls+=' opt-wrong';
+    return `<div class="${cls}"><div class="oltr">${LETTERS[i]}</div><span>${o}</span></div>`;
+  }).join('');
+  card.querySelector('.opts').innerHTML=optsHTML;
+  let ex=card.querySelector('.explain');
+  if(!ex){ex=document.createElement('div');ex.className='explain';card.appendChild(ex);}
+  ex.innerHTML=`<strong>💡 Explanation:</strong> ${q.explanation}`;
+  ex.classList.add('vis');
+}
+
+function render(){
+  applyFilters(false);
+  updateStats();
+  document.getElementById('resultPanel').classList.remove('vis');
+
+  // Group by section for dividers
+  let prevSection='';
+  const html=filtered.map((q,i)=>{
+    let divider='';
+    if(activeSec==='all'&&q.section!==prevSection){
+      prevSection=q.section;
+      const icon=q.section==='Cloud Shell'?'🖥️':'📋';
+      divider=`<div class="section-divider"><div class="sd-line"></div>
+        <div class="sd-badge">${icon} ${q.section}</div>
+        <div class="sd-line"></div></div>`;
+    }
+
+    const codeBlock=q.code?`<div class="code-block">${q.code}</div>`:'';
+    const optsHTML=q.options.map((o,j)=>
+      `<div class="opt" onclick="answer(${i},${j})">
+        <div class="oltr">${LETTERS[j]}</div><span>${o}</span>
+      </div>`
+    ).join('');
+
+    const secLabel=q.section==='Cloud Shell'?'🖥️ Cloud Shell':'📋 ARM Templates';
+
+    return `${divider}<div class="qcard" id="qc${i}" style="animation-delay:${Math.min(i,25)*0.03}s">
+      <div class="qmeta">
+        <span class="qnum">Q${i+1}</span>
+        <span class="qtag qt-${q.type}">${typeIcon(q.type)} ${q.type}</span>
+        <span class="qsec"><span>${secLabel}</span></span>
+      </div>
+      <div class="qtext">${q.question}</div>
+      ${codeBlock}
+      <div class="opts">${optsHTML}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('quizBox').innerHTML=html;
+}
+
+render();
+</script>
+</body>
+</html>
