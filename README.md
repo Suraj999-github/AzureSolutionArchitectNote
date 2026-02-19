@@ -2,6 +2,7 @@
 Azure Solution Architect Note
 Here is a clean, professional **README.md** version you can directly use in your project:
 
+### Published Link is : https://suraj999-github.github.io/AzureSolutionArchitectNote/Home.html
 
 ## 🏗 Azure Solution Architect – Master Priority Index (Career-Based Order)
 
