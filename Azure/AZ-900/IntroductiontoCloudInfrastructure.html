@@ -1,142 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming soon · Azure notes</title>
-  <!-- Bootstrap 5 darkly (same dark theme as dashboard) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/darkly/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome icons (simple) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    body {
-      background-color: #1a1a2b;
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 1rem;
-    }
-    .coming-card {
-      background-color: #24243c;
-      border: none;
-      border-radius: 2.5rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      max-width: 700px;
-      width: 100%;
-      padding: 3rem 2rem;
-      text-align: center;
-    }
-    .icon-lg {
-      font-size: 5rem;
-      color: #00bc8c;
-      margin-bottom: 1.5rem;
-      opacity: 0.9;
-    }
-    h1 {
-      font-weight: 600;
-      color: #ffffff;
-      letter-spacing: -0.5px;
-      margin-bottom: 0.5rem;
-    }
-    .badge-soon {
-      background-color: #2f2f4a;
-      color: #b5c5d4;
-      font-size: 0.9rem;
-      padding: 0.4rem 1.2rem;
-      border-radius: 50px;
-      border: 1px solid #3e3e62;
-      display: inline-block;
-      margin-bottom: 1.8rem;
-    }
-    .message {
-      color: #b5c5d4;
-      font-size: 1.2rem;
-      margin-bottom: 2.5rem;
-      line-height: 1.6;
-    }
-    .features {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.5rem;
-      margin: 2rem 0 2.2rem;
-    }
-    .feature-item {
-      background: #1e1e32;
-      border-radius: 60px;
-      padding: 0.5rem 1.5rem;
-      color: #9bb0c7;
-      border: 1px solid #35355a;
-      font-size: 0.95rem;
-    }
-    .feature-item i {
-      color: #00bc8c;
-      margin-right: 8px;
-    }
-    .btn-return {
-      background-color: transparent;
-      border: 2px solid #00bc8c;
-      color: #00bc8c;
-      border-radius: 40px;
-      padding: 0.7rem 2.5rem;
-      font-weight: 600;
-      font-size: 1.1rem;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-return:hover {
-      background-color: #00bc8c;
-      color: #14141f;
-      border-color: #00bc8c;
-    }
-    .footer-note {
-      margin-top: 2.2rem;
-      color: #4f6382;
-      font-size: 0.85rem;
-    }
-    .footer-note i {
-      color: #00bc8c;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>introduction to cloud infrastructure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0b131a;          /* deep dark base */
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #dceadc;                      /* soft light text */
+            padding: 2rem 1rem;
+        }
+
+        .study-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #17232b;            /* dark slate with thyme undertone */
+            border-radius: 2.5rem;
+            padding: 2.8rem 2.5rem;
+            box-shadow: 0 25px 45px -12px #020604, 0 0 0 1px #3e623e inset;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: #c9e9a8;                       /* fresh thyme */
+            text-shadow: 0 3px 8px rgba(95, 139, 56, 0.4);
+            border-left: 6px solid #78a25a;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subhead {
+            font-size: 1.2rem;
+            color: #a8c7b5;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px dashed #446a41;
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subhead span {
+            background: #2e4a34;
+            padding: 0.2rem 1.3rem;
+            border-radius: 40px;
+            color: #deffca;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid #71a157;
+        }
+
+        /* main content card */
+        .infra-card {
+            background: #1f302d;
+            border-radius: 2rem;
+            padding: 2.2rem 2.5rem 2rem 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #2b4837;
+            transition: border-color 0.2s, box-shadow 0.3s;
+            box-shadow: 0 12px 26px -12px #0a140e;
+        }
+
+        .infra-card:hover {
+            border-color: #98c47a;
+            box-shadow: 0 20px 34px -14px #618f4c, 0 0 0 2px rgba(130, 190, 80, 0.2);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            background: #263f30;
+            color: #d9f7b5;
+            font-weight: 700;
+            font-size: 2rem;
+            width: 4rem;
+            height: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50% 40% 45% 55% / 45% 50% 50% 55%;
+            border: 2px solid #80aa66;
+            box-shadow: 0 0 0 3px #1d3124;
+        }
+
+        .infra-card h2 {
+            font-size: 2.2rem;
+            font-weight: 520;
+            color: #daf5bf;
+            letter-spacing: -0.01em;
+        }
+
+        .note-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+            margin: 1.8rem 0 1.5rem;
+        }
+
+        .note-item {
+            background: #20332f;
+            padding: 1.6rem 1.6rem 1.6rem 1.8rem;
+            border-radius: 1.6rem;
+            border-left: 6px solid #82ab6a;
+            box-shadow: inset 0 1px 5px #14221d, 0 8px 12px rgba(0, 25, 5, 0.5);
+        }
+
+        .note-item strong {
+            color: #e2ffc0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1.3rem;
+            margin-bottom: 0.9rem;
+            font-weight: 600;
+            border-bottom: 1px dotted #548049;
+            padding-bottom: 0.4rem;
+        }
+
+        .note-item p {
+            color: #cfe2d1;
+            font-size: 0.96rem;
+            margin: 0.6rem 0;
+        }
+
+        .note-item ul {
+            margin: 0.5rem 0 0 1.3rem;
+            color: #c7e3c2;
+        }
+
+        .note-item li {
+            margin: 0.3rem 0;
+        }
+
+        .accent-badge {
+            background: #316438;
+            color: #ebffe0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 1.2rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.3px;
+            border: 1px solid #8fb977;
+            text-transform: uppercase;
+        }
+
+        .key-points {
+            background: #1e392f;
+            border-radius: 1.5rem;
+            padding: 1.2rem 2rem;
+            margin-top: 2rem;
+            border: 1px solid #689751;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 1rem;
+        }
+
+        .key-points .emph {
+            color: #e0ffbc;
+            font-weight: 600;
+            margin-right: 0.3rem;
+        }
+
+        .key-points p {
+            color: #cfead0;
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, #2b5532, #80b064, #2b5532);
+            margin: 2rem 0 1.5rem;
+            width: 60%;
+            border-radius: 4px;
+        }
+
+        .extra-studies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 2.5rem 0 1rem;
+        }
+
+        .extra-card {
+            flex: 1 1 240px;
+            background: #1d312c;
+            border-radius: 1.8rem;
+            padding: 1.8rem 1.8rem;
+            border: 1px solid #4b7546;
+        }
+
+        .extra-card h3 {
+            color: #cff0b0;
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .extra-card ul {
+            list-style-type: '🌱 ';
+            color: #d2ecce;
+            padding-left: 1.6rem;
+        }
+
+        .extra-card li {
+            margin: 0.5rem 0;
+        }
+
+        .footer-note {
+            text-align: left;
+            font-size: 0.95rem;
+            color: #8eb281;
+            border-top: 1px solid #356134;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .footer-note a {
+            color: #ccf0af;
+            text-decoration: none;
+            border-bottom: 1px dotted #6ea656;
+        }
+
+        .thyme-deco {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #578049;
+            font-size: 1.8rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 650px) {
+            .study-wrapper { padding: 1.8rem; }
+            h1 { font-size: 2.2rem; }
+            .infra-card h2 { font-size: 1.8rem; }
+        }
+    </style>
 </head>
 <body>
-  <div class="coming-card">
-    <!-- simple large icon -->
-    <div class="icon-lg">
-      <i class="fas fa-feather-alt"></i>
+<div class="study-wrapper">
+    <h1>🌿 introduction to cloud infrastructure</h1>
+    <div class="subhead">
+        core concepts · IaaS, virtualization, compute, storage, networking
+        <span>standalone notes</span>
     </div>
-    
-    <!-- badge indicates notes section -->
-    <span class="badge-soon"><i class="far fa-clock me-2"></i>in progress</span>
-    
-    <h1>Notes coming soon</h1>
-    
-    <!-- short, clean message -->
-    <div class="message">
-      <i class="fas fa-pen-fancy me-2" style="color: #00bc8c;"></i>
-      I'm writing detailed notes for this module.<br>
-      <span style="font-size: 1rem;">They will be available shortly.</span>
+
+    <!-- main infrastructure card (all-in-one) -->
+    <div class="infra-card">
+        <div class="section-title">
+            <div class="section-icon">☁️</div>
+            <h2>cloud infrastructure fundamentals</h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>📦 cloud service models (infra focus)</strong>
+                <p><span class="emph">IaaS:</span> virtual machines, storage, networks — you control OS, middleware, apps. Azure manages hardware.</p>
+                <p><span class="emph">PaaS:</span> managed platform (App Services, SQL DB) — focus on app code, infrastructure abstracted.</p>
+                <p><span class="emph">SaaS:</span> ready-to-use software (M365).</p>
+                <ul><li>Shared responsibility model: IaaS gives most control and responsibility.</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>🖥️ virtualization & hypervisors</strong>
+                <p>Physical hardware → hypervisor (Azure uses Hyper-V) → multiple VMs. Enables isolation, flexibility, and efficient resource usage.</p>
+                <ul><li>Azure runs on massive-scale hypervisor clusters.</li>
+                <li>Virtual hardware: vCPU, memory, virtual disks, virtual NICs.</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>🌍 regions & availability</strong>
+                <p><strong>Region</strong> – geographical area with datacenters. <strong>Availability Zones</strong> – physically separate zones within a region (fault tolerance). <strong>Region pairs</strong> (e.g., East US & West US) for disaster recovery.</p>
+                <ul><li>Choose region based on latency, compliance, and service availability.</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>📁 resource hierarchy</strong>
+                <p>Management group → Subscription → Resource group → Resource. Resources are organized in resource groups (logical containers). RBAC and policies apply at each level.</p>
+                <ul><li>ARM (Azure Resource Manager) handles deployment and management.</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>⚙️ compute infrastructure</strong>
+                <p><strong>Azure VMs:</strong> IaaS, choice of OS, sizes, scaling (scale sets). <strong>Containers:</strong> ACI (simple), AKS (orchestration). <strong>Serverless:</strong> Azure Functions (event-driven).</p>
+                <ul><li>VM availability sets (update/fault domains) vs Availability Zones.</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>🌐 networking infrastructure</strong>
+                <p><strong>Virtual Network (VNet):</strong> isolated network, subnets, IP addressing. <strong>Network Security Groups (NSG):</strong> filter traffic. <strong>Load balancers:</strong> distribute traffic (Azure LB, Application Gateway). <strong>VPN Gateway / ExpressRoute:</strong> hybrid connectivity.</p>
+            </div>
+            <div class="note-item">
+                <strong>💾 storage infrastructure</strong>
+                <p><strong>Blob:</strong> unstructured data (images, backups). <strong>Disk:</strong> managed disks for VMs (SSD/HDD). <strong>Files:</strong> SMB shares. <strong>Tiers:</strong> hot, cool, archive. <strong>Redundancy:</strong> LRS, ZRS, GRS.</p>
+                <ul><li>Storage accounts are the base container for Azure Storage services.</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>🔐 identity & governance</strong>
+                <p><strong>Microsoft Entra ID:</strong> identity and access. <strong>RBAC:</strong> granular permissions. <strong>Azure Policy:</strong> enforce rules (e.g., only certain VM sizes). <strong>Resource locks:</strong> prevent accidental deletion.</p>
+                <ul><li>Monitor with Azure Monitor, Advisor, and Service Health.</li></ul>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">📘 architect view</span>
+            <p><span class="emph">·</span> Cloud infrastructure is the foundation: compute, storage, networking delivered as services. Understanding IaaS vs PaaS, virtualization, and resource hierarchy is essential.</p>
+        </div>
     </div>
-    
-    <!-- minimal feature list (simple, not overwhelming) -->
-    <div class="features">
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-900</span>
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-104</span>
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-305</span>
+
+    <hr>
+
+    <!-- extra study details -->
+    <div class="extra-studies">
+        <div class="extra-card">
+            <h3>📋 key terms</h3>
+            <ul>
+                <li><strong>IaaS</strong> – Infrastructure as a Service</li>
+                <li><strong>Hypervisor</strong> – enables VMs</li>
+                <li><strong>VNet</strong> – Virtual Network</li>
+                <li><strong>NSG</strong> – Network Security Group</li>
+                <li><strong>Availability Zone</strong> – isolated datacenter in region</li>
+                <li><strong>ARM</strong> – Azure Resource Manager</li>
+                <li><strong>LRS/GRS</strong> – storage redundancy</li>
+            </ul>
+        </div>
+        <div class="extra-card">
+            <h3>⚙️ infrastructure components</h3>
+            <ul>
+                <li>Virtual Machines (IaaS)</li>
+                <li>Virtual Networking (VNet, peering)</li>
+                <li>Managed Disks (persistent storage)</li>
+                <li>Load Balancers (traffic distribution)</li>
+                <li>Storage Accounts (blob, files, queues)</li>
+                <li>Azure Resource Groups (logical containers)</li>
+            </ul>
+        </div>
+        <div class="extra-card">
+            <h3>🧠 study reminders</h3>
+            <ul>
+                <li>Shared responsibility – IaaS vs PaaS</li>
+                <li>Region vs Availability Zone vs Region pair</li>
+                <li>Resource groups cannot be nested</li>
+                <li>VMs use virtual disks (page blobs)</li>
+                <li>Azure Policy for compliance, RBAC for access</li>
+            </ul>
+        </div>
     </div>
-    
-    <!-- return button (same style as dashboard, points back to hub) -->
-    <a href="../../Home.html" class="btn-return">
-      <i class="fas fa-arrow-left me-2"></i> Back to Home Page
-      </a>
-    <!-- subtle footer with folder hint -->
+
+    <!-- footer -->
     <div class="footer-note">
-      <i class="far fa-folder-open me-1"></i> notes will appear in <code>Azure/AZ-xxx/</code>
+        <span>🌿 · introduction to cloud infrastructure (standalone notes)</span>       
     </div>
-  </div>
+</div>
+<div class="thyme-deco">⚘ ⚘ ⚘</div>
 </body>
 </html>

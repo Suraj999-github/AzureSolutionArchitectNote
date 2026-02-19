@@ -1,142 +1,466 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming soon · Azure notes</title>
-  <!-- Bootstrap 5 darkly (same dark theme as dashboard) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/darkly/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome icons (simple) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    body {
-      background-color: #1a1a2b;
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 1rem;
-    }
-    .coming-card {
-      background-color: #24243c;
-      border: none;
-      border-radius: 2.5rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      max-width: 700px;
-      width: 100%;
-      padding: 3rem 2rem;
-      text-align: center;
-    }
-    .icon-lg {
-      font-size: 5rem;
-      color: #00bc8c;
-      margin-bottom: 1.5rem;
-      opacity: 0.9;
-    }
-    h1 {
-      font-weight: 600;
-      color: #ffffff;
-      letter-spacing: -0.5px;
-      margin-bottom: 0.5rem;
-    }
-    .badge-soon {
-      background-color: #2f2f4a;
-      color: #b5c5d4;
-      font-size: 0.9rem;
-      padding: 0.4rem 1.2rem;
-      border-radius: 50px;
-      border: 1px solid #3e3e62;
-      display: inline-block;
-      margin-bottom: 1.8rem;
-    }
-    .message {
-      color: #b5c5d4;
-      font-size: 1.2rem;
-      margin-bottom: 2.5rem;
-      line-height: 1.6;
-    }
-    .features {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.5rem;
-      margin: 2rem 0 2.2rem;
-    }
-    .feature-item {
-      background: #1e1e32;
-      border-radius: 60px;
-      padding: 0.5rem 1.5rem;
-      color: #9bb0c7;
-      border: 1px solid #35355a;
-      font-size: 0.95rem;
-    }
-    .feature-item i {
-      color: #00bc8c;
-      margin-right: 8px;
-    }
-    .btn-return {
-      background-color: transparent;
-      border: 2px solid #00bc8c;
-      color: #00bc8c;
-      border-radius: 40px;
-      padding: 0.7rem 2.5rem;
-      font-weight: 600;
-      font-size: 1.1rem;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-return:hover {
-      background-color: #00bc8c;
-      color: #14141f;
-      border-color: #00bc8c;
-    }
-    .footer-note {
-      margin-top: 2.2rem;
-      color: #4f6382;
-      font-size: 0.85rem;
-    }
-    .footer-note i {
-      color: #00bc8c;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cybersecurity architect (sc-100)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0c1217;        /* deep dark background */
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #d6e3da;                    /* soft light text */
+            padding: 2rem 1rem;
+        }
+
+        .study-wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+            background-color: #19232b;          /* dark slate with thyme warmth */
+            border-radius: 2.2rem;
+            padding: 2.8rem 2.5rem;
+            box-shadow: 0 25px 40px -12px #020604, 0 0 0 1px #415f3f inset;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: #c7e6a4;                     /* fresh thyme green */
+            text-shadow: 0 3px 8px rgba(97, 139, 56, 0.4);
+            border-left: 6px solid #769e5a;
+            padding-left: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .subhead {
+            font-size: 1.2rem;
+            color: #a3bfaf;
+            margin-bottom: 2.8rem;
+            border-bottom: 1px dashed #42633b;
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subhead span {
+            background: #2d4635;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            color: #daf0c0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid #618750;
+        }
+
+        /* part cards */
+        .part-card {
+            background: #1f2d2b;
+            border-radius: 2rem;
+            padding: 2.2rem 2.2rem 2rem 2.2rem;
+            margin-bottom: 2.8rem;
+            border: 1px solid #2c4635;
+            transition: border-color 0.2s, box-shadow 0.3s;
+            box-shadow: 0 10px 24px -10px #0d1810;
+        }
+
+        .part-card:hover {
+            border-color: #98c079;
+            box-shadow: 0 18px 30px -12px #5f8a4e, 0 0 0 2px rgba(128, 184, 82, 0.2);
+        }
+
+        .part-title {
+            display: flex;
+            align-items: center;
+            gap: 1.3rem;
+            margin-bottom: 2rem;
+        }
+
+        .part-icon {
+            background: #25382b;
+            color: #d3f0b0;
+            font-weight: 700;
+            font-size: 1.7rem;
+            width: 3.5rem;
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 45% 55% 40% 60% / 50% 40% 60% 50%;
+            border: 2px solid #7ca064;
+            box-shadow: 0 0 0 3px #1f2f24;
+        }
+
+        .part-card h2 {
+            font-size: 2rem;
+            font-weight: 520;
+            color: #daf0bc;
+            letter-spacing: -0.01em;
+        }
+
+        .part-card h2 small {
+            font-size: 0.9rem;
+            background: #2c4531;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            color: #c5e3a3;
+            margin-left: 1.3rem;
+            font-weight: 400;
+            border: 1px solid #628d4b;
+            vertical-align: middle;
+        }
+
+        .note-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.6rem;
+            margin: 2rem 0 1.2rem;
+        }
+
+        .note-item {
+            background: #1f2f2e;
+            padding: 1.5rem 1.5rem 1.5rem 1.7rem;
+            border-radius: 1.5rem;
+            border-left: 6px solid #7ea36b;
+            box-shadow: inset 0 1px 4px #101d19, 0 6px 10px rgba(0, 15, 5, 0.5);
+        }
+
+        .note-item strong {
+            color: #dcf5b7;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            margin-bottom: 0.9rem;
+            font-weight: 600;
+            border-bottom: 1px dotted #527d4a;
+            padding-bottom: 0.35rem;
+        }
+
+        .note-item p {
+            color: #c6dbcf;
+            font-size: 0.95rem;
+            margin: 0.5rem 0;
+        }
+
+        .note-item ul {
+            margin: 0.6rem 0 0 1.3rem;
+            color: #c0dbbc;
+        }
+
+        .note-item li {
+            margin: 0.3rem 0;
+        }
+
+        .accent-badge {
+            background: #345f3c;
+            color: #ecffe0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.3px;
+            border: 1px solid #8eb576;
+            text-transform: uppercase;
+        }
+
+        .key-points {
+            background: #1a332b;
+            border-radius: 1.4rem;
+            padding: 1.2rem 2rem;
+            margin-top: 2rem;
+            border: 1px solid #618f52;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 1rem;
+        }
+
+        .key-points .emph {
+            color: #daefb2;
+            font-weight: 600;
+            margin-right: 0.4rem;
+        }
+
+        .key-points p {
+            color: #cae0c7;
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, #2e4f32, #7ca564, #2e4f32);
+            margin: 2.5rem 0 1.8rem;
+            width: 80%;
+            border-radius: 4px;
+        }
+
+        .extra-studies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 2rem 0 1.5rem;
+        }
+
+        .extra-card {
+            flex: 1 1 280px;
+            background: #1d2d28;
+            border-radius: 1.6rem;
+            padding: 1.8rem;
+            border: 1px solid #44653b;
+        }
+
+        .extra-card h3 {
+            color: #cae9a8;
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .extra-card ul {
+            list-style-type: '🌱 ';
+            color: #cde3cf;
+            padding-left: 1.5rem;
+        }
+
+        .extra-card li {
+            margin: 0.6rem 0;
+        }
+
+        .footer-note {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #7e9f7a;
+            border-top: 1px solid #305236;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .footer-note a {
+            color: #c2e3a3;
+            text-decoration: none;
+            border-bottom: 1px dotted #679255;
+        }
+
+        .thyme-deco {
+            text-align: center;
+            margin-top: 1rem;
+            color: #517a48;
+            font-size: 1.6rem;
+            opacity: 0.5;
+        }
+
+        /* responsive */
+        @media (max-width: 650px) {
+            .study-wrapper { padding: 1.5rem; }
+            h1 { font-size: 2.2rem; }
+            .part-card h2 { font-size: 1.6rem; }
+        }
+    </style>
 </head>
 <body>
-  <div class="coming-card">
-    <!-- simple large icon -->
-    <div class="icon-lg">
-      <i class="fas fa-feather-alt"></i>
+<div class="study-wrapper">
+    <h1>🌿 microsoft cybersecurity architect</h1>
+    <div class="subhead">
+        design solutions · best practices, operations, apps, infrastructure
+       
     </div>
-    
-    <!-- badge indicates notes section -->
-    <span class="badge-soon"><i class="far fa-clock me-2"></i>in progress</span>
-    
-    <h1>Notes coming soon</h1>
-    
-    <!-- short, clean message -->
-    <div class="message">
-      <i class="fas fa-pen-fancy me-2" style="color: #00bc8c;"></i>
-      I'm writing detailed notes for this module.<br>
-      <span style="font-size: 1rem;">They will be available shortly.</span>
+
+    <!-- PART 1: Design solutions that align with security best practices and priorities -->
+    <div class="part-card">
+        <div class="part-title">
+            <div class="part-icon">1</div>
+            <h2>align with best practices & priorities <small>zero trust · risk · strategy</small></h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>🔰 security fundamentals</strong>
+                <p><span class="emph">Zero Trust</span> – verify explicitly, least privilege, assume breach. <span class="emph">Defense in depth</span>: layers (data, app, compute, network, perimeter, identity, physical).</p>
+                <ul><li>Microsoft Cloud Security Benchmark (MCSB) · Azure Policy</li>
+                <li>Secure Score · Compliance Manager for continuous improvement</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>📐 threat modeling & priorities</strong>
+                <p>STRIDE, PASTA, Microsoft Threat Modeling Tool. Align security to business goals, regulatory priorities (GDPR, CMMC).</p>
+                <ul><li>Identify critical assets · data sensitivity</li>
+                <li>Risk management: inherent vs. residual risk</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>🧭 security best practices</strong>
+                <p>Automate security (DevSecOps), centralize logging, use AI/ML for detection. Microsoft recommendations: <strong>rapid modernization</strong>, <strong>unified XDR</strong>.</p>
+                <ul><li>Microsoft Cybersecurity Reference Architecture (MCRA)</li>
+                <li>Cloud Adoption Framework security discipline</li></ul>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">🎯 architect focus</span>
+            <p><span class="emph">·</span> Design must balance usability, cost, and security. Map controls to MCSB and Zero Trust maturity model.</p>
+        </div>
     </div>
-    
-    <!-- minimal feature list (simple, not overwhelming) -->
-    <div class="features">
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-900</span>
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-104</span>
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-305</span>
+
+    <!-- PART 2: Design security operations, identity, and compliance capabilities -->
+    <div class="part-card">
+        <div class="part-title">
+            <div class="part-icon">2</div>
+            <h2>security operations · identity · compliance <small>soc + entra + purview</small></h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>🛡️ security operations (SecOps)</strong>
+                <p>Design SOC with <strong>Microsoft Sentinel</strong> (SIEM+SOAR). Define data connectors, analytics rules, workbooks, automation playbooks.</p>
+                <ul><li>Incident response lifecycle · threat hunting with KQL</li>
+                <li>Unified XDR: Microsoft 365 Defender (endpoint, identity, email, cloud apps)</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>🧑‍💼 identity & access (Entra)</strong>
+                <p>Entra ID (Azure AD) design: Conditional Access, Identity Protection, Multi-Factor Authentication. Identity Governance: PIM, access reviews, entitlement management.</p>
+                <ul><li>B2B, B2C, hybrid identities (Azure AD Connect / cloud sync)</li>
+                <li>Privileged Access Workstations (PAW) / Zero Standing Access</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>⚖️ compliance (Purview)</strong>
+                <p>Information protection: sensitivity labels, DLP. Insider risk management, eDiscovery (Premium), audit, communication compliance.</p>
+                <ul><li>Microsoft Purview Data Lifecycle Management</li>
+                <li>Compliance Manager for assessments & continuous monitoring</li></ul>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">📋 integration</span>
+            <p><span class="emph">·</span> Unify identity signals into Sentinel & Defender to correlate incidents. Use Purview for compliance automation.</p>
+        </div>
     </div>
-    
-    <!-- return button (same style as dashboard, points back to hub) -->
-    <a href="../../Home.html" class="btn-return">
-      <i class="fas fa-arrow-left me-2"></i> Back to Home Page
-      </a>
-    <!-- subtle footer with folder hint -->
+
+    <!-- PART 3: Design security solutions for applications and data -->
+    <div class="part-card">
+        <div class="part-title">
+            <div class="part-icon">3</div>
+            <h2>applications & data security <small>devsecops · data protection</small></h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>📱 application security</strong>
+                <p>Secure SDLC: threat modeling, static/dynamic analysis (GitHub Advanced Security, Defender for DevOps).</p>
+                <ul><li>Azure Web Application Firewall (WAF) on Front Door / Application Gateway</li>
+                <li>API security: API Management with authentication, throttling</li>
+                <li>DDoS Protection for apps</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>🗄️ data protection</strong>
+                <p>Encryption at rest (Azure Storage encryption, SQL TDE, Key Vault) and in transit (TLS). Data classification with Purview.</p>
+                <ul><li>Sensitivity labels for files, databases, emails</li>
+                <li>Data Loss Prevention (DLP) across endpoints, cloud, apps</li>
+                <li>Azure Confidential Computing / Always Encrypted for sensitive</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>☁️ workload security</strong>
+                <p>Microsoft Defender for Cloud – CSPM, workload protection for AKS, databases, storage. DevOps security posture.</p>
+                <ul><li>Defender for APIs, Defender for Containers</li>
+                <li>Container image scanning (ACR, Defender)</li>
+                <li>Security assessments & recommendations</li></ul>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">🔐 data-first</span>
+            <p><span class="emph">·</span> Architect data encryption at rest/in transit, tokenization for sensitive, and apply least privilege access via Conditional Access.</p>
+        </div>
+    </div>
+
+    <!-- PART 4: Design security solutions for infrastructure -->
+    <div class="part-card">
+        <div class="part-title">
+            <div class="part-icon">4</div>
+            <h2>infrastructure security <small>network · endpoint · hybrid · containers</small></h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>🌐 network & hybrid</strong>
+                <p>Segmentation with VNets, NSGs, Azure Firewall, Azure DDoS Protection. Secure hybrid: VPN, ExpressRoute, Azure Bastion, just-in-time VM access.</p>
+                <ul><li>Zero Trust network: micro-segmentation, adaptive access</li>
+                <li>Web Application Firewall, Firewall Manager</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>💻 endpoint & device security</strong>
+                <p>Defender for Endpoint (EDR, P2), Microsoft Intune for mobile/device compliance. Endpoint privilege management, attack surface reduction.</p>
+                <ul><li>Device risk scoring with Conditional Access</li>
+                <li>Secure configuration baselines (CIS, Microsoft)</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>📦 container & orchestration</strong>
+                <p>Defender for Containers (AKS, AWS/GCP). Image scanning, admission controller policies (Gatekeeper). Runtime threat detection.</p>
+                <ul><li>AKS security: Azure Policy for Kubernetes, Azure Active Directory integration</li>
+                <li>Secret management with Key Vault CSI driver</li></ul>
+            </div>
+            <div class="note-item">
+                <strong>🏛️ identity infrastructure</strong>
+                <p>Secure AD DS, Azure AD Connect (pass-through auth, federation), AD FS security. Protect domain controllers, implement LAPS.</p>
+                <ul><li>Azure AD Password Protection, smart lockout</li>
+                <li>Privileged access with PIM for on-prem?</li></ul>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">🛡️ hybrid defense</span>
+            <p><span class="emph">·</span> Extend Zero Trust to on-premises, multicloud. Use Defender for Cloud and Arc for unified visibility.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- extra necessary notes & cross-domain details -->
+    <div class="extra-studies">
+        <div class="extra-card">
+            <h3>📌 key acronyms & models</h3>
+            <ul>
+                <li><strong>ZT</strong> – Zero Trust</li>
+                <li><strong>CSPM</strong> – Cloud Security Posture Mgmt</li>
+                <li><strong>CWPP</strong> – Cloud Workload Protection</li>
+                <li><strong>CIEM</strong> – Cloud Infrastructure Entitlement Mgmt (Entra Permissions Mgmt)</li>
+                <li><strong>XDR</strong> / <strong>SIEM+SOAR</strong></li>
+                <li><strong>MCSB</strong> – Microsoft Cloud Security Benchmark</li>
+                <li><strong>PIM</strong> – Privileged Identity Management</li>
+            </ul>
+        </div>
+        <div class="extra-card">
+            <h3>🧠 architect priorities</h3>
+            <ul>
+                <li>Align security to business outcomes</li>
+                <li>Design with <strong>defense in depth</strong> across all layers</li>
+                <li>Automate incident response (Sentinel playbooks)</li>
+                <li>Consolidate tools into Microsoft unified stack</li>
+                <li>Plan for <strong>resilience</strong> and <strong>compliance</strong></li>
+            </ul>
+        </div>
+        <div class="extra-card">
+            <h3>⚙️ integrated design</h3>
+            <ul>
+                <li>Entra ID + Conditional Access → Defender for Cloud Apps → Sentinel</li>
+                <li>Purview + Defender for Cloud (sensitivity labels for workloads)</li>
+                <li>DevOps security: GitHub Advanced Security → Defender for Cloud</li>
+                <li>Azure Policy + Defender regulatory compliance</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- final study callout -->
     <div class="footer-note">
-      <i class="far fa-folder-open me-1"></i> notes will appear in <code>Azure/AZ-xxx/</code>
+        <span>🌿 microsoft cybersecurity architect  detailed notes</span>       
     </div>
-  </div>
+</div>
+<div class="thyme-deco">⚘ ⚘ ⚘</div>
 </body>
 </html>

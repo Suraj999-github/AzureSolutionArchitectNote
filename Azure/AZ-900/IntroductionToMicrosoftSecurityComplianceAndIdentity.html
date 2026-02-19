@@ -1,142 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming soon · Azure notes</title>
-  <!-- Bootstrap 5 darkly (same dark theme as dashboard) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/darkly/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome icons (simple) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    body {
-      background-color: #1a1a2b;
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 1rem;
-    }
-    .coming-card {
-      background-color: #24243c;
-      border: none;
-      border-radius: 2.5rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      max-width: 700px;
-      width: 100%;
-      padding: 3rem 2rem;
-      text-align: center;
-    }
-    .icon-lg {
-      font-size: 5rem;
-      color: #00bc8c;
-      margin-bottom: 1.5rem;
-      opacity: 0.9;
-    }
-    h1 {
-      font-weight: 600;
-      color: #ffffff;
-      letter-spacing: -0.5px;
-      margin-bottom: 0.5rem;
-    }
-    .badge-soon {
-      background-color: #2f2f4a;
-      color: #b5c5d4;
-      font-size: 0.9rem;
-      padding: 0.4rem 1.2rem;
-      border-radius: 50px;
-      border: 1px solid #3e3e62;
-      display: inline-block;
-      margin-bottom: 1.8rem;
-    }
-    .message {
-      color: #b5c5d4;
-      font-size: 1.2rem;
-      margin-bottom: 2.5rem;
-      line-height: 1.6;
-    }
-    .features {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.5rem;
-      margin: 2rem 0 2.2rem;
-    }
-    .feature-item {
-      background: #1e1e32;
-      border-radius: 60px;
-      padding: 0.5rem 1.5rem;
-      color: #9bb0c7;
-      border: 1px solid #35355a;
-      font-size: 0.95rem;
-    }
-    .feature-item i {
-      color: #00bc8c;
-      margin-right: 8px;
-    }
-    .btn-return {
-      background-color: transparent;
-      border: 2px solid #00bc8c;
-      color: #00bc8c;
-      border-radius: 40px;
-      padding: 0.7rem 2.5rem;
-      font-weight: 600;
-      font-size: 1.1rem;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-return:hover {
-      background-color: #00bc8c;
-      color: #14141f;
-      border-color: #00bc8c;
-    }
-    .footer-note {
-      margin-top: 2.2rem;
-      color: #4f6382;
-      font-size: 0.85rem;
-    }
-    .footer-note i {
-      color: #00bc8c;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ms security & compliance study</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0f1419;        /* deep charcoal base */
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #d9e2e8;                    /* soft off-white */
+            padding: 2rem 1rem;
+        }
+
+        /* main container with subtle thyme undertones */
+        .study-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #1a2128;          /* dark slate with warm hint */
+            border-radius: 2rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.8), 0 0 0 1px #3d4b3c inset; /* thyme edge */
+        }
+
+        /* headings use thyme green */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.4rem;
+            color: #b7d98c;                     /* fresh thyme */
+            text-shadow: 0 2px 5px rgba(120, 140, 70, 0.3);
+            border-left: 6px solid #6f8c5d;
+            padding-left: 1.2rem;
+        }
+
+        .subhead {
+            font-size: 1.1rem;
+            color: #a0b8b0;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px dashed #3f5a4a;
+            padding-bottom: 0.8rem;
+        }
+
+        /* part cards – each section gets a subtle thyme glow on hover */
+        .part-card {
+            background: #1c262e;
+            border-radius: 1.6rem;
+            padding: 2rem 2rem 1.8rem 2rem;
+            margin-bottom: 2.2rem;
+            border: 1px solid #2f4237;
+            transition: border-color 0.2s, box-shadow 0.3s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .part-card:hover {
+            border-color: #8bb56a;
+            box-shadow: 0 10px 25px -8px #5b7e4a, 0 0 0 2px rgba(160, 200, 100, 0.15);
+        }
+
+        .part-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .part-icon {
+            background: #2a3a30;
+            color: #c7e9a0;
+            font-weight: 700;
+            font-size: 1.4rem;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 60% 40% 50% 50% / 40% 50% 60% 50%;  /* organic, herb-like */
+            border: 2px solid #6f8c5d;
+            box-shadow: 0 0 0 2px #1f2d22;
+        }
+
+        .part-card h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            color: #d5f0ba;
+            letter-spacing: -0.01em;
+        }
+
+        .part-card h2 span {
+            font-size: 1rem;
+            background: #2d4030;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            color: #cbe5ae;
+            margin-left: 1.2rem;
+            font-weight: 400;
+            vertical-align: middle;
+            border: 1px solid #557a4a;
+        }
+
+        /* notes / details grid */
+        .note-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.4rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .note-item {
+            background: #212e33;
+            padding: 1.3rem 1.5rem;
+            border-radius: 1.2rem;
+            border-left: 5px solid #7e9f6a;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.6), 0 4px 6px rgba(0,20,0,0.4);
+        }
+
+        .note-item strong {
+            color: #d8f0b2;
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .note-item p {
+            color: #cbd5cf;
+            font-size: 0.95rem;
+            margin: 0.25rem 0;
+        }
+
+        .note-item ul {
+            margin: 0.5rem 0 0 1.3rem;
+            color: #b1cfbb;
+        }
+
+        .note-item li {
+            margin: 0.25rem 0;
+        }
+
+        .accent-badge {
+            background: #385a3c;
+            color: #eaffd6;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.3px;
+            border: 1px solid #80a36b;
+        }
+
+        .key-points {
+            background: #1a2d28;
+            border-radius: 1.2rem;
+            padding: 1.2rem 1.8rem;
+            margin-top: 1.5rem;
+            border: 1px dashed #6f9462;
+        }
+
+        .key-points p {
+            display: flex;
+            gap: 0.6rem;
+            align-items: flex-start;
+            color: #bdd6bb;
+        }
+
+        .key-points .emph {
+            color: #c8eea0;
+            font-weight: 500;
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, #2d4830, #6c8b58, #2d4830);
+            margin: 2rem 0 1rem;
+            width: 70%;
+            border-radius: 2px;
+        }
+
+        .footer-note {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #76937c;
+            border-top: 1px solid #2f463a;
+            padding-top: 1.8rem;
+            margin-top: 1rem;
+        }
+
+        .footer-note a {
+            color: #b7dd90;
+            text-decoration: none;
+            border-bottom: 1px dotted #6a8f57;
+        }
+
+        /* extra touch: thyme sprig via pseudo (cosmetic) */
+        .part-card:after {
+            content: "⚘";
+            float: right;
+            font-size: 1.8rem;
+            color: #557d4e;
+            opacity: 0.3;
+            margin-top: -1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .study-wrapper { padding: 1.5rem; }
+            h1 { font-size: 2rem; }
+            .part-card h2 { font-size: 1.6rem; }
+        }
+    </style>
 </head>
 <body>
-  <div class="coming-card">
-    <!-- simple large icon -->
-    <div class="icon-lg">
-      <i class="fas fa-feather-alt"></i>
+<div class="study-wrapper">
+    <h1>🌿 ms security, compliance & identity</h1>
+    <div class="subhead">core concepts + essential details for study</div>
+
+    <!-- PART 1 -->
+    <div class="part-card">
+        <div class="part-title">
+            <div class="part-icon">1</div>
+            <h2>security, compliance & identity <span>foundations</span></h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>🔐 security concepts</strong>
+                <p>CIA triad: <em>Confidentiality, Integrity, Availability</em>. Zero Trust model (verify explicitly, least privilege, assume breach). Defense in depth: physical, identity, perimeter, network, compute, application, data.</p>
+            </div>
+            <div class="note-item">
+                <strong>⚖️ compliance fundamentals</strong>
+                <p>Regulatory frameworks: GDPR, HIPAA, FedRAMP, ISO 27001. Microsoft compliance offerings: compliance manager, compliance center, audit logs. Shared responsibility in cloud.</p>
+            </div>
+            <div class="note-item">
+                <strong>🧾 identity basics</strong>
+                <p>Identity as the new perimeter. Authentication vs. authorization. Modern protocols: OAuth 2.0, OpenID Connect, SAML. Identity lifecycle management.</p>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">📌 key takeaway</span>
+            <p><span class="emph">·</span> Security, compliance, and identity are intertwined—identity controls access, compliance ensures standards, security protects assets. Microsoft unifies them across Entra, Purview, and Priva.</p>
+        </div>
     </div>
-    
-    <!-- badge indicates notes section -->
-    <span class="badge-soon"><i class="far fa-clock me-2"></i>in progress</span>
-    
-    <h1>Notes coming soon</h1>
-    
-    <!-- short, clean message -->
-    <div class="message">
-      <i class="fas fa-pen-fancy me-2" style="color: #00bc8c;"></i>
-      I'm writing detailed notes for this module.<br>
-      <span style="font-size: 1rem;">They will be available shortly.</span>
+
+    <!-- PART 2 : Microsoft Entra -->
+    <div class="part-card">
+        <div class="part-title">
+            <div class="part-icon">2</div>
+            <h2>Microsoft Entra <span>identity & access</span></h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>🌐 Entra ID (Azure AD)</strong>
+                <p>Cloud-based identity and access management. Features: SSO, MFA, Conditional Access, Identity Protection, B2B collaboration, and B2C. Hybrid identity with Azure AD Connect.</p>
+            </div>
+            <div class="note-item">
+                <strong>🛡️ Entra Identity Governance</strong>
+                <p>Access reviews, entitlement management, privileged identity management (PIM). Lifecycle workflows, automated provisioning.</p>
+            </div>
+            <div class="note-item">
+                <strong>📋 Entra Permissions Management</strong>
+                <p>Cloud infrastructure entitlement management (CIEM) – discover, monitor, remediate excessive permissions across AWS, Azure, GCP.</p>
+            </div>
+            <div class="note-item">
+                <strong>🔑 Verified ID & decentralized</strong>
+                <p>Entra Verified ID – verifiable credentials, decentralized identity standards. Build trust without passwords.</p>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">📘 exam note</span>
+            <p><span class="emph">·</span> Microsoft Entra is the product family formerly Azure AD + new services. Conditional policies, risk detections, and identity protection are core for security.</p>
+        </div>
     </div>
-    
-    <!-- minimal feature list (simple, not overwhelming) -->
-    <div class="features">
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-900</span>
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-104</span>
-      <span class="feature-item"><i class="fas fa-check-circle"></i> AZ-305</span>
+
+    <!-- PART 3 : Microsoft security solutions -->
+    <div class="part-card">
+        <div class="part-title">
+            <div class="part-icon">3</div>
+            <h2>Microsoft security solutions <span>defender & sentinel</span></h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>🛡️ Microsoft Defender XDR</strong>
+                <p>Defender for Endpoint (EDR), Defender for Office 365 (anti-phish), Defender for Identity (identity detection), Defender for Cloud Apps (CASB). Unified incident in Microsoft 365 Defender.</p>
+            </div>
+            <div class="note-item">
+                <strong>📡 Microsoft Sentinel</strong>
+                <p>Cloud-native SIEM/SOAR. Collect data across enterprise, use KQL to detect threats, automate responses with playbooks (Logic Apps).</p>
+            </div>
+            <div class="note-item">
+                <strong>☁️ Defender for Cloud</strong>
+                <p>Secure multicloud workloads (CSPM). Recommendations, workload protection, regulatory compliance for Azure, AWS, GCP.</p>
+            </div>
+            <div class="note-item">
+                <strong>🔒 security posture management</strong>
+                <p>Secure Score, exposure management, attack surface reduction. Integration with Microsoft 365 Defender and external tools.</p>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">⚡ integrated defense</span>
+            <p><span class="emph">·</span> Microsoft’s security stack shares signals across Defender, Sentinel, and Entra for accelerated detection and response (XDR + SIEM).</p>
+        </div>
     </div>
-    
-    <!-- return button (same style as dashboard, points back to hub) -->
-    <a href="../../Home.html" class="btn-return">
-      <i class="fas fa-arrow-left me-2"></i> Back to Home Page
-      </a>
-    <!-- subtle footer with folder hint -->
-    <div class="footer-note">
-      <i class="far fa-folder-open me-1"></i> notes will appear in <code>Azure/AZ-xxx/</code>
+
+    <!-- PART 4 : Microsoft Priva & Purview -->
+    <div class="part-card">
+        <div class="part-title">
+            <div class="part-icon">4</div>
+            <h2>Microsoft Priva & Purview <span>privacy + governance</span></h2>
+        </div>
+        <div class="note-grid">
+            <div class="note-item">
+                <strong>🥗 Microsoft Priva</strong>
+                <p>Privacy risk management: overexposure, data transfers, minimisation. Subject rights requests automation. Consent management, privacy assessments.</p>
+            </div>
+            <div class="note-item">
+                <strong>📊 Microsoft Purview</strong>
+                <p>Unified data governance: data map, catalog, data estate insights. Scan on-prem, multicloud, SaaS. Classification and lineage.</p>
+            </div>
+            <div class="note-item">
+                <strong>🔏 Purview risk & compliance</strong>
+                <p>Information protection (sensitivity labels, DLP), insider risk management, eDiscovery, audit, communication compliance. Formerly Microsoft 365 compliance.</p>
+            </div>
+            <div class="note-item">
+                <strong>🌱 integrated scenarios</strong>
+                <p>Priva uses Purview’s data classification to detect personal data. Both share a common policy and insight platform.</p>
+            </div>
+        </div>
+        <div class="key-points">
+            <span class="accent-badge">🌐 data + privacy</span>
+            <p><span class="emph">·</span> Purview focuses on data governance & compliance; Priva adds automated privacy operations. Together they cover data security, privacy, and regulatory needs.</p>
+        </div>
     </div>
-  </div>
+
+    <!-- extra cross-notes: study details -->
+    <hr>
+    <div style="display: flex; flex-wrap: wrap; gap: 1.8rem; margin: 1.5rem 0 0.5rem;">
+        <div style="flex: 1; min-width: 200px; background: #1f2f2a; border-radius: 1.2rem; padding: 1.5rem;">
+            <span style="color:#b1d882; font-weight:600;font-size:1.2rem;">📘 necessary details — acronyms</span>
+            <ul style="margin-top: 1rem; list-style-type: '🌱 '; color: #c3dec0;">
+                <li><strong>Zero Trust</strong> – never trust, always verify</li>
+                <li><strong>MFA</strong> – multi‑factor authentication</li>
+                <li><strong>PIM</strong> – privileged identity management</li>
+                <li><strong>XDR</strong> – extended detection & response</li>
+                <li><strong>CIEM</strong> – cloud infrastructure entitlement mgmt</li>
+                <li><strong>DLP</strong> – data loss prevention</li>
+                <li><strong>SIEM/SOAR</strong> – security info & event management / orchestration & automation</li>
+            </ul>
+        </div>
+        <div style="flex: 2; min-width: 280px; background: #1f2f2a; border-radius: 1.2rem; padding: 1.5rem;">
+            <span style="color:#b1d882; font-weight:600;font-size:1.2rem;">📝 possible study notes (why it matters)</span>
+            <ul style="margin-top: 1rem; list-style-type: '⚘ '; color: #cde0cf;">
+                <li><strong>Identity (Entra)</strong> controls who gets access — foundation of Zero Trust.</li>
+                <li><strong>Defender solutions</strong> stop attacks across endpoints, identity, email, cloud.</li>
+                <li><strong>Sentinel</strong> gives bird’s-eye view with KQL hunting.</li>
+                <li><strong>Purview</strong> maps sensitive data, essential for GDPR and compliance.</li>
+                <li><strong>Priva</strong> operationalises privacy (subject rights requests, risk assessments).</li>
+                <li><strong>Integration</strong>: all share signals and policy to reduce complexity.</li>
+            </ul>
+        </div>
+    </div>    
+</div>
+<!-- small decorative thyme element -->
+<div style="text-align:center; margin-top:1rem; color: #4a6b3f; font-size:1.4rem; opacity:0.5;">⚘ ⚘ ⚘</div>
 </body>
 </html>
