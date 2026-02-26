@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASP.NET Core Security Flow</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1a2980;
+            --secondary-blue: #2a3f9d;
+            --accent-teal: #26d0ce;
+            --accent-purple: #8a4fff;
+            --accent-orange: #ff7e5f;
+            --accent-red: #ff4757;
+            --accent-green: #2ed573;
+            --light-bg: #ffffff;
+            --dark-text: #2c3e50;
+            --light-text: #ffffff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            color: var(--dark-text);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .pdf-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pdf-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--accent-teal) 100%);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%231a2980' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        
+        .header h1 {
+            font-weight: 800;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        
+        .flow-container {
+            margin-top: 30px;
+        }
+        
+        .flow-step {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 8px solid var(--primary-blue);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            page-break-inside: avoid;
+        }
+        
+        .flow-step:hover {
+            transform: translateY(-3px);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.3);
+            z-index: 2;
+        }
+        
+        .step-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+            padding-left: 15px;
+            border-left: none;
+        }
+        
+        .step-subtitle {
+            font-weight: 600;
+            color: var(--secondary-blue);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            display: inline-block;
+            padding: 5px 15px;
+            background-color: rgba(26, 41, 128, 0.08);
+            border-radius: 30px;
+        }
+        
+        .step-content {
+            padding-left: 15px;
+        }
+        
+        .step-content ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        
+        .step-content li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .step-icon {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 2.2rem;
+            color: var(--primary-blue);
+            opacity: 0.15;
+        }
+        
+        .phase {
+            background-color: rgba(26, 41, 128, 0.03);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid rgba(26, 41, 128, 0.2);
+        }
+        
+        .phase-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .phase-title i {
+            margin-right: 10px;
+            color: var(--accent-teal);
+        }
+        
+        .color-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        .legend {
+            background-color: rgba(26, 41, 128, 0.03);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 40px;
+            border: 2px solid rgba(26, 41, 128, 0.1);
+        }
+        
+        .legend h4 {
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(26, 41, 128, 0.1);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--primary-blue);
+            font-size: 0.9rem;
+            opacity: 0.7;
+            border-top: 1px solid rgba(26, 41, 128, 0.1);
+        }
+        
+        /* Color coding for steps */
+        .client-step { border-left-color: var(--accent-green); }
+        .gateway-step { border-left-color: var(--accent-orange); }
+        .middleware-step { border-left-color: var(--secondary-blue); }
+        .auth-step { border-left-color: var(--accent-purple); }
+        .controller-step { border-left-color: var(--accent-teal); }
+        .response-step { border-left-color: var(--accent-red); }
+        
+        /* Print/PDF specific styles */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0;
+            }
+            
+            .pdf-container {
+                box-shadow: none;
+                padding: 20px;
+                margin: 0;
+                max-width: 100%;
+            }
+            
+            .header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .flow-step {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            .step-number {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .step-title {
+                font-size: 1.3rem;
+            }
+            
+            .pdf-container {
+                padding: 15px;
+            }
+        }
+        
+        code {
+            background-color: rgba(26, 41, 128, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d63384;
+        }
+    </style>
+</head>
+<body>
+    <div class="pdf-container">
+        <!-- Header with Title -->
+        <div class="header">
+            <h1>ASP.NET Core Security Flow</h1>
+            <p class="lead mb-0">Comprehensive Security Architecture for Web APIs</p>
+        </div>
+        
+        <!-- Flow Visualization -->
+        <div class="flow-container">
+            
+            <!-- Step 1: Client -->
+            <div class="flow-step client-step">
+                <div class="step-number">1</div>
+                <div class="step-title">CLIENT (Frontend / App)</div>
+                <div class="step-subtitle">Build Request</div>
+                <div class="step-content">
+                    <ul>
+                        <li>Encrypts via TLS</li>
+                        <li>Adds Authorization Header: Bearer <code>&lt;JWT&gt;</code></li>
+                        <li>Adds X-Signature / X-API-KEY if required</li>
+                        <li>Optionally AES encrypts payload</li>
+                    </ul>
+                </div>
+                <div class="step-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+            </div>
+            
+            <!-- Step 2: API Gateway -->
+            <div class="flow-step gateway-step">
+                <div class="step-number">2</div>
+                <div class="step-title">API GATEWAY / FIREWALL</div>
+                <div class="step-subtitle">Network Security Layer</div>
+                <div class="step-content">
+                    <ul>
+                        <li>HTTPS terminates here</li>
+                        <li>IP whitelisting, DDoS protection</li>
+                        <li>Rate limiting</li>
+                    </ul>
+                </div>
+                <div class="step-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+            </div>
+            
+            <!-- Step 3-5: Middleware Pipeline -->
+            <div class="flow-step middleware-step">
+                <div class="step-number">3</div>
+                <div class="step-title">ASP.NET Core Middleware Pipeline</div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-check-circle"></i> CORS Validation</div>
+                    <ul>
+                        <li>Checks Origin headers</li>
+                        <li>Allows or denies cross-origin requests</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-key"></i> API Key Middleware (optional)</div>
+                    <ul>
+                        <li>Validates <code>X-API-KEY</code> header</li>
+                        <li>Rejects unauthorized service calls</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-tachometer-alt"></i> Rate Limiter Middleware (optional)</div>
+                    <ul>
+                        <li>Enforces per-client call thresholds</li>
+                    </ul>
+                </div>
+                
+                <div class="step-icon">
+                    <i class="fas fa-filter"></i>
+                </div>
+            </div>
+          
+            <!-- Step 6: Authentication -->
+            <div class="flow-step auth-step">
+                <div class="step-number">4</div>
+                <div class="step-title">Authentication Middleware</div>
+                <div class="step-subtitle">JWT / OAuth Authentication</div>
+                <div class="step-content">
+                    <ul>
+                        <li>Extracts Authorization: Bearer <code>&lt;token&gt;</code></li>
+                        <li>Verifies signature using secret/public key</li>
+                        <li>Checks token expiration, audience, issuer</li>
+                        <li>Rejects if invalid or expired</li>
+                    </ul>
+                </div>
+                <div class="step-icon">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+            </div>
+            
+            <!-- Step 7: Authorization -->
+            <div class="flow-step auth-step">
+                <div class="step-number">5</div>
+                <div class="step-title">Authorization Middleware</div>
+                <div class="step-subtitle">Role/Policy Validation</div>
+                <div class="step-content">
+                    <ul>
+                        <li>Validates <code>[Authorize]</code> and <code>[Policy]</code> attributes</li>
+                        <li>Evaluates roles, claims, scopes</li>
+                        <li>Denies access if not authorized</li>
+                    </ul>
+                </div>
+                <div class="step-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+            </div>
+            
+            <!-- Step 8-10: Controller Execution -->
+            <div class="flow-step controller-step">
+                <div class="step-number">6</div>
+                <div class="step-title">Controller Execution</div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-lock"></i> Payload Decryption (if used)</div>
+                    <ul>
+                        <li>Decrypt AES/RSA body</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-check-double"></i> Input Validation</div>
+                    <ul>
+                        <li>Validate model state, sanitize inputs</li>
+                        <li>Prevent injection / XSS</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-cogs"></i> Business Logic Executes</div>
+                    <ul>
+                        <li>Reads/writes data securely</li>
+                        <li>Encrypts sensitive data at rest</li>
+                    </ul>
+                </div>
+                
+                <div class="step-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+            </div>
+            
+            <!-- Step 11-14: Response Pipeline -->
+            <div class="flow-step response-step">
+                <div class="step-number">7</div>
+                <div class="step-title">Response Pipeline</div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-lock"></i> Output Encryption (if required)</div>
+                    <ul>
+                        <li>Encrypt response body</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-shield-alt"></i> Add Security Headers</div>
+                    <ul>
+                        <li>Strict-Transport-Security</li>
+                        <li>X-Content-Type-Options</li>
+                        <li>X-Frame-Options</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-clipboard-list"></i> Logging & Auditing</div>
+                    <ul>
+                        <li>Log auth attempts, token issues, anomalies</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-reply"></i> Return HTTPS Encrypted Response</div>
+                </div>
+                
+                <div class="step-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+            </div>
+            
+            <!-- Step 15-16: Client Receives -->
+            <div class="flow-step client-step">
+                <div class="step-number">8</div>
+                <div class="step-title">CLIENT RECEIVES</div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-unlock"></i> Client Decrypts Response (if encrypted)</div>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-title"><i class="fas fa-check-circle"></i> Handles/Displays Secure Result</div>
+                </div>
+                
+                <div class="step-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <h4>Flow Phase Legend</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="legend-item">
+                        <span class="color-indicator" style="background-color: var(--accent-green);"></span>
+                        <span><strong>Client-Side Steps</strong> - Request generation and response handling</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="color-indicator" style="background-color: var(--accent-orange);"></span>
+                        <span><strong>Gateway/Firewall</strong> - Network-level security and filtering</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="color-indicator" style="background-color: var(--secondary-blue);"></span>
+                        <span><strong>Middleware Pipeline</strong> - Request processing and validation</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="legend-item">
+                        <span class="color-indicator" style="background-color: var(--accent-purple);"></span>
+                        <span><strong>Authentication & Authorization</strong> - Identity and access control</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="color-indicator" style="background-color: var(--accent-teal);"></span>
+                        <span><strong>Controller Execution</strong> - Business logic and data processing</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="color-indicator" style="background-color: var(--accent-red);"></span>
+                        <span><strong>Response Pipeline</strong> - Secure response generation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>ASP.NET Core Security Flow Diagram | Designed for optimal PDF conversion</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Simple script to ensure proper PDF rendering
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add print-specific class when printing
+            window.addEventListener('beforeprint', function() {
+                document.body.classList.add('printing');
+            });
+            
+            window.addEventListener('afterprint', function() {
+                document.body.classList.remove('printing');
+            });
+        });
+    </script>
+</body>
+</html>

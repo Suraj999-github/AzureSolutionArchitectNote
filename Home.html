@@ -135,14 +135,20 @@
     <div class="container-fluid px-4">
       <ul class="nav nav-tabs" id="azureTabs" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="az900-tab" data-bs-toggle="tab" data-bs-target="#az900" type="button" role="tab"><i class="fas fa-certificate"></i> AZ-900</button>
+          <button class="nav-link active" id="cheatsheet-tab" data-bs-toggle="tab" 
+                  data-bs-target="#cheatsheet" type="button" role="tab">
+            <i class="fas fa-layer-group"></i> Cheat Sheet
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link " id="az900-tab" data-bs-toggle="tab" data-bs-target="#az900" type="button" role="tab"><i class="fas fa-certificate"></i> AZ-900</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="az104-tab" data-bs-toggle="tab" data-bs-target="#az104" type="button" role="tab"><i class="fas fa-cogs"></i> AZ-104</button>
         </li>
-        <!-- <li class="nav-item" role="presentation">
+         <li class="nav-item" role="presentation">
           <button class="nav-link" id="az305-tab" data-bs-toggle="tab" data-bs-target="#az305" type="button" role="tab"><i class="fas fa-draw-polygon"></i> AZ-305</button>
-        </li> -->
+        </li> 
       </ul>
     </div>
   </div>
@@ -152,7 +158,7 @@
     <div class="tab-content" id="azureTabsContent">
       
       <!-- ========== AZ-900 PANE ========== -->
-      <div class="tab-pane fade show active" id="az900" role="tabpanel">
+      <div class="tab-pane fade" id="az900" role="tabpanel">
         <!-- 4 modules exactly as described -->
         <div class="row g-4 mt-2">
           <!-- Introduction to Cloud Infrastructure + Quiz -->
@@ -380,7 +386,940 @@
             </div>
           </div>
         </div>
+
+        <div class="col-12">
+          <div class="card p-4">
+            <div class="card-body text-center">
+              <h5 class="card-title">
+                <i class="fas fa-file-pdf"></i> 
+              </h5>
+              <p class="card-text">
+                Azure 1
+              </p>
+        
+              <!-- PDF Viewer -->
+              <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                <iframe 
+                  src="Azure/AZ-305/Azure 1.pdf" 
+                  width="100%" 
+                  height="100%" 
+                  style="border:0;" 
+                  allowfullscreen
+                ></iframe>
+              </div>  
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card p-4">
+            <div class="card-body text-center">
+              <h5 class="card-title">
+                <i class="fas fa-file-pdf"></i> 
+              </h5>
+              <p class="card-text">
+                Azure 2
+              </p>
+        
+              <!-- PDF Viewer -->
+              <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                <iframe 
+                  src="Azure/AZ-305/Azure 2.pdf" 
+                  width="100%" 
+                  height="100%" 
+                  style="border:0;" 
+                  allowfullscreen
+                ></iframe>
+              </div>  
+            </div>
+          </div>
+        </div>
       </div>
+      <!-- ========== CHEAT SHEET PANE ========== -->
+<div class="tab-pane fade show active" id="cheatsheet" role="tabpanel">
+
+  <div class="subhead mt-4">
+    <i class="fas fa-image"></i> Architecture & Design References
+  </div>
+  <div class="row g-4 mt-2">
+    <div class="row g-4 mb-4">
+      <!-- API Security Practices -->
+     
+      <div class="col-12">
+        <div class="card p-4">
+          <div class="card-body">
+      
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-shield-alt"></i> API Security Practices
+            </h5>
+            <p class="card-text">Best practices for securing APIs in  solutions.</p>
+            <img src="Images/ApiSecurityPractises.jpg" alt="API Security Practices" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+            <img src="Images/SecurityPractises.gif" alt="API Security Practices" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+      
+          </div>
+        </div>
+      </div> </div>
+      <!-- Architecture Concept -->
+     
+      <div class="col-12">
+        <div class="card p-4">
+          <div class="card-body">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-sitemap"></i> Architecture Concept
+            </h5>
+            <p class="card-text">Core  architecture and solution design concepts.</p>
+            <img src="Images/ArchitectureConcept.gif" alt="Architecture Concept" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+          </div>
+        </div>
+      </div>
+    </div>
+      <!-- System Design Cheat Sheet -->
+     
+      <div class="col-12">
+        <div class="card p-4">
+          <div class="card-body">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-layer-group"></i> System Design Cheat Sheet
+            </h5>
+            <p class="card-text">Quick reference for system design patterns and principles.</p>
+            <img src="Images/SystemDesignCheatSheet.jpg" alt="System Design Cheat Sheet" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+            
+            <img src="Images/𝐃𝐞𝐬𝐢𝐠𝐧P𝐫𝐢𝐧𝐜𝐢𝐩𝐥𝐞𝐬.jpg" alt="System Design Cheat Sheet" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+        
+          </div>
+        </div>   
+      </div> 
+    </div> 
+        
+<!-- JWT (JSON Web Token) -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-key"></i> JWT (JSON Web Token)
+      </h5>
+
+      <p class="card-text">
+        <strong>What is JWT and how does it work?</strong><br><br>
+
+        JWT (JSON Web Token) is a compact, URL-safe token used to securely transmit 
+        information between a client and a server. It is most commonly used for 
+        authentication in modern web applications.
+      </p>
+
+      <div class="subhead"><i class="fas fa-puzzle-piece"></i> Structure of a JWT</div>
+
+      <p class="card-text">
+        A JWT has three parts separated by dots:<br>
+        <code>xxxxx.yyyyy.zzzzz</code>
+      </p>
+
+      <ul class="card-text">
+        <li><strong>Header:</strong> Contains the signing algorithm (e.g., HS256, RS256) and the token type (JWT).</li>
+        <li><strong>Payload:</strong> Contains the "claims", statements about an entity (typically the user) and additional data.</li>
+        <li><strong>Signature:</strong> Ensures the token hasn’t been tampered with. It’s created by signing the encoded header + payload using a secret (HMAC) or private key (RSA/ECDSA).</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-sync-alt"></i> How JWT Authentication Works</div>
+
+      <ol class="card-text">
+        <li>User logs in with credentials.</li>
+        <li>Server validates credentials and generates a signed JWT.</li>
+        <li>Server sends the JWT back to the client.</li>
+        <li>Client stores the JWT (HttpOnly cookie or secure storage).</li>
+        <li>Client sends JWT on future requests via <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+      </ol>
+
+      <div class="subhead"><i class="fas fa-star"></i> Key Benefits</div>
+
+      <ul class="card-text">
+        <li><strong>Stateless:</strong> No server-side session storage required, making scaling easier.</li>
+        <li><strong>Tamper-resistant:</strong> Signature proves the content wasn’t modified.</li>
+        <li><strong>Lightweight:</strong> Small and efficient for transmission on every request.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-shield-alt"></i> JWT Security Best Practices</div>
+
+      <ul class="card-text">
+        <li>Always use HTTPS</li>
+        <li>Keep access tokens short-lived (5–10 minutes recommended)</li>
+        <li>Use refresh tokens for long sessions</li>
+        <li>Prefer HttpOnly cookies over localStorage (reduces XSS risk)</li>
+        <li>Rotate signing keys and support token revocation</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <img src="Images/JSONWebToken.gif"
+           alt="JWT Diagram"
+           class="img-fluid rounded"
+           style="max-height:1000px; object-fit:contain;">
+
+    </div>
+  </div>
+</div> 
+<!-- Database Scaling & Performance Techniques -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-database"></i> Database Scaling & Performance Cheat Sheet
+      </h5>
+
+      <p class="card-text">
+        <strong>Key Techniques to Improve Database Performance & Scalability</strong><br><br>
+        These strategies help optimize read/write performance, improve availability, 
+        and support horizontal or vertical scaling in modern system design.
+      </p>
+
+      <div class="subhead"><i class="fas fa-gauge-high"></i> Performance Optimization</div>
+
+      <ul class="card-text">
+        <li><strong>Indexing:</strong> Speed up read queries by creating indexes on frequently accessed columns.</li>
+        <li><strong>Query Optimization:</strong> Fine-tune SQL queries, eliminate expensive operations, and leverage indexes effectively.</li>
+        <li><strong>Connection Pooling:</strong> Reduce overhead of opening/closing DB connections by reusing existing ones.</li>
+        <li><strong>Materialized Views:</strong> Pre-compute and store results of complex queries to avoid expensive recalculation.</li>
+        <li><strong>Denormalization:</strong> Store redundant but structured data to minimize joins in read-heavy workloads.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-up-right-and-down-left-from-center"></i> Vertical Scaling</div>
+
+      <ul class="card-text">
+        <li><strong>Vertical Scaling:</strong> Add more CPU, RAM, or storage to a database server to handle higher workloads.</li>
+        <li><strong>Vertical Partitioning:</strong> Split large tables into smaller partitions containing subsets of columns.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-diagram-project"></i> Horizontal Scaling</div>
+
+      <ul class="card-text">
+        <li><strong>Sharding:</strong> Split the database into independent shards distributed across servers.</li>
+        <li><strong>Replication:</strong> Create multiple replicas across servers to balance read traffic and improve availability.</li>
+        <li><strong>Caching:</strong> Use in-memory stores like Redis to serve hot data faster and reduce database load.</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <img src="Images/ScalingDatabases.gif"
+           alt="Database Scaling Diagram"
+           class="img-fluid rounded"
+           style="max-height:1000px; object-fit:contain;">
+
+    </div>
+  </div>
+</div>
+<!-- SOLID Principles -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-cubes"></i> SOLID Principles (Object-Oriented Design)
+      </h5>
+
+      <p class="card-text">
+        <strong>SOLID</strong> is a set of five design principles that help developers build 
+        maintainable, scalable, and flexible software systems. These principles improve 
+        code readability, reduce coupling, and enhance extensibility.
+      </p>
+
+      <div class="subhead"><i class="fas fa-user"></i> S — Single Responsibility Principle (SRP)</div>
+
+      <p class="card-text">
+        Each class should have a single responsibility, and that responsibility should 
+        be entirely encapsulated by the class.
+      </p>
+
+      <ul class="card-text">
+        <li>Makes code modular and easier to understand.</li>
+        <li>Reduces unintended side effects.</li>
+        <li>Improves maintainability and testing.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-lock-open"></i> O — Open/Closed Principle (OCP)</div>
+
+      <p class="card-text">
+        Software entities (classes, modules, functions) should be open for extension 
+        but closed for modification.
+      </p>
+
+      <ul class="card-text">
+        <li>Encourages use of interfaces and abstract classes.</li>
+        <li>New functionality can be added without changing existing code.</li>
+        <li>Reduces risk of breaking stable features.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-exchange-alt"></i> L — Liskov Substitution Principle (LSP)</div>
+
+      <p class="card-text">
+        Subtypes must be substitutable for their base types without altering 
+        the correctness of the program.
+      </p>
+
+      <ul class="card-text">
+        <li>Derived classes should honor base class contracts.</li>
+        <li>Prevents unexpected runtime behavior.</li>
+        <li>Supports reliable polymorphism.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-object-group"></i> I — Interface Segregation Principle (ISP)</div>
+
+      <p class="card-text">
+        Clients should not be forced to depend on interfaces they do not use.
+      </p>
+
+      <ul class="card-text">
+        <li>Create smaller, specific interfaces.</li>
+        <li>Avoid “fat” interfaces.</li>
+        <li>Reduces unnecessary dependencies.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-project-diagram"></i> D — Dependency Inversion Principle (DIP)</div>
+
+      <p class="card-text">
+        High-level modules should not depend on low-level modules; both should depend 
+        on abstractions. Abstractions should not depend on details; details should depend on abstractions.
+      </p>
+
+      <ul class="card-text">
+        <li>Promotes loose coupling.</li>
+        <li>Improves flexibility and maintainability.</li>
+        <li>Commonly implemented using Dependency Injection (DI).</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <p class="card-text text-muted">
+        💡 <strong>Why SOLID matters:</strong> These principles form the foundation of clean 
+        architecture, domain-driven design, and scalable enterprise systems.
+      </p>
+      <hr class="my-4">
+
+      <img src="Images/Solid.gif"
+           alt="𝐒𝐎𝐋𝐈𝐃  Principle"
+           class="img-fluid rounded"
+           style="max-height:1000px; object-fit:contain;">
+
+    </div>
+  </div>
+</div>
+<!-- Database Lock Types -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-lock"></i> Database Lock Types & Differences
+      </h5>
+
+      <p class="card-text">
+        <strong>What are the differences among database locks?</strong><br><br>
+        In database management systems (DBMS), locks are mechanisms that control 
+        concurrent access to data. They ensure data integrity, consistency, 
+        and isolation between transactions.
+      </p>
+
+      <div class="subhead"><i class="fas fa-key"></i> Core Lock Types</div>
+
+      <ul class="card-text">
+        <li>
+          <strong>Shared Lock (S Lock):</strong> 
+          Allows multiple transactions to read a resource simultaneously, 
+          but prevents modification. Other transactions can also acquire shared locks.
+        </li>
+        <li>
+          <strong>Exclusive Lock (X Lock):</strong> 
+          Allows a transaction to read and modify a resource. 
+          No other transaction can acquire any lock on that resource while held.
+        </li>
+        <li>
+          <strong>Update Lock (U Lock):</strong> 
+          Used when a transaction intends to update a resource. 
+          Helps prevent deadlocks during read-to-write transitions.
+        </li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-sitemap"></i> Structural & Special Locks</div>
+
+      <ul class="card-text">
+        <li>
+          <strong>Schema Lock:</strong> 
+          Protects the structure of database objects (tables, indexes) 
+          during schema changes.
+        </li>
+        <li>
+          <strong>Bulk Update Lock (BU Lock):</strong> 
+          Used during bulk insert operations to improve performance 
+          by reducing locking overhead.
+        </li>
+        <li>
+          <strong>Key-Range Lock:</strong> 
+          Used with indexed data to prevent phantom reads by locking 
+          a range of keys.
+        </li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-layer-group"></i> Lock Granularity Levels</div>
+
+      <ul class="card-text">
+        <li>
+          <strong>Row-Level Lock:</strong> 
+          Locks a specific row, allowing high concurrency.
+        </li>
+        <li>
+          <strong>Page-Level Lock:</strong> 
+          Locks a fixed-size data page (multiple rows).
+        </li>
+        <li>
+          <strong>Table-Level Lock:</strong> 
+          Locks the entire table. Simple but reduces concurrency.
+        </li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-balance-scale"></i> Key Differences at a Glance</div>
+
+      <ul class="card-text">
+        <li><strong>S vs X Lock:</strong> Shared allows reads; Exclusive allows writes and blocks others.</li>
+        <li><strong>U Lock:</strong> Prevents deadlocks during updates.</li>
+        <li><strong>Granularity:</strong> Row → Page → Table (increasing scope, decreasing concurrency).</li>
+        <li><strong>Key-Range Lock:</strong> Prevents phantom reads in higher isolation levels.</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <p class="card-text text-muted">
+        💡 Proper lock management balances <strong>data consistency</strong> and 
+        <strong>system concurrency</strong>, which is critical in high-performance systems.
+      </p>
+      <hr class="my-4">
+
+      <img src="Images/Databaselocks.gif"
+           alt="lock management balances"
+           class="img-fluid rounded"
+           style="max-height:1000px; object-fit:contain;">
+    </div>
+  </div>
+</div>
+<!-- Cache Eviction Strategies -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-memory"></i> Top 8 Cache Eviction Strategies
+      </h5>
+
+      <p class="card-text">
+        Cache eviction strategies determine which items are removed when the cache 
+        reaches capacity. Choosing the right strategy improves performance, 
+        reduces latency, and optimizes memory usage.
+      </p>
+
+      <div class="subhead">
+        <i class="fas fa-history"></i> Recency-Based Strategies
+      </div>
+
+      <ul class="card-text">
+        <li>
+          <strong>LRU (Least Recently Used):</strong> 
+          Removes the least recently accessed items first. 
+          Assumes recently used items are likely to be used again.
+        </li>
+        <li>
+          <strong>MRU (Most Recently Used):</strong> 
+          Removes the most recently accessed items first. 
+          Useful when recently accessed items are unlikely to be reused soon.
+        </li>
+        <li>
+          <strong>SLRU (Segmented LRU):</strong> 
+          Divides cache into probationary and protected segments. 
+          Frequently accessed items get promoted to the protected segment.
+        </li>
+      </ul>
+
+      <div class="subhead">
+        <i class="fas fa-chart-line"></i> Frequency-Based Strategies
+      </div>
+
+      <ul class="card-text">
+        <li>
+          <strong>LFU (Least Frequently Used):</strong> 
+          Evicts items with the lowest access frequency.
+        </li>
+      </ul>
+
+      <div class="subhead">
+        <i class="fas fa-stream"></i> Order-Based Strategies
+      </div>
+
+      <ul class="card-text">
+        <li>
+          <strong>FIFO (First In, First Out):</strong> 
+          Evicts the oldest items first, regardless of access frequency or recency.
+        </li>
+      </ul>
+
+      <div class="subhead">
+        <i class="fas fa-clock"></i> Time-Based Strategy
+      </div>
+
+      <ul class="card-text">
+        <li>
+          <strong>TTL (Time-to-Live):</strong> 
+          Each cache item has a predefined lifespan. 
+          Items expire automatically after the set duration.
+        </li>
+      </ul>
+
+      <div class="subhead">
+        <i class="fas fa-layer-group"></i> Architectural Strategies
+      </div>
+
+      <ul class="card-text">
+        <li>
+          <strong>Two-Tiered Caching:</strong> 
+          Uses an in-memory cache (fast access) as Layer 1 and a distributed 
+          cache as Layer 2 for scalability.
+        </li>
+        <li>
+          <strong>RR (Random Replacement):</strong> 
+          Randomly evicts an item. Simple and low-overhead, 
+          but not optimized for access patterns.
+        </li>
+      </ul>
+
+      <div class="subhead">
+        <i class="fas fa-balance-scale"></i> Quick Comparison
+      </div>
+
+      <ul class="card-text">
+        <li><strong>LRU:</strong> Best general-purpose strategy.</li>
+        <li><strong>LFU:</strong> Best for stable access patterns.</li>
+        <li><strong>FIFO:</strong> Simple but less intelligent.</li>
+        <li><strong>TTL:</strong> Great for expiring stale data.</li>
+        <li><strong>Two-Tier:</strong> Best for large-scale distributed systems.</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <p class="card-text text-muted">
+        💡 In system design interviews and real-world architecture, 
+        LRU and LFU are most commonly discussed, especially in 
+        distributed caching systems like Redis or Memcached.
+      </p>
+      <hr class="my-4">
+
+      <img src="Images/CacheEvictionStrategies.gif"
+           alt="Cache Eviction Strategies"
+           class="img-fluid rounded"
+           style="max-height:1000px; object-fit:contain;">
+
+    </div>
+  </div>
+</div>
+
+<!-- API Architecture Styles -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-network-wired"></i> 6 API Architecture Styles Every Developer Must Know
+      </h5>
+
+      <p class="card-text">
+        API architecture defines how clients and services communicate. 
+        Choosing the right style impacts scalability, performance, flexibility, and maintainability.
+      </p>
+
+      <div class="subhead"><i class="fas fa-globe"></i> 1. REST (Representational State Transfer)</div>
+
+      <ul class="card-text">
+        <li>Stateless architecture using standard HTTP methods.</li>
+        <li>Resource-based URLs (GET, POST, PUT, DELETE).</li>
+        <li>Simple, scalable, and widely adopted.</li>
+        <li><strong>Use Cases:</strong> Social media platforms, e-commerce websites, public web APIs.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-project-diagram"></i> 2. GraphQL</div>
+
+      <ul class="card-text">
+        <li>Query language allowing clients to request exactly the data they need.</li>
+        <li>Reduces over-fetching and under-fetching.</li>
+        <li>Aggregates data from multiple services.</li>
+        <li><strong>Use Cases:</strong> Complex front-end applications, CMS, large e-commerce systems.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-exchange-alt"></i> 3. WebSocket</div>
+
+      <ul class="card-text">
+        <li>Full-duplex communication over a single TCP connection.</li>
+        <li>Persistent connection between client and server.</li>
+        <li>Enables real-time, two-way interaction.</li>
+        <li><strong>Use Cases:</strong> Chat systems, live sports updates, trading platforms, collaboration tools.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-bolt"></i> 4. gRPC (Remote Procedure Calls)</div>
+
+      <ul class="card-text">
+        <li>High-performance RPC framework developed by Google.</li>
+        <li>Uses HTTP/2 for transport.</li>
+        <li>Efficient serialization using Protocol Buffers.</li>
+        <li>Supports streaming (bi-directional).</li>
+        <li><strong>Use Cases:</strong> Microservices, cloud-native systems, mobile backends.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-satellite-dish"></i> 5. MQTT (Message Queuing Telemetry Transport)</div>
+
+      <ul class="card-text">
+        <li>Lightweight publish/subscribe messaging protocol.</li>
+        <li>Designed for low-bandwidth, unreliable networks.</li>
+        <li>Efficient for constrained devices.</li>
+        <li><strong>Use Cases:</strong> IoT systems, remote sensing, telemetry applications.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-cloud"></i> 6. Serverless Architecture</div>
+
+      <ul class="card-text">
+        <li>Cloud provider dynamically manages infrastructure.</li>
+        <li>Auto-scaling and pay-per-use pricing model.</li>
+        <li>No server management required.</li>
+        <li><strong>Use Cases:</strong> Event-driven systems, microservices, background processing jobs.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-balance-scale"></i> Quick Comparison</div>
+
+      <ul class="card-text">
+        <li><strong>REST:</strong> Simple, scalable, industry standard.</li>
+        <li><strong>GraphQL:</strong> Flexible data querying.</li>
+        <li><strong>WebSocket:</strong> Real-time communication.</li>
+        <li><strong>gRPC:</strong> High-performance microservices.</li>
+        <li><strong>MQTT:</strong> IoT and constrained networks.</li>
+        <li><strong>Serverless:</strong> Infrastructure-free scaling.</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <p class="card-text text-muted">
+        💡 In modern cloud architecture (especially AZ-305 scenarios), 
+        REST and gRPC dominate backend services, while WebSocket and MQTT 
+        power real-time and IoT systems.
+      </p>
+      <hr class="my-4">
+
+      <img src="Images/APIArchitecture.gif"
+           alt="API Architecture"
+           class="img-fluid rounded"
+           style="max-height:1000px; object-fit:contain;">
+    </div>
+  </div>
+</div>
+<!-- ACID Properties -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-flask"></i> ACID Properties in Database Transactions
+      </h5>
+
+      <p class="card-text">
+        <strong>What does ACID mean?</strong><br><br>
+        ACID defines four essential properties that guarantee reliable 
+        and consistent database transactions, especially in systems 
+        with concurrent operations and potential failures.
+      </p>
+
+      <div class="subhead"><i class="fas fa-atom"></i> 🔹 Atomicity</div>
+
+      <p class="card-text">
+        All operations in a transaction are executed completely or not at all.
+      </p>
+
+      <ul class="card-text">
+        <li>If any part of the transaction fails, the entire transaction is rolled back.</li>
+        <li>No partial writes are allowed.</li>
+        <li>Often described as <strong>“all or nothing”</strong>.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-check-circle"></i> 🔹 Consistency</div>
+
+      <p class="card-text">
+        Ensures that the database moves from one valid state to another valid state.
+      </p>
+
+      <ul class="card-text">
+        <li>All constraints, rules, and invariants must be preserved.</li>
+        <li>Data written must satisfy schema rules, constraints, and triggers.</li>
+        <li>
+          ⚠ Not the same as consistency in the CAP theorem 
+          (which refers to read consistency across distributed nodes).
+        </li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-user-shield"></i> 🔹 Isolation</div>
+
+      <p class="card-text">
+        Concurrent transactions are isolated from each other.
+      </p>
+
+      <ul class="card-text">
+        <li>Prevents transactions from seeing intermediate states.</li>
+        <li>The strictest level is <strong>Serializability</strong>.</li>
+        <li>In practice, databases use lower isolation levels for performance.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-database"></i> 🔹 Durability</div>
+
+      <p class="card-text">
+        Once a transaction is committed, the data is permanently stored.
+      </p>
+
+      <ul class="card-text">
+        <li>Survives crashes, power loss, or system failures.</li>
+        <li>Typically ensured via write-ahead logging (WAL).</li>
+        <li>In distributed systems, data is replicated across nodes.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-balance-scale"></i> Quick Summary</div>
+
+      <ul class="card-text">
+        <li><strong>Atomicity:</strong> All or nothing.</li>
+        <li><strong>Consistency:</strong> Valid state → Valid state.</li>
+        <li><strong>Isolation:</strong> Transactions don’t interfere.</li>
+        <li><strong>Durability:</strong> Committed data is permanent.</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <p class="card-text text-muted">
+        💡 ACID guarantees strong reliability in relational databases and is 
+        critical in financial systems, inventory systems, and enterprise applications.
+      </p>
+      <hr class="my-4">
+
+      <img src="Images/ACID.gif"
+           alt="ACID"
+           class="img-fluid rounded"
+           style="max-height:1000px; object-fit:contain;">
+    </div>
+  </div>
+</div>
+<!-- Authentication & Authorization Models -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-user-lock"></i> Session, Cookie, JWT, Token, SSO & OAuth 2.0 Explained
+      </h5>
+
+      <p class="card-text">
+        When a user logs in, the system must manage identity securely and efficiently.
+        Different authentication models handle this in different ways depending on
+        scalability, security, and cross-platform requirements.
+      </p>
+
+      <div class="subhead"><i class="fas fa-server"></i> 🔹 Session-Based Authentication</div>
+
+      <ul class="card-text">
+        <li>Server stores user identity (session data).</li>
+        <li>Browser receives a <strong>session ID cookie</strong>.</li>
+        <li>Server checks session store on every request.</li>
+        <li>Works well for traditional web apps.</li>
+        <li>⚠ Not ideal for distributed systems or multi-device scenarios.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-key"></i> 🔹 Token-Based Authentication</div>
+
+      <ul class="card-text">
+        <li>User identity is encoded into a token.</li>
+        <li>Browser sends token on each request.</li>
+        <li>No server-side session storage required (stateless).</li>
+        <li>Requires proper encryption and validation.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-id-badge"></i> 🔹 JWT (JSON Web Token)</div>
+
+      <ul class="card-text">
+        <li>A standardized token format with header, payload, and signature.</li>
+        <li>Digitally signed to ensure integrity.</li>
+        <li>Stateless — no session storage required.</li>
+        <li>Common in modern APIs and microservices.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-sign-in-alt"></i> 🔹 SSO (Single Sign-On)</div>
+
+      <ul class="card-text">
+        <li>Uses a centralized authentication provider.</li>
+        <li>One login works across multiple applications.</li>
+        <li>Improves user experience and enterprise security.</li>
+        <li>Common in corporate and cloud ecosystems.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-shield-alt"></i> 🔹 OAuth 2.0</div>
+
+      <ul class="card-text">
+        <li>Authorization framework (not authentication).</li>
+        <li>Allows third-party apps to access user data securely.</li>
+        <li>Users don’t share passwords with third-party apps.</li>
+        <li>Uses access tokens and scopes for limited permissions.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-qrcode"></i> 🔹 QR Code Login</div>
+
+      <ul class="card-text">
+        <li>Encodes a random authentication token inside a QR code.</li>
+        <li>User scans the code with a trusted device.</li>
+        <li>Logs in without typing credentials.</li>
+        <li>Common in mobile-to-web login flows.</li>
+      </ul>
+
+      <div class="subhead"><i class="fas fa-balance-scale"></i> Quick Comparison</div>
+
+      <ul class="card-text">
+        <li><strong>Session:</strong> Server-side stateful.</li>
+        <li><strong>Token/JWT:</strong> Stateless, scalable APIs.</li>
+        <li><strong>SSO:</strong> Centralized login across systems.</li>
+        <li><strong>OAuth 2.0:</strong> Secure delegated access.</li>
+        <li><strong>QR Login:</strong> Passwordless convenience.</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <p class="card-text text-muted">
+        💡 Modern cloud architectures (microservices, SPAs, mobile apps)
+        typically prefer JWT + OAuth 2.0 for scalability and security.
+      </p>
+      <hr class="my-4">
+
+      <img src="Images/IdentityManager.gif"
+           alt="Identity Manager"
+           class="img-fluid rounded"
+           style="max-height:1000px; object-fit:contain;">
+    </div>
+  </div>
+</div>
+<!-- HTTP Methods / Verbs Cheat Sheet -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body">
+
+      <h5 class="card-title">
+        <i class="fas fa-network-wired"></i> Common HTTP Methods / Verbs
+      </h5>
+
+      <p class="card-text">
+        HTTP methods define the action to be performed on a resource. Understanding them is essential for API design and web development.
+      </p>
+
+      <ul class="card-text">
+        <li><strong>GET:</strong> Retrieves a resource. Idempotent. Multiple identical requests return the same result.</li>
+        <li><strong>PUT:</strong> Updates or creates a resource. Idempotent. Multiple identical requests update the same resource.</li>
+        <li><strong>POST:</strong> Creates a new resource. Not idempotent. Identical requests may create duplicates.</li>
+        <li><strong>DELETE:</strong> Deletes a resource. Idempotent. Multiple identical requests delete the same resource.</li>
+        <li><strong>PATCH:</strong> Applies partial modifications to a resource. Useful for incremental updates.</li>
+        <li><strong>HEAD:</strong> Requests headers identical to GET but without the response body.</li>
+        <li><strong>CONNECT:</strong> Establishes a tunnel to the target server, often used for HTTPS proxies.</li>
+        <li><strong>OPTIONS:</strong> Returns supported communication options for a resource.</li>
+        <li><strong>TRACE:</strong> Performs a message loop-back test along the path to the target resource.</li>
+      </ul>
+
+      <hr class="my-4">
+
+      <p class="card-text text-muted">
+       
+      </p>
+
+      <img src="Images/HTTPMethods.gif" alt="HTTP Methods Cheat Sheet" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+      <img src="Images/HTTPStatusCodes.jpg" alt="HTTP Methods Cheat Sheet" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+   
+      
+    </div>
+  </div>
+</div>
+
+<!-- PDF Viewer Card -->
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body text-center">
+      <h5 class="card-title">
+        <i class="fas fa-file-pdf"></i> 
+      </h5>
+      <p class="card-text">
+        API Quick Reference
+      </p>
+
+      <!-- PDF Viewer -->
+      <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <iframe 
+          src="Pdfs/APIQuickReference.pdf" 
+          width="100%" 
+          height="100%" 
+          style="border:0;" 
+          allowfullscreen
+        ></iframe>
+      </div>  
+    </div>
+  </div>
+</div>
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body text-center">
+      <h5 class="card-title">
+        <i class="fas fa-file-pdf"></i> 
+      </h5>
+      <p class="card-text">
+        Async And Parallel Patterns In Dot NET
+      </p>
+
+      <!-- PDF Viewer -->
+      <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <iframe 
+          src="Pdfs/AsyncAndParallelPatternsInDotNET.pdf" 
+          width="100%" 
+          height="100%" 
+          style="border:0;" 
+          allowfullscreen
+        ></iframe>
+      </div>  
+    </div>
+  </div>
+</div>
+
+<div class="col-12">
+  <div class="card p-4">
+    <div class="card-body text-center">
+      <h5 class="card-title">
+        <i class="fas fa-file-pdf"></i> 
+      </h5>
+      <p class="card-text">
+        ASP Dot NET Core Flow
+      </p>
+
+      <!-- PDF Viewer -->
+      <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <iframe 
+          src="Pdfs/ASPDotNETCoreFlow.pdf" 
+          width="100%" 
+          height="100%" 
+          style="border:0;" 
+          allowfullscreen
+        ></iframe>
+      </div>  
+    </div>
+  </div>
+</div>
+ <!----------------->
+
+
+    </div>
+  </div>
+  </div>
+</div>
     </div>
 
     <!-- simple footer with file structure reminder (clean) -->
