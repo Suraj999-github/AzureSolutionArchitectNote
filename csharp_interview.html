@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Technical Interview — C# & .NET</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="./interview-questions.js"></script>
+<script src="./interview-engine.js"></script>
+<style>
+:root {
+  --bg:#0a0c10; --surface:#111318; --surface2:#181c24;
+  --border:#1e2430; --border2:#252d3d;
+  --accent:#4af2a1; --accent2:#2dd4bf; --accent3:#f59e0b;
+  --text:#e8edf5; --text2:#8b95a8; --text3:#4d5668;
+  --red:#f87171; --purple:#a78bfa; --blue:#60a5fa; --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(74,242,161,.03)1px,transparent 1px),linear-gradient(90deg,rgba(74,242,161,.03)1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+#app{position:relative;z-index:1}
+
+/* LANDING */
+#landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
+.logo-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(74,242,161,.08);border:1px solid rgba(74,242,161,.2);border-radius:100px;padding:6px 16px;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px;animation:fadeDown .6s ease both}
+.logo-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+.local-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:100px;padding:5px 14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);margin-bottom:28px;letter-spacing:1px;animation:fadeDown .6s .08s ease both}
+h1.hero-title{font-family:'Syne',sans-serif;font-size:clamp(36px,7vw,72px);font-weight:800;line-height:1.05;letter-spacing:-1px;margin-bottom:20px;animation:fadeDown .6s .12s ease both}
+h1.hero-title span.grad{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,var(--purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:16px;color:var(--text2);max-width:520px;line-height:1.7;margin-bottom:40px;font-weight:300;animation:fadeDown .6s .18s ease both}
+.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:680px;width:100%;margin-bottom:40px;animation:fadeDown .6s .24s ease both}
+.meta-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:center}
+.meta-card .val{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;color:var(--accent);display:block;margin-bottom:4px}
+.meta-card .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'DM Mono',monospace}
+.form-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px;max-width:480px;width:100%;animation:fadeUp .6s .3s ease both}
+.form-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:24px}
+.field-group{margin-bottom:18px}
+.field-group label{display:block;font-size:12px;color:var(--text2);margin-bottom:8px;font-family:'DM Mono',monospace;letter-spacing:.5px}
+.field-group input,.field-group select{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s}
+.field-group input:focus,.field-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,242,161,.1)}
+.field-group select option{background:#1a1e28}
+.btn-start{width:100%;background:var(--accent);color:#0a0c10;border:none;border-radius:8px;padding:14px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-start:hover{background:#5fffa8;box-shadow:0 0 28px rgba(74,242,161,.4);transform:translateY(-1px)}
+
+/* INTERVIEW */
+#interview{display:none;min-height:100vh;flex-direction:column}
+.top-bar{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:14px}
+.candidate-tag{font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);background:rgba(74,242,161,.08);border:1px solid rgba(74,242,161,.2);border-radius:6px;padding:4px 10px}
+.offline-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:6px;padding:3px 8px}
+.phase-label{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace}
+.timer-wrap{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:14px}
+.timer-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+.timer-wrap.warn .timer-dot{background:var(--accent3)}
+.timer-wrap.warn #timer-display{color:var(--accent3)}
+.progress-track{height:2px;background:var(--border);width:100%}
+.progress-fill{height:100%;transition:width 1s linear;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.phase-steps{display:flex;align-items:center;padding:14px 24px;border-bottom:1px solid var(--border);overflow-x:auto;gap:0}
+.phase-step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;white-space:nowrap;padding:6px 12px;border-radius:6px;transition:all .3s}
+.phase-step.active{color:var(--accent);background:rgba(74,242,161,.08)}
+.phase-step.done{color:var(--text2)}
+.phase-sep{color:var(--text3);font-size:14px;margin:0 4px}
+.phase-num{width:20px;height:20px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.phase-step.done .phase-num{background:var(--text2);color:var(--bg);border-color:var(--text2)}
+.phase-step.active .phase-num{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+
+/* Chat */
+.chat-area{flex:1;overflow-y:auto;padding:32px 24px;max-width:820px;margin:0 auto;width:100%}
+.msg{margin-bottom:20px;animation:fadeUp .4s ease both}
+.msg-ai{display:flex;gap:14px}
+.msg-user{display:flex;gap:14px;flex-direction:row-reverse}
+.avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:'Syne',sans-serif}
+.avatar-ai{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c10}
+.avatar-user{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);font-size:11px}
+.bubble{max-width:80%;border-radius:12px;padding:14px 18px;line-height:1.7;font-size:14.5px}
+.bubble-ai{background:var(--surface);border:1px solid var(--border);color:var(--text);border-top-left-radius:2px}
+.bubble-user{background:rgba(74,242,161,.1);border:1px solid rgba(74,242,161,.2);color:var(--text);border-top-right-radius:2px}
+.bubble code{font-family:'DM Mono',monospace;font-size:12.5px;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:4px;color:var(--accent2)}
+.bubble pre{background:#0d1017;border:1px solid var(--border2);border-radius:8px;padding:16px;margin-top:10px;overflow-x:auto;font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;color:var(--text2)}
+.bubble strong{color:var(--accent);font-weight:600}
+.typing-indicator{display:flex;gap:14px;align-items:flex-start;margin-bottom:20px}
+.typing-dots{background:var(--surface);border:1px solid var(--border);border-radius:12px;border-top-left-radius:2px;padding:16px 20px;display:flex;gap:5px;align-items:center}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:typingBounce 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:.15s}
+.typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px);background:var(--accent)}}
+
+/* Input */
+.input-area{border-top:1px solid var(--border);padding:16px 24px 20px;max-width:820px;margin:0 auto;width:100%}
+.sugg-toggle-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.toggle-sugg-btn{background:transparent;border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--text3);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+.toggle-sugg-btn:hover{border-color:var(--accent);color:var(--accent)}
+.toggle-sugg-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(74,242,161,.06)}
+.sugg-hint{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)}
+.suggestions-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:0;transition:max-height .35s ease;margin-bottom:10px}
+.suggestions-panel.open{max-height:360px}
+.sugg-inner{padding:14px 16px}
+.sugg-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.sugg-phase-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.sugg-tab{font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.sugg-tab:hover{border-color:var(--accent);color:var(--accent)}
+.sugg-tab.active{background:rgba(74,242,161,.1);border-color:var(--accent);color:var(--accent)}
+.sugg-chips{display:flex;flex-wrap:wrap;gap:8px;max-height:190px;overflow-y:auto}
+.chip{background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:7px 13px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;text-align:left;line-height:1.4}
+.chip:hover{border-color:var(--accent);color:var(--text);background:rgba(74,242,161,.05);transform:translateY(-1px)}
+.chip-diff{font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;flex-shrink:0}
+.chip-diff.junior{background:rgba(74,242,161,.12);color:var(--accent)}
+.chip-diff.mid{background:rgba(96,165,250,.12);color:var(--blue)}
+.chip-diff.senior{background:rgba(167,139,250,.12);color:var(--purple)}
+.input-wrap{display:flex;gap:12px;align-items:flex-end;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 16px;transition:border-color .2s,box-shadow .2s}
+.input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,242,161,.08)}
+#user-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;resize:none;line-height:1.6;max-height:160px;min-height:24px}
+#user-input::placeholder{color:var(--text3)}
+.send-btn{background:var(--accent);border:none;border-radius:8px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;color:#0a0c10}
+.send-btn:hover{background:#5fffa8;transform:scale(1.05)}
+.send-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.input-hint{font-size:11px;color:var(--text3);margin-top:8px;font-family:'DM Mono',monospace;text-align:center}
+
+/* Modal */
+.q-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeUp .2s ease}
+.q-modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;max-width:640px;width:100%;max-height:82vh;overflow-y:auto;padding:28px}
+.q-modal-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.q-modal h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px;line-height:1.4}
+.q-modal-question{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:13.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap;margin-bottom:20px}
+.q-modal-sample-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.q-modal-sample{background:#0d1017;border:1px solid var(--border2);border-radius:8px;padding:16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.7;white-space:pre-wrap;margin-bottom:20px}
+.q-modal-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn-use-ans{background:var(--accent);color:#0a0c10;border:none;border-radius:8px;padding:10px 20px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-use-ans:hover{background:#5fffa8}
+.btn-close-modal{background:transparent;color:var(--text3);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;margin-left:auto;transition:all .2s}
+.btn-close-modal:hover{color:var(--text);border-color:var(--text3)}
+
+/* Report */
+#report{display:none;max-width:820px;margin:0 auto;padding:48px 24px 80px}
+.report-header{text-align:center;margin-bottom:48px;animation:fadeUp .5s ease both}
+.report-header .badge{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);background:rgba(74,242,161,.08);border:1px solid rgba(74,242,161,.2);border-radius:100px;padding:5px 14px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px}
+.report-header h2{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:8px}
+.report-header .sub{color:var(--text2);font-size:14px}
+.score-circle-wrap{display:flex;justify-content:center;margin:40px 0;animation:fadeUp .5s .1s ease both}
+.score-circle{width:160px;height:160px;border-radius:50%;border:3px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface)}
+.score-circle .val{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;line-height:1}
+.score-circle .lbl{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:4px}
+.rec-badge{padding:10px 24px;border-radius:100px;font-family:'Syne',sans-serif;font-weight:700;font-size:16px;display:flex;justify-content:center;max-width:260px;margin:0 auto 48px;align-items:center;gap:8px;animation:fadeUp .5s .2s ease both}
+.rec-strong{background:rgba(74,242,161,.15);border:1px solid var(--accent);color:var(--accent)}
+.rec-hire{background:rgba(96,165,250,.15);border:1px solid var(--blue);color:var(--blue)}
+.rec-no{background:rgba(248,113,113,.15);border:1px solid var(--red);color:var(--red)}
+.sections-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;animation:fadeUp .5s .3s ease both}
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.section-card .sh{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.section-card .sval{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:8px}
+.section-card .sfb{font-size:13px;color:var(--text2);line-height:1.6}
+.score-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:2px}
+.list-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;animation:fadeUp .5s .4s ease both}
+.list-card h4{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px}
+.list-card ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.list-card li{font-size:13.5px;color:var(--text2);line-height:1.6;padding-left:20px;position:relative}
+.list-card li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-size:11px}
+.btn-restart{width:100%;background:transparent;border:1px solid var(--accent);border-radius:8px;padding:14px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--accent);cursor:pointer;transition:all .2s;margin-top:24px;animation:fadeUp .5s .5s ease both}
+.btn-restart:hover{background:var(--accent);color:#0a0c10}
+
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+@media(max-width:600px){.meta-grid{grid-template-columns:repeat(2,1fr)}.sections-grid{grid-template-columns:1fr}.form-block{padding:24px}.hero-title{font-size:36px!important}.bubble{max-width:90%}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- LANDING -->
+<section id="landing">
+  <div class="logo-badge"><span class="logo-dot"></span>AI Interview System</div>
+  <div class="local-badge">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+    100% Local · No API · No Backend · No Network
+  </div>
+  <h1 class="hero-title">C# & .NET<br><span class="grad">Technical Interview</span></h1>
+  <p class="hero-sub">A fully offline structured examination covering .NET fundamentals, OOP & design patterns, coding exercises, and Agile collaboration. Nothing leaves your browser.</p>
+  <div class="meta-grid">
+    <div class="meta-card"><span class="val">43</span><span class="lbl">Minutes</span></div>
+    <div class="meta-card"><span class="val">5</span><span class="lbl">Phases</span></div>
+    <div class="meta-card"><span class="val">28+</span><span class="lbl">Questions</span></div>
+    <div class="meta-card"><span class="val">0–100</span><span class="lbl">Score</span></div>
+  </div>
+  <div class="form-block">
+    <div class="form-title">Candidate Registration</div>
+    <div class="field-group">
+      <label>Full Name</label>
+      <input type="text" id="f-name" placeholder="e.g. Alex Johnson">
+    </div>
+    <div class="field-group">
+      <label>Experience Level</label>
+      <select id="f-level">
+        <option value="">Select level...</option>
+        <option value="junior">Junior (0–2 years)</option>
+        <option value="mid">Mid-Level (2–5 years)</option>
+        <option value="senior">Senior (5+ years)</option>
+        <option value="lead">Lead / Architect</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Primary Focus</label>
+      <select id="f-focus">
+        <option value="general">General .NET Development</option>
+        <option value="api">API & Backend Services</option>
+        <option value="microservices">Microservices Architecture</option>
+        <option value="cloud">Cloud & Azure</option>
+      </select>
+    </div>
+    <button class="btn-start" onclick="startInterview()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Begin Interview
+    </button>
+  </div>
+</section>
+
+<!-- INTERVIEW -->
+<section id="interview">
+  <div class="top-bar">
+    <span class="candidate-tag" id="cand-label">Candidate</span>
+    <span class="offline-tag">⬡ OFFLINE</span>
+    <span class="phase-label" id="phase-label">Phase 1 / 5</span>
+    <div class="timer-wrap" id="timer-wrap">
+      <span class="timer-dot"></span>
+      <span id="timer-display">43:00</span>
+    </div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="phase-steps">
+    <div class="phase-step active" id="ps-0"><div class="phase-num">1</div>Introduction</div>
+    <span class="phase-sep">›</span>
+    <div class="phase-step" id="ps-1"><div class="phase-num">2</div>C# & .NET</div>
+    <span class="phase-sep">›</span>
+    <div class="phase-step" id="ps-2"><div class="phase-num">3</div>OOP & Patterns</div>
+    <span class="phase-sep">›</span>
+    <div class="phase-step" id="ps-3"><div class="phase-num">4</div>Coding Exercise</div>
+    <span class="phase-sep">›</span>
+    <div class="phase-step" id="ps-4"><div class="phase-num">5</div>Agile & Comms</div>
+  </div>
+  <div class="chat-area" id="chat-area"></div>
+  <div class="input-area">
+    <div class="sugg-toggle-bar">
+      <button class="toggle-sugg-btn" id="sugg-btn" onclick="toggleSuggestions()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Question Bank
+      </button>
+      <span class="sugg-hint">Browse all 28+ questions · click chip to prefill a sample answer</span>
+    </div>
+    <div class="suggestions-panel" id="sugg-panel">
+      <div class="sugg-inner">
+        <div class="sugg-label">Filter by Phase</div>
+        <div class="sugg-phase-tabs" id="sugg-tabs"></div>
+        <div class="sugg-chips" id="sugg-chips"></div>
+      </div>
+    </div>
+    <div class="input-wrap">
+      <textarea id="user-input" rows="1" placeholder="Type your answer here..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="input-hint">Enter to send · Shift+Enter for new line</div>
+  </div>
+</section>
+
+<!-- REPORT -->
+<section id="report"></section>
+</div>
+
+<script>
+// ── state ────────────────────────────────────────────────────
+let candidateName='', candidateLevel='', candidateFocus='';
+let timerInterval, secondsLeft=43*60;
+let currentPhase=0, engineBusy=false;
+let suggOpen=false, activeTab='introduction';
+
+const PHASE_TAB_LABELS={introduction:'1 · Intro',csharp:'2 · C# & .NET',oop:'3 · OOP',coding:'4 · Coding',agile:'5 · Agile'};
+const PHASE_ICONS={introduction:'👋',csharp:'⚡',oop:'🏗️',coding:'💻',agile:'🔄'};
+
+// ── start ────────────────────────────────────────────────────
+function startInterview(){
+  candidateName=document.getElementById('f-name').value.trim()||'Candidate';
+  candidateLevel=document.getElementById('f-level').value||'mid';
+  candidateFocus=document.getElementById('f-focus').value||'general';
+  document.getElementById('landing').style.display='none';
+  document.getElementById('interview').style.display='flex';
+  document.getElementById('cand-label').textContent=candidateName;
+  startTimer();
+  buildSuggestionTabs();
+  buildChips();
+
+  window.InterviewEngine.init({
+    candidate:{name:candidateName,level:candidateLevel,focus:candidateFocus},
+    onMessage:handleEngineMessage,
+    onPhaseChange:handlePhaseChange,
+    onComplete:showReport,
+    typingDelay:750,
+  });
+  window.InterviewEngine.start();
+}
+
+// ── engine callbacks ─────────────────────────────────────────
+async function handleEngineMessage(role,text,meta){
+  if(role!=='ai') return;
+  showTyping();
+  await sleep(meta.type==='feedback'?350:780);
+  hideTyping();
+  appendAIMessage(text);
+  engineBusy=false;
+  setSendDisabled(false);
+}
+
+function handlePhaseChange(n){
+  currentPhase=n;
+  document.getElementById('phase-label').textContent=`Phase ${Math.min(n+1,5)} / 5`;
+  for(let i=0;i<5;i++){
+    const el=document.getElementById(`ps-${i}`);
+    if(!el) continue;
+    el.className='phase-step'+(i<n?' done':i===n?' active':'');
+  }
+  const keys=Object.keys(PHASE_TAB_LABELS);
+  const key=keys[n];
+  if(key){activeTab=key;if(suggOpen){buildSuggestionTabs();buildChips();}}
+}
+
+// ── send ─────────────────────────────────────────────────────
+async function sendMessage(){
+  const input=document.getElementById('user-input');
+  const text=input.value.trim();
+  if(!text||engineBusy) return;
+  engineBusy=true;
+  setSendDisabled(true);
+  appendUserMessage(text);
+  input.value='';
+  autoResize(input);
+  await window.InterviewEngine.respond(text);
+}
+
+// ── chat helpers ─────────────────────────────────────────────
+function appendAIMessage(text){
+  const chat=document.getElementById('chat-area');
+  const d=document.createElement('div');
+  d.className='msg msg-ai';
+  d.innerHTML=`<div class="avatar avatar-ai">AI</div><div class="bubble bubble-ai">${fmt(text)}</div>`;
+  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+}
+function appendUserMessage(text){
+  const chat=document.getElementById('chat-area');
+  const initials=candidateName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const d=document.createElement('div');
+  d.className='msg msg-user';
+  d.innerHTML=`<div class="avatar avatar-user">${initials}</div><div class="bubble bubble-user">${esc(text)}</div>`;
+  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+}
+function showTyping(){
+  const chat=document.getElementById('chat-area');
+  const el=document.createElement('div');
+  el.className='typing-indicator'; el.id='typing-ind';
+  el.innerHTML=`<div class="avatar avatar-ai">AI</div><div class="typing-dots"><span></span><span></span><span></span></div>`;
+  chat.appendChild(el); chat.scrollTop=chat.scrollHeight;
+}
+function hideTyping(){ document.getElementById('typing-ind')?.remove(); }
+function setSendDisabled(v){
+  document.getElementById('send-btn').disabled=v;
+  document.getElementById('user-input').disabled=v;
+}
+function fmt(t){
+  t=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
+  t=t.replace(/```(?:\w*\n)?([\s\S]*?)```/g,'<pre>$1</pre>');
+  t=t.replace(/\n/g,'<br>');
+  return t;
+}
+function esc(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ── timer ────────────────────────────────────────────────────
+function startTimer(){
+  timerInterval=setInterval(()=>{
+    secondsLeft--;
+    const m=Math.floor(secondsLeft/60), s=secondsLeft%60;
+    document.getElementById('timer-display').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+    document.getElementById('progress-fill').style.width=((43*60-secondsLeft)/(43*60)*100)+'%';
+    if(secondsLeft<=300) document.getElementById('timer-wrap').classList.add('warn');
+    if(secondsLeft<=0) clearInterval(timerInterval);
+  },1000);
+}
+
+// ── question bank ─────────────────────────────────────────────
+function toggleSuggestions(){
+  suggOpen=!suggOpen;
+  document.getElementById('sugg-panel').classList.toggle('open',suggOpen);
+  document.getElementById('sugg-btn').classList.toggle('active',suggOpen);
+  if(suggOpen){buildSuggestionTabs();buildChips();}
+}
+function buildSuggestionTabs(){
+  const el=document.getElementById('sugg-tabs'); if(!el) return;
+  el.innerHTML='';
+  Object.entries(PHASE_TAB_LABELS).forEach(([key,label])=>{
+    const btn=document.createElement('button');
+    btn.className='sugg-tab'+(key===activeTab?' active':'');
+    btn.textContent=label;
+    btn.onclick=()=>{ activeTab=key; buildSuggestionTabs(); buildChips(); };
+    el.appendChild(btn);
+  });
+}
+function buildChips(){
+  const el=document.getElementById('sugg-chips'); if(!el) return;
+  el.innerHTML='';
+  const qs=(window.INTERVIEW_QUESTIONS||{})[activeTab]||[];
+  if(!qs.length){ el.innerHTML='<span style="color:var(--text3);font-size:12px;font-family:\'DM Mono\',monospace;">No questions found.</span>'; return; }
+  qs.forEach(q=>{
+    const chip=document.createElement('button');
+    chip.className='chip';
+    const diff=q.difficulty?`<span class="chip-diff ${q.difficulty}">${q.difficulty}</span>`:'';
+    chip.innerHTML=`<span>${PHASE_ICONS[activeTab]||'❓'}</span><span style="flex:1">${q.label}</span>${diff}`;
+    chip.onclick=()=>openModal(q);
+    el.appendChild(chip);
+  });
+}
+function openModal(q){
+  document.getElementById('q-modal-bg')?.remove();
+  const phaseLabel=Object.entries(PHASE_TAB_LABELS).find(([k])=>(window.INTERVIEW_QUESTIONS?.[k]||[]).some(bq=>bq.id===q.id))?.[1]||'';
+  const bg=document.createElement('div');
+  bg.className='q-modal-bg'; bg.id='q-modal-bg';
+  bg.onclick=e=>{ if(e.target===bg) bg.remove(); };
+  bg.innerHTML=`
+    <div class="q-modal">
+      <div class="q-modal-tag">${phaseLabel}${q.difficulty?' · '+q.difficulty:''}</div>
+      <h3>${q.label}</h3>
+      <div class="q-modal-question">${esc(q.question)}</div>
+      <div class="q-modal-sample-label">💡 Sample Answer / Code Scaffold</div>
+      <div class="q-modal-sample">${esc(q.sampleAnswer)}</div>
+      <div class="q-modal-actions">
+        <button class="btn-use-ans" onclick="useSample(${JSON.stringify(q.sampleAnswer)})">Use Sample Answer</button>
+        <button class="btn-close-modal" onclick="document.getElementById('q-modal-bg').remove()">Close</button>
+      </div>
+    </div>`;
+  document.body.appendChild(bg);
+}
+function useSample(answer){
+  document.getElementById('q-modal-bg')?.remove();
+  const input=document.getElementById('user-input');
+  input.value=answer; autoResize(input); input.focus();
+}
+
+// ── report ───────────────────────────────────────────────────
+function showReport(data){
+  clearInterval(timerInterval);
+  document.getElementById('interview').style.display='none';
+  const report=document.getElementById('report');
+  report.style.display='block';
+  const score=data.overall_score||0;
+  const sc=score>=75?'var(--accent)':score>=55?'var(--accent3)':'var(--red)';
+  const rec=data.recommendation||'Hire';
+  const rcls=rec==='Strong Hire'?'rec-strong':rec==='Hire'?'rec-hire':'rec-no';
+  const rico=rec==='Strong Hire'?'★':rec==='Hire'?'✓':'✗';
+  const sections=[
+    {label:'C# & .NET',score:data.csharp_score,fb:data.csharp_feedback},
+    {label:'OOP & Patterns',score:data.oop_score,fb:data.oop_feedback},
+    {label:'Coding Exercise',score:data.coding_score,fb:data.coding_feedback},
+    {label:'Agile & Communication',score:data.agile_score,fb:data.agile_feedback},
+  ];
+  const cards=sections.map(s=>{
+    const c=(s.score||0)>=75?'var(--accent)':(s.score||0)>=55?'var(--accent3)':'var(--red)';
+    return `<div class="section-card">
+      <div class="sh">${s.label}</div>
+      <div class="sval" style="color:${c}">${s.score||'—'}<span style="font-size:14px;color:var(--text3)">/100</span></div>
+      <div class="score-bar"><div class="score-bar-fill" style="width:${s.score||0}%;background:${c}"></div></div>
+      <div class="sfb">${s.fb||'—'}</div>
+    </div>`;
+  }).join('');
+  const strengths=(data.strengths||[]).map(s=>`<li>${esc(s)}</li>`).join('');
+  const improvements=(data.improvements||[]).map(s=>`<li>${esc(s)}</li>`).join('');
+  report.innerHTML=`
+    <div class="report-header">
+      <div class="badge">Interview Complete</div>
+      <h2>${esc(candidateName)}</h2>
+      <div class="sub">${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+    </div>
+    <div class="score-circle-wrap">
+      <div class="score-circle" style="border-color:${sc};box-shadow:0 0 40px ${sc}22">
+        <div class="val" style="color:${sc}">${score}</div>
+        <div class="lbl">Overall Score</div>
+      </div>
+    </div>
+    <div class="rec-badge ${rcls}">${rico} ${rec}</div>
+    <div class="sections-grid">${cards}</div>
+    <div class="list-card"><h4>💪 Strengths</h4><ul>${strengths||'<li>—</li>'}</ul></div>
+    <div class="list-card"><h4>📈 Areas for Improvement</h4><ul>${improvements||'<li>—</li>'}</ul></div>
+    <button class="btn-restart" onclick="location.reload()">↩ Start New Interview</button>
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
