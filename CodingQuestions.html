@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>.NET Interview Prep – C# Coding Questions</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #1a1f2e, #0d1520); border-bottom: 1px solid #2d3748; padding: 2rem; text-align: center; }
+  header h1 { font-size: 2rem; font-weight: 700; color: #60a5fa; margin-bottom: 0.5rem; }
+  header p { color: #94a3b8; font-size: 0.95rem; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; padding: 1.5rem 2rem 0; background: #0f1117; border-bottom: 1px solid #1e293b; }
+  .tab { padding: 8px 18px; border-radius: 8px 8px 0 0; border: 1px solid #2d3748; border-bottom: none; background: #1a1f2e; color: #94a3b8; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.15s; }
+  .tab:hover { background: #1e293b; color: #cbd5e1; }
+  .tab.active { background: #1e40af; color: #bfdbfe; border-color: #3b82f6; }
+  .section { display: none; padding: 2rem; max-width: 960px; margin: 0 auto; }
+  .section.active { display: block; }
+  .section-header { font-size: 0.75rem; font-weight: 600; color: #64748b; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.25rem; }
+  .card { border: 1px solid #1e293b; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  .card-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: #151a28; cursor: pointer; user-select: none; transition: background 0.1s; }
+  .card-header:hover { background: #1a2035; }
+  .num { background: #1e3a5f; color: #93c5fd; font-size: 11px; font-weight: 600; border-radius: 5px; padding: 3px 8px; min-width: 30px; text-align: center; }
+  .title { font-size: 0.95rem; font-weight: 500; color: #e2e8f0; flex: 1; }
+  .arrow { color: #475569; font-size: 13px; transition: transform 0.2s; }
+  .card-body { display: none; }
+  .card-body.open { display: block; }
+  .desc { font-size: 0.88rem; color: #94a3b8; padding: 14px 18px 10px; background: #0d1117; border-top: 1px solid #1e293b; line-height: 1.7; }
+  pre { background: #090d16; padding: 16px 18px; overflow-x: auto; border-top: 1px solid #1e293b; }
+  code { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 0.82rem; line-height: 1.7; color: #cdd6f4; }
+  .kw { color: #89b4fa; }
+  .st { color: #a6e3a1; }
+  .cm { color: #585b70; }
+  .tp { color: #f38ba8; }
+  .nm { color: #fab387; }
+  nav {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+nav a {
+    color: #f3f4f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    letter-spacing: 0.3px;
+}
+
+nav a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* Optional: Add an underline animation effect */
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #ffd700;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+nav a:hover::after {
+    width: 70%;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    nav a {
+        text-align: center;
+        padding: 0.75rem;
+    }
+} 
+</style>
+</head>
+<body>
+  <nav>    
+    <a href="Home.html">Home</a>
+    <a href="ManyApiRequest.html">Handling Thousands of Requests</a>
+  </nav>
+<header>
+  <h1>.NET Interview Prep — C# Coding Questions</h1>
+  <p>Click any topic to see the problem description and solution code</p>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="show('strings',this)">Strings</div>
+  <div class="tab" onclick="show('arrays',this)">Arrays</div>
+  <div class="tab" onclick="show('linq',this)">Collections & LINQ</div>
+  <div class="tab" onclick="show('recursion',this)">Recursion</div>
+  <div class="tab" onclick="show('async',this)">Multithreading</div>
+  <div class="tab" onclick="show('ds',this)">Data Structures</div>
+</div>
+
+<!-- STRINGS -->
+<div class="section active" id="strings">
+<div class="section-header">Strings — 10 problems</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">1</span><span class="title">Check if a string is palindrome</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Compare characters from both ends moving inward. A palindrome reads the same forward and backward (e.g. "racecar"). No built-in reverse needed.</div>
+    <pre><code><span class="kw">static bool</span> IsPalindrome(<span class="kw">string</span> s) {
+    <span class="kw">int</span> l = <span class="nm">0</span>, r = s.Length - <span class="nm">1</span>;
+    <span class="kw">while</span> (l &lt; r) {
+        <span class="kw">if</span> (s[l] != s[r]) <span class="kw">return false</span>;
+        l++; r--;
+    }
+    <span class="kw">return true</span>;
+}
+<span class="cm">// IsPalindrome("racecar") → true
+// IsPalindrome("hello")   → false</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">2</span><span class="title">Find first non-repeating character</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Pass 1: count frequency of every character into a Dictionary. Pass 2: return the first character whose count is exactly 1.</div>
+    <pre><code><span class="kw">static char</span> FirstNonRepeating(<span class="kw">string</span> s) {
+    <span class="kw">var</span> freq = <span class="kw">new</span> Dictionary&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt;();
+    <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> s)
+        freq[c] = freq.GetValueOrDefault(c) + <span class="nm">1</span>;
+    <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> s)
+        <span class="kw">if</span> (freq[c] == <span class="nm">1</span>) <span class="kw">return</span> c;
+    <span class="kw">return</span> <span class="st">'\0'</span>;
+}
+<span class="cm">// FirstNonRepeating("aabbcd") → 'c'</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">3</span><span class="title">Count occurrences of each character</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Iterate through the string, incrementing the count for each character in a Dictionary. Return the map for reporting.</div>
+    <pre><code><span class="kw">static</span> Dictionary&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt; CharCount(<span class="kw">string</span> s) {
+    <span class="kw">var</span> map = <span class="kw">new</span> Dictionary&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt;();
+    <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> s)
+        map[c] = map.GetValueOrDefault(c) + <span class="nm">1</span>;
+    <span class="kw">return</span> map;
+}
+<span class="cm">// CharCount("hello") → {h:1, e:1, l:2, o:1}</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">4</span><span class="title">Remove duplicate characters from string</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Use a HashSet to track seen characters. Only append a character to the StringBuilder result if it hasn't been seen before.</div>
+    <pre><code><span class="kw">static string</span> RemoveDuplicates(<span class="kw">string</span> s) {
+    <span class="kw">var</span> seen = <span class="kw">new</span> HashSet&lt;<span class="kw">char</span>&gt;();
+    <span class="kw">var</span> sb = <span class="kw">new</span> System.Text.StringBuilder();
+    <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> s)
+        <span class="kw">if</span> (seen.Add(c)) sb.Append(c);
+    <span class="kw">return</span> sb.ToString();
+}
+<span class="cm">// RemoveDuplicates("programming") → "progamin"</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">5</span><span class="title">Check if two strings are anagrams</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Two strings are anagrams if they have identical character frequencies. Increment counts for string A and decrement for B; any non-zero entry means not an anagram.</div>
+    <pre><code><span class="kw">static bool</span> AreAnagrams(<span class="kw">string</span> a, <span class="kw">string</span> b) {
+    <span class="kw">if</span> (a.Length != b.Length) <span class="kw">return false</span>;
+    <span class="kw">int</span>[] freq = <span class="kw">new int</span>[<span class="nm">256</span>];
+    <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> a) freq[c]++;
+    <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> b) freq[c]--;
+    <span class="kw">foreach</span> (<span class="kw">var</span> f <span class="kw">in</span> freq)
+        <span class="kw">if</span> (f != <span class="nm">0</span>) <span class="kw">return false</span>;
+    <span class="kw">return true</span>;
+}
+<span class="cm">// AreAnagrams("listen", "silent") → true</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">6</span><span class="title">String compression (aaabb → a3b2)</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Walk through the string counting consecutive repeated characters. Append the character and its count to the result. Only return compressed form if it is shorter.</div>
+    <pre><code><span class="kw">static string</span> Compress(<span class="kw">string</span> s) {
+    <span class="kw">var</span> sb = <span class="kw">new</span> System.Text.StringBuilder();
+    <span class="kw">int</span> i = <span class="nm">0</span>;
+    <span class="kw">while</span> (i &lt; s.Length) {
+        <span class="kw">char</span> c = s[i]; <span class="kw">int</span> count = <span class="nm">1</span>;
+        <span class="kw">while</span> (i + count &lt; s.Length &amp;&amp; s[i + count] == c)
+            count++;
+        sb.Append(c); sb.Append(count);
+        i += count;
+    }
+    <span class="kw">var</span> result = sb.ToString();
+    <span class="kw">return</span> result.Length &lt; s.Length ? result : s;
+}
+<span class="cm">// Compress("aaabb") → "a3b2"
+// Compress("abc")   → "abc" (not shorter)</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">7</span><span class="title">Find longest substring without repeating characters</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Sliding window: expand right pointer. When a duplicate appears, shrink from the left until the window has no repeats. Track max window size.</div>
+    <pre><code><span class="kw">static int</span> LongestUnique(<span class="kw">string</span> s) {
+    <span class="kw">var</span> seen = <span class="kw">new</span> HashSet&lt;<span class="kw">char</span>&gt;();
+    <span class="kw">int</span> l = <span class="nm">0</span>, max = <span class="nm">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> r = <span class="nm">0</span>; r &lt; s.Length; r++) {
+        <span class="kw">while</span> (seen.Contains(s[r]))
+            seen.Remove(s[l++]);
+        seen.Add(s[r]);
+        max = Math.Max(max, r - l + <span class="nm">1</span>);
+    }
+    <span class="kw">return</span> max;
+}
+<span class="cm">// LongestUnique("abcabcbb") → 3 ("abc")</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">8</span><span class="title">Convert string to title case without built-in</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Split by space, capitalize the first character of each word using ASCII arithmetic (subtract 32 to uppercase), lowercase the rest, then join.</div>
+    <pre><code><span class="kw">static string</span> ToTitleCase(<span class="kw">string</span> s) {
+    <span class="kw">var</span> words = s.Split(<span class="st">' '</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">0</span>; i &lt; words.Length; i++) {
+        <span class="kw">if</span> (words[i].Length == <span class="nm">0</span>) <span class="kw">continue</span>;
+        <span class="kw">char</span> first = (<span class="kw">char</span>)(words[i][<span class="nm">0</span>] >= <span class="st">'a'</span>
+            ? words[i][<span class="nm">0</span>] - <span class="nm">32</span> : words[i][<span class="nm">0</span>]);
+        words[i] = first + words[i].Substring(<span class="nm">1</span>).ToLower();
+    }
+    <span class="kw">return string</span>.Join(<span class="st">" "</span>, words);
+}
+<span class="cm">// ToTitleCase("hello world") → "Hello World"</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">9</span><span class="title">Implement your own StringBuilder-like class</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Back the class with a List&lt;char&gt; for O(1) amortized appends. Expose Append (chainable), Length, and ToString. Avoids repeated string concatenation overhead.</div>
+    <pre><code><span class="kw">class</span> MyStringBuilder {
+    <span class="kw">private</span> List&lt;<span class="kw">char</span>&gt; _chars = <span class="kw">new</span>();
+
+    <span class="kw">public</span> MyStringBuilder Append(<span class="kw">string</span> s) {
+        <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> s) _chars.Add(c);
+        <span class="kw">return this</span>;
+    }
+    <span class="kw">public</span> MyStringBuilder Append(<span class="kw">char</span> c) {
+        _chars.Add(c); <span class="kw">return this</span>;
+    }
+    <span class="kw">public int</span> Length => _chars.Count;
+    <span class="kw">public override string</span> ToString() =>
+        <span class="kw">new string</span>(_chars.ToArray());
+}
+<span class="cm">// new MyStringBuilder().Append("Hello").Append('!').ToString()
+// → "Hello!"</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">10</span><span class="title">Reverse a string without built-in methods</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Convert to char array, then use two pointers from each end, swapping characters until they meet in the middle. O(n) time, O(n) space.</div>
+    <pre><code><span class="kw">static string</span> Reverse(<span class="kw">string</span> s) {
+    <span class="kw">char</span>[] arr = s.ToCharArray();
+    <span class="kw">int</span> l = <span class="nm">0</span>, r = arr.Length - <span class="nm">1</span>;
+    <span class="kw">while</span> (l &lt; r) {
+        <span class="kw">char</span> tmp = arr[l];
+        arr[l++] = arr[r];
+        arr[r--] = tmp;
+    }
+    <span class="kw">return new string</span>(arr);
+}
+<span class="cm">// Reverse("hello") → "olleh"</span></code></pre>
+  </div>
+</div>
+</div><!-- end strings -->
+
+<!-- ARRAYS -->
+<div class="section" id="arrays">
+<div class="section-header">Arrays — 6 problems</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">1</span><span class="title">Find second largest element</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Single-pass tracking of both first and second largest. When a new max is found, push current max down to second. Update second directly if not a new overall max.</div>
+    <pre><code><span class="kw">static int</span> SecondLargest(<span class="kw">int</span>[] arr) {
+    <span class="kw">int</span> first = <span class="kw">int</span>.MinValue, second = <span class="kw">int</span>.MinValue;
+    <span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> arr) {
+        <span class="kw">if</span> (n > first) { second = first; first = n; }
+        <span class="kw">else if</span> (n > second &amp;&amp; n != first) second = n;
+    }
+    <span class="kw">return</span> second;
+}
+<span class="cm">// SecondLargest([3,1,4,1,5,9,2,6]) → 6</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">2</span><span class="title">Move all zeros to end</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Use a write pointer. Copy every non-zero element to the front in order, then fill the remaining positions with zeros. Preserves relative order of non-zero elements.</div>
+    <pre><code><span class="kw">static void</span> MoveZerosToEnd(<span class="kw">int</span>[] arr) {
+    <span class="kw">int</span> pos = <span class="nm">0</span>;
+    <span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> arr)
+        <span class="kw">if</span> (n != <span class="nm">0</span>) arr[pos++] = n;
+    <span class="kw">while</span> (pos &lt; arr.Length)
+        arr[pos++] = <span class="nm">0</span>;
+}
+<span class="cm">// [0,1,0,3,12] → [1,3,12,0,0]</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">3</span><span class="title">Find missing number in array (1 to n)</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">The expected sum of 1 through n is n*(n+1)/2. Subtracting the actual array sum gives the missing number. O(n) time, O(1) space.</div>
+    <pre><code><span class="kw">static int</span> FindMissing(<span class="kw">int</span>[] arr, <span class="kw">int</span> n) {
+    <span class="kw">int</span> expected = n * (n + <span class="nm">1</span>) / <span class="nm">2</span>;
+    <span class="kw">int</span> actual = arr.Sum();
+    <span class="kw">return</span> expected - actual;
+}
+<span class="cm">// FindMissing([1,2,4,5,6], 6) → 3</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">4</span><span class="title">Find duplicates in array</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">HashSet.Add returns false if the element already exists. Collect every element that fails to add — those are the duplicates.</div>
+    <pre><code><span class="kw">static</span> List&lt;<span class="kw">int</span>&gt; FindDuplicates(<span class="kw">int</span>[] arr) {
+    <span class="kw">var</span> seen = <span class="kw">new</span> HashSet&lt;<span class="kw">int</span>&gt;();
+    <span class="kw">var</span> dups = <span class="kw">new</span> List&lt;<span class="kw">int</span>&gt;();
+    <span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> arr)
+        <span class="kw">if</span> (!seen.Add(n)) dups.Add(n);
+    <span class="kw">return</span> dups;
+}
+<span class="cm">// FindDuplicates([1,2,3,2,4,3]) → [2, 3]</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">5</span><span class="title">Merge two sorted arrays</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Use three pointers: i for array A, j for array B, k for output. Always pick the smaller current element. Copy remaining elements after one array is exhausted.</div>
+    <pre><code><span class="kw">static int</span>[] MergeSorted(<span class="kw">int</span>[] a, <span class="kw">int</span>[] b) {
+    <span class="kw">int</span>[] result = <span class="kw">new int</span>[a.Length + b.Length];
+    <span class="kw">int</span> i = <span class="nm">0</span>, j = <span class="nm">0</span>, k = <span class="nm">0</span>;
+    <span class="kw">while</span> (i &lt; a.Length &amp;&amp; j &lt; b.Length)
+        result[k++] = (a[i] &lt;= b[j]) ? a[i++] : b[j++];
+    <span class="kw">while</span> (i &lt; a.Length) result[k++] = a[i++];
+    <span class="kw">while</span> (j &lt; b.Length) result[k++] = b[j++];
+    <span class="kw">return</span> result;
+}
+<span class="cm">// MergeSorted([1,3,5],[2,4,6]) → [1,2,3,4,5,6]</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">6</span><span class="title">Sort array without built-in sort</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Bubble Sort: repeatedly pass through the array, swapping adjacent elements that are out of order. Each pass moves the largest unsorted element to its correct position.</div>
+    <pre><code><span class="kw">static void</span> BubbleSort(<span class="kw">int</span>[] arr) {
+    <span class="kw">int</span> n = arr.Length;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">0</span>; i &lt; n - <span class="nm">1</span>; i++)
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="nm">0</span>; j &lt; n - i - <span class="nm">1</span>; j++)
+            <span class="kw">if</span> (arr[j] > arr[j + <span class="nm">1</span>]) {
+                <span class="kw">int</span> tmp = arr[j];
+                arr[j] = arr[j + <span class="nm">1</span>];
+                arr[j + <span class="nm">1</span>] = tmp;
+            }
+}
+<span class="cm">// BubbleSort([5,3,1,4,2]) → [1,2,3,4,5]</span></code></pre>
+  </div>
+</div>
+</div><!-- end arrays -->
+
+<!-- LINQ -->
+<div class="section" id="linq">
+<div class="section-header">Collections & LINQ — 7 problems</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">1</span><span class="title">Group employees by department</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">GroupBy partitions the sequence using a key selector. Each group exposes the key and the matching elements. Project to an anonymous type for clean output.</div>
+    <pre><code><span class="kw">var</span> grouped = employees
+    .GroupBy(e => e.Department)
+    .Select(g => <span class="kw">new</span> {
+        Department = g.Key,
+        Count = g.Count(),
+        Names = g.Select(e => e.Name).ToList()
+    });
+
+<span class="kw">foreach</span> (<span class="kw">var</span> g <span class="kw">in</span> grouped)
+    Console.WriteLine(
+        $<span class="st">"{g.Department}: {g.Count} employees"</span>);</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">2</span><span class="title">Find top 3 highest salaries</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Sort in descending order then take the first 3. Select only the needed fields. Handles any size collection efficiently with deferred execution.</div>
+    <pre><code><span class="kw">var</span> top3 = employees
+    .OrderByDescending(e => e.Salary)
+    .Take(<span class="nm">3</span>)
+    .Select(e => <span class="kw">new</span> { e.Name, e.Salary })
+    .ToList();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> e <span class="kw">in</span> top3)
+    Console.WriteLine($<span class="st">"{e.Name}: {e.Salary:C}"</span>);</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">3</span><span class="title">Remove duplicates using LINQ</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Distinct() removes duplicate primitives. For objects, use DistinctBy() (.NET 6+) on a key property. For older .NET, GroupBy and take the first of each group.</div>
+    <pre><code><span class="cm">// Primitives</span>
+<span class="kw">var</span> unique = numbers.Distinct().ToList();
+
+<span class="cm">// Objects (.NET 6+)</span>
+<span class="kw">var</span> uniqueEmps = employees
+    .DistinctBy(e => e.Id).ToList();
+
+<span class="cm">// Pre-.NET 6 workaround</span>
+<span class="kw">var</span> uniqueOld = employees
+    .GroupBy(e => e.Id)
+    .Select(g => g.First()).ToList();</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">4</span><span class="title">Find frequency of elements using LINQ</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">GroupBy each element by its own value, then project each group into a value-count pair. Sort descending to see most frequent first.</div>
+    <pre><code><span class="kw">var</span> freq = numbers
+    .GroupBy(n => n)
+    .Select(g => <span class="kw">new</span> {
+        Value = g.Key,
+        Count = g.Count()
+    })
+    .OrderByDescending(x => x.Count);
+
+<span class="kw">foreach</span> (<span class="kw">var</span> f <span class="kw">in</span> freq)
+    Console.WriteLine($<span class="st">"{f.Value}: {f.Count} times"</span>);</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">5</span><span class="title">Pagination using LINQ</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Skip the items from previous pages using (pageNumber-1)*pageSize, then Take the next pageSize items. This is the standard paging pattern used in APIs and data grids.</div>
+    <pre><code><span class="kw">static</span> IEnumerable&lt;T&gt; Paginate&lt;T&gt;(
+    IEnumerable&lt;T&gt; source,
+    <span class="kw">int</span> pageNumber,
+    <span class="kw">int</span> pageSize) {
+    <span class="kw">return</span> source
+        .Skip((pageNumber - <span class="nm">1</span>) * pageSize)
+        .Take(pageSize);
+}
+<span class="cm">// Paginate(employees, pageNumber: 2, pageSize: 10)
+// returns items 11-20</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">6</span><span class="title">Dynamic sorting (ascending/descending)</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Accept a boolean or string direction flag and conditionally apply OrderBy or OrderByDescending. Use System.Linq.Dynamic.Core for string-based property sorting.</div>
+    <pre><code><span class="kw">static</span> IEnumerable&lt;Employee&gt; SortEmployees(
+    IEnumerable&lt;Employee&gt; list,
+    <span class="kw">string</span> property, <span class="kw">bool</span> ascending) {
+    <span class="kw">return</span> (property, ascending) <span class="kw">switch</span> {
+        (<span class="st">"Name"</span>, <span class="kw">true</span>)   => list.OrderBy(e => e.Name),
+        (<span class="st">"Name"</span>, <span class="kw">false</span>)  => list.OrderByDescending(e => e.Name),
+        (<span class="st">"Salary"</span>, <span class="kw">true</span>) => list.OrderBy(e => e.Salary),
+        _                 => list.OrderByDescending(e => e.Salary)
+    };
+}</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">7</span><span class="title">Find common elements between lists</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Intersect() returns elements present in both sequences using set semantics — duplicates are removed. Efficient for finding overlap between collections.</div>
+    <pre><code><span class="kw">var</span> list1 = <span class="kw">new</span> List&lt;<span class="kw">int</span>&gt; { <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span> };
+<span class="kw">var</span> list2 = <span class="kw">new</span> List&lt;<span class="kw">int</span>&gt; { <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>, <span class="nm">7</span> };
+
+<span class="kw">var</span> common = list1.Intersect(list2).ToList();
+Console.WriteLine(<span class="kw">string</span>.Join(<span class="st">", "</span>, common));
+<span class="cm">// Output: 3, 4, 5</span></code></pre>
+  </div>
+</div>
+</div><!-- end linq -->
+
+<!-- RECURSION -->
+<div class="section" id="recursion">
+<div class="section-header">Recursion — 7 problems</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">1</span><span class="title">Factorial using recursion</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Base case: 0! = 1. Recursive case: n! = n × (n-1)!. Each call reduces n by 1 until the base case. Classic demonstration of call stack unwinding.</div>
+    <pre><code><span class="kw">static long</span> Factorial(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n &lt;= <span class="nm">0</span>) <span class="kw">return</span> <span class="nm">1</span>;
+    <span class="kw">return</span> n * Factorial(n - <span class="nm">1</span>);
+}
+<span class="cm">// Factorial(5) → 120
+// Stack: 5 × 4 × 3 × 2 × 1 × 1</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">2</span><span class="title">Fibonacci series</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2). Add memoization (Dictionary cache) to reduce time from O(2^n) to O(n) by avoiding duplicate sub-calls.</div>
+    <pre><code><span class="kw">static int</span> Fib(<span class="kw">int</span> n,
+    Dictionary&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; memo = <span class="kw">null</span>) {
+    memo ??= <span class="kw">new</span>();
+    <span class="kw">if</span> (n &lt;= <span class="nm">1</span>) <span class="kw">return</span> n;
+    <span class="kw">if</span> (memo.ContainsKey(n)) <span class="kw">return</span> memo[n];
+    memo[n] = Fib(n - <span class="nm">1</span>, memo) + Fib(n - <span class="nm">2</span>, memo);
+    <span class="kw">return</span> memo[n];
+}
+<span class="cm">// Fib(10) → 55</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">3</span><span class="title">Reverse string using recursion</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Take the last character, prepend the reverse of the remaining string. Base case: 0 or 1 characters — nothing to reverse.</div>
+    <pre><code><span class="kw">static string</span> ReverseRec(<span class="kw">string</span> s) {
+    <span class="kw">if</span> (s.Length &lt;= <span class="nm">1</span>) <span class="kw">return</span> s;
+    <span class="kw">return</span> ReverseRec(s.Substring(<span class="nm">1</span>)) + s[<span class="nm">0</span>];
+}
+<span class="cm">// ReverseRec("hello") → "olleh"
+// hello → ello → llo → lo → o (unwind adds h,e,l,l)</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">4</span><span class="title">Sum of digits</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Extract the last digit with n%10, add it to the recursive result of n/10. Base case: n==0 returns 0.</div>
+    <pre><code><span class="kw">static int</span> SumDigits(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n == <span class="nm">0</span>) <span class="kw">return</span> <span class="nm">0</span>;
+    <span class="kw">return</span> (n % <span class="nm">10</span>) + SumDigits(n / <span class="nm">10</span>);
+}
+<span class="cm">// SumDigits(1234) → 10  (1+2+3+4)</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">5</span><span class="title">Binary search using recursion</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Compare target with the middle element. Recurse into the left half if smaller, right half if larger. Return -1 when left exceeds right (not found).</div>
+    <pre><code><span class="kw">static int</span> BinarySearch(<span class="kw">int</span>[] arr,
+    <span class="kw">int</span> target, <span class="kw">int</span> l, <span class="kw">int</span> r) {
+    <span class="kw">if</span> (l > r) <span class="kw">return</span> -<span class="nm">1</span>;
+    <span class="kw">int</span> mid = (l + r) / <span class="nm">2</span>;
+    <span class="kw">if</span> (arr[mid] == target) <span class="kw">return</span> mid;
+    <span class="kw">if</span> (arr[mid] > target)
+        <span class="kw">return</span> BinarySearch(arr, target, l, mid - <span class="nm">1</span>);
+    <span class="kw">return</span> BinarySearch(arr, target, mid + <span class="nm">1</span>, r);
+}
+<span class="cm">// BinarySearch([1,3,5,7,9], 7, 0, 4) → index 3</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">6</span><span class="title">Tower of Hanoi</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Move n-1 disks to the auxiliary peg, move the largest disk to the target, then move n-1 disks from auxiliary to target. Requires 2^n - 1 moves.</div>
+    <pre><code><span class="kw">static void</span> Hanoi(<span class="kw">int</span> n,
+    <span class="kw">char</span> from, <span class="kw">char</span> to, <span class="kw">char</span> aux) {
+    <span class="kw">if</span> (n == <span class="nm">0</span>) <span class="kw">return</span>;
+    Hanoi(n - <span class="nm">1</span>, from, aux, to);
+    Console.WriteLine(
+        $<span class="st">"Move disk {n}: {from} → {to}"</span>);
+    Hanoi(n - <span class="nm">1</span>, aux, to, from);
+}
+<span class="cm">// Hanoi(3, 'A', 'C', 'B') → 7 moves</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">7</span><span class="title">Check palindrome recursively</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Compare first and last characters. If they match, recurse on the inner substring. Base case: 0 or 1 characters always return true.</div>
+    <pre><code><span class="kw">static bool</span> IsPalindromeRec(<span class="kw">string</span> s) {
+    <span class="kw">if</span> (s.Length &lt;= <span class="nm">1</span>) <span class="kw">return true</span>;
+    <span class="kw">if</span> (s[<span class="nm">0</span>] != s[s.Length - <span class="nm">1</span>]) <span class="kw">return false</span>;
+    <span class="kw">return</span> IsPalindromeRec(
+        s.Substring(<span class="nm">1</span>, s.Length - <span class="nm">2</span>));
+}
+<span class="cm">// IsPalindromeRec("racecar") → true</span></code></pre>
+  </div>
+</div>
+</div><!-- end recursion -->
+
+<!-- ASYNC -->
+<div class="section" id="async">
+<div class="section-header">Multithreading / Async — 8 problems</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">1</span><span class="title">Print numbers using multiple threads</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Create Thread objects with lambda callbacks. Always capture the loop variable in a local copy — closures capture by reference and the loop variable may have changed by the time the thread runs.</div>
+    <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">1</span>; i &lt;= <span class="nm">5</span>; i++) {
+    <span class="kw">int</span> num = i; <span class="cm">// capture loop var locally!</span>
+    <span class="kw">new</span> Thread(() =>
+        Console.WriteLine(
+            $<span class="st">"Thread {num}: prints {num}"</span>)).Start();
+}
+<span class="cm">// Output order is non-deterministic</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">2</span><span class="title">Implement parallel processing</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Parallel.ForEach distributes work across thread pool threads. Use MaxDegreeOfParallelism to limit concurrency. Best for CPU-bound tasks on large collections.</div>
+    <pre><code><span class="kw">var</span> items = Enumerable.Range(<span class="nm">1</span>, <span class="nm">100</span>).ToList();
+
+Parallel.ForEach(items,
+    <span class="kw">new</span> ParallelOptions {
+        MaxDegreeOfParallelism = <span class="nm">4</span>
+    },
+    item => {
+        <span class="kw">var</span> result = item * item; <span class="cm">// CPU work</span>
+        Console.WriteLine(
+            $<span class="st">"Item {item} squared = {result}"</span>);
+    });</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">3</span><span class="title">Async method to call 3 APIs in parallel</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Start all tasks without awaiting them individually, then await Task.WhenAll. Total time equals the slowest call, not the sum. Essential pattern for I/O-bound parallel work.</div>
+    <pre><code><span class="kw">static async</span> Task CallApisInParallel() {
+    <span class="kw">using var</span> http = <span class="kw">new</span> HttpClient();
+
+    <span class="kw">var</span> t1 = http.GetStringAsync(<span class="st">"https://api1.com/data"</span>);
+    <span class="kw">var</span> t2 = http.GetStringAsync(<span class="st">"https://api2.com/data"</span>);
+    <span class="kw">var</span> t3 = http.GetStringAsync(<span class="st">"https://api3.com/data"</span>);
+
+    <span class="kw">string</span>[] results = <span class="kw">await</span> Task.WhenAll(t1, t2, t3);
+    Console.WriteLine(<span class="kw">string</span>.Join(<span class="st">"\n---\n"</span>, results));
+}</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">4</span><span class="title">Avoid race condition using lock</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Shared mutable state accessed from multiple threads needs a lock or atomic operation. The lock ensures only one thread executes the critical section at a time.</div>
+    <pre><code><span class="kw">static int</span> _counter = <span class="nm">0</span>;
+<span class="kw">static readonly object</span> _lock = <span class="kw">new</span>();
+
+<span class="kw">static void</span> Increment() {
+    <span class="kw">lock</span> (_lock) {
+        _counter++; <span class="cm">// thread-safe critical section</span>
+    }
+}
+
+<span class="cm">// For simple increment/decrement, prefer Interlocked:</span>
+Interlocked.Increment(<span class="kw">ref</span> _counter); <span class="cm">// atomic, faster</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">5</span><span class="title">Create thread-safe singleton</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Lazy&lt;T&gt; provides built-in thread safety using LazyThreadSafetyMode.ExecutionAndPublication by default. The instance is created exactly once on first access.</div>
+    <pre><code><span class="kw">public sealed class</span> Singleton {
+    <span class="kw">private static readonly</span> Lazy&lt;Singleton&gt; _instance
+        = <span class="kw">new</span>(() => <span class="kw">new</span> Singleton());
+
+    <span class="kw">private</span> Singleton() { <span class="cm">/* init */</span> }
+
+    <span class="kw">public static</span> Singleton Instance
+        => _instance.Value;
+
+    <span class="kw">public void</span> DoWork() =>
+        Console.WriteLine(<span class="st">"Singleton working"</span>);
+}
+<span class="cm">// Singleton.Instance.DoWork();</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">6</span><span class="title">Deadlock simulation</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Deadlock: Thread A holds Lock1 and waits for Lock2; Thread B holds Lock2 and waits for Lock1. Prevention: always acquire locks in a consistent global order across all threads.</div>
+    <pre><code><span class="kw">object</span> lockA = <span class="kw">new</span>(), lockB = <span class="kw">new</span>();
+
+<span class="cm">// Thread 1: A → B</span>
+<span class="kw">new</span> Thread(() => {
+    <span class="kw">lock</span>(lockA) {
+        Thread.Sleep(<span class="nm">50</span>); <span class="cm">// give T2 time to grab B</span>
+        <span class="kw">lock</span>(lockB) { Console.WriteLine(<span class="st">"T1 done"</span>); }
+    }
+}).Start();
+
+<span class="cm">// Thread 2: B → A  ← deadlock with T1!</span>
+<span class="kw">new</span> Thread(() => {
+    <span class="kw">lock</span>(lockB) {
+        Thread.Sleep(<span class="nm">50</span>);
+        <span class="kw">lock</span>(lockA) { Console.WriteLine(<span class="st">"T2 done"</span>); }
+    }
+}).Start();</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">7</span><span class="title">CancellationToken example</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">CancellationTokenSource controls cancellation. Pass the token to long-running operations and call ThrowIfCancellationRequested() at checkpoints. Graceful shutdown without aborting threads.</div>
+    <pre><code><span class="kw">static async</span> Task RunWithCancellation() {
+    <span class="kw">using var</span> cts =
+        <span class="kw">new</span> CancellationTokenSource();
+    cts.CancelAfter(TimeSpan.FromSeconds(<span class="nm">3</span>));
+
+    <span class="kw">try</span> {
+        <span class="kw">while</span> (<span class="kw">true</span>) {
+            cts.Token.ThrowIfCancellationRequested();
+            Console.WriteLine(<span class="st">"Processing..."</span>);
+            <span class="kw">await</span> Task.Delay(<span class="nm">1000</span>, cts.Token);
+        }
+    } <span class="kw">catch</span> (OperationCanceledException) {
+        Console.WriteLine(<span class="st">"Task cancelled gracefully."</span>);
+    }
+}</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">8</span><span class="title">File processing using async</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Async file I/O (ReadAllTextAsync, WriteAllLinesAsync) yields the thread while waiting for disk I/O, keeping the application responsive. Chain LINQ to process lines before writing.</div>
+    <pre><code><span class="kw">static async</span> Task ProcessFileAsync(<span class="kw">string</span> inputPath) {
+    <span class="kw">var</span> content =
+        <span class="kw">await</span> File.ReadAllTextAsync(inputPath);
+
+    <span class="kw">var</span> processed = content
+        .Split(<span class="st">'\n'</span>)
+        .Where(l => l.Trim().Length > <span class="nm">0</span>)
+        .Select(l => l.ToUpper().Trim());
+
+    <span class="kw">await</span> File.WriteAllLinesAsync(
+        <span class="st">"output.txt"</span>, processed);
+
+    Console.WriteLine(<span class="st">"File processed successfully."</span>);
+}</code></pre>
+  </div>
+</div>
+</div><!-- end async -->
+
+<!-- DATA STRUCTURES -->
+<div class="section" id="ds">
+<div class="section-header">Data Structures — 6 problems</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">1</span><span class="title">Implement Stack using array</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">A stack is LIFO (Last In, First Out). Use a top index starting at -1. Push increments and places value; Pop returns and decrements; Peek reads without removing.</div>
+    <pre><code><span class="kw">class</span> MyStack {
+    <span class="kw">private int</span>[] _arr;
+    <span class="kw">private int</span> _top = -<span class="nm">1</span>;
+
+    <span class="kw">public</span> MyStack(<span class="kw">int</span> capacity)
+        => _arr = <span class="kw">new int</span>[capacity];
+
+    <span class="kw">public void</span> Push(<span class="kw">int</span> val) {
+        <span class="kw">if</span> (_top == _arr.Length - <span class="nm">1</span>)
+            <span class="kw">throw new</span> InvalidOperationException(<span class="st">"Stack full"</span>);
+        _arr[++_top] = val;
+    }
+    <span class="kw">public int</span> Pop() {
+        <span class="kw">if</span> (IsEmpty) <span class="kw">throw new</span> InvalidOperationException();
+        <span class="kw">return</span> _arr[_top--];
+    }
+    <span class="kw">public int</span> Peek() => _arr[_top];
+    <span class="kw">public bool</span> IsEmpty => _top == -<span class="nm">1</span>;
+}</code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">2</span><span class="title">Implement Queue using two stacks</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Stack1 receives all enqueues. On dequeue, if Stack2 is empty, pour everything from Stack1 into Stack2 (reversing the order). Then pop from Stack2 for FIFO behavior.</div>
+    <pre><code><span class="kw">class</span> QueueFromStacks {
+    <span class="kw">private</span> Stack&lt;<span class="kw">int</span>&gt; s1 = <span class="kw">new</span>();
+    <span class="kw">private</span> Stack&lt;<span class="kw">int</span>&gt; s2 = <span class="kw">new</span>();
+
+    <span class="kw">public void</span> Enqueue(<span class="kw">int</span> val) => s1.Push(val);
+
+    <span class="kw">public int</span> Dequeue() {
+        <span class="kw">if</span> (s2.Count == <span class="nm">0</span>)
+            <span class="kw">while</span> (s1.Count > <span class="nm">0</span>)
+                s2.Push(s1.Pop()); <span class="cm">// transfer reverses order</span>
+        <span class="kw">return</span> s2.Pop();
+    }
+    <span class="kw">public bool</span> IsEmpty => s1.Count == <span class="nm">0</span> &amp;&amp; s2.Count == <span class="nm">0</span>;
+}
+<span class="cm">// Enqueue(1,2,3) then Dequeue() → 1 (FIFO)</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">3</span><span class="title">Reverse a linked list</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Iteratively walk with three pointers: prev (null initially), curr, and next. At each node, flip the Next pointer, then advance all three pointers. Return prev as the new head.</div>
+    <pre><code><span class="kw">class</span> Node { <span class="kw">public int</span> Val; <span class="kw">public</span> Node Next; }
+
+<span class="kw">static</span> Node Reverse(Node head) {
+    Node prev = <span class="kw">null</span>, curr = head;
+    <span class="kw">while</span> (curr != <span class="kw">null</span>) {
+        <span class="kw">var</span> next = curr.Next; <span class="cm">// save next</span>
+        curr.Next = prev;     <span class="cm">// flip link</span>
+        prev = curr;          <span class="cm">// advance prev</span>
+        curr = next;          <span class="cm">// advance curr</span>
+    }
+    <span class="kw">return</span> prev; <span class="cm">// prev is new head</span>
+}
+<span class="cm">// 1→2→3→null  becomes  3→2→1→null</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">4</span><span class="title">Detect loop in linked list</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">Floyd's cycle detection (tortoise and hare): slow pointer moves 1 step, fast pointer moves 2. If they ever point to the same node, there is a cycle. O(n) time, O(1) space.</div>
+    <pre><code><span class="kw">static bool</span> HasCycle(Node head) {
+    Node slow = head, fast = head;
+    <span class="kw">while</span> (fast != <span class="kw">null</span> &amp;&amp; fast.Next != <span class="kw">null</span>) {
+        slow = slow.Next;        <span class="cm">// 1 step</span>
+        fast = fast.Next.Next;   <span class="cm">// 2 steps</span>
+        <span class="kw">if</span> (slow == fast) <span class="kw">return true</span>; <span class="cm">// cycle!</span>
+    }
+    <span class="kw">return false</span>;
+}
+<span class="cm">// Works in O(n) time and O(1) space</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">5</span><span class="title">Binary search tree insertion</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">BST property: left subtree has smaller values, right has larger. Recursively navigate left or right and insert at the null position where you stop. In-order traversal gives sorted output.</div>
+    <pre><code><span class="kw">class</span> BstNode {
+    <span class="kw">public int</span> Val;
+    <span class="kw">public</span> BstNode Left, Right;
+    <span class="kw">public</span> BstNode(<span class="kw">int</span> v) => Val = v;
+}
+
+<span class="kw">static</span> BstNode Insert(BstNode root, <span class="kw">int</span> val) {
+    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="kw">return new</span> BstNode(val);
+    <span class="kw">if</span> (val &lt; root.Val)
+        root.Left = Insert(root.Left, val);
+    <span class="kw">else if</span> (val > root.Val)
+        root.Right = Insert(root.Right, val);
+    <span class="kw">return</span> root;
+}
+<span class="cm">// Insert sequence: 5,3,7,1 builds balanced BST</span></code></pre>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggle(this)"><span class="num">6</span><span class="title">Graph traversal (BFS & DFS)</span><span class="arrow">▼</span></div>
+  <div class="card-body">
+    <div class="desc">BFS (Breadth-First) uses a Queue — explores level by level, good for shortest path. DFS (Depth-First) uses a Stack or recursion — explores as deep as possible, good for cycle detection. Both need a visited set to avoid revisiting nodes.</div>
+    <pre><code><span class="kw">var</span> graph = <span class="kw">new</span> Dictionary&lt;<span class="kw">int</span>, List&lt;<span class="kw">int</span>&gt;&gt;();
+
+<span class="cm">// BFS — level by level</span>
+<span class="kw">void</span> Bfs(<span class="kw">int</span> start) {
+    <span class="kw">var</span> visited = <span class="kw">new</span> HashSet&lt;<span class="kw">int</span>&gt;();
+    <span class="kw">var</span> queue = <span class="kw">new</span> Queue&lt;<span class="kw">int</span>&gt;();
+    queue.Enqueue(start); visited.Add(start);
+    <span class="kw">while</span> (queue.Count > <span class="nm">0</span>) {
+        <span class="kw">var</span> node = queue.Dequeue();
+        Console.Write(node + <span class="st">" "</span>);
+        <span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> graph[node])
+            <span class="kw">if</span> (visited.Add(n)) queue.Enqueue(n);
+    }
+}
+
+<span class="cm">// DFS — depth first (replace Queue with Stack,
+//        Dequeue→Pop, Enqueue→Push)</span></code></pre>
+  </div>
+</div>
+</div><!-- end ds -->
+
+<script>
+function show(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.arrow');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+</script>
+</body>
+</html>

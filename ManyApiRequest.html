@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handling Thousands of Requests - Complete Architecture Guide</title>
+    <style>
+        @media print {
+            body { margin: 0; padding: 10mm; }
+            .no-break { page-break-inside: avoid; }
+            h1, h2 { page-break-after: avoid; }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 4px solid #2563eb;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #1e40af;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #64748b;
+            font-size: 1.2em;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-left: 5px solid #3b82f6;
+            border-radius: 8px;
+        }
+        
+        .section h2 {
+            color: #1e40af;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-number {
+            background: #3b82f6;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .subsection {
+            margin: 15px 0;
+        }
+        
+        .subsection h3 {
+            color: #475569;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .content-box {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        
+        li {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .diagram {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+        
+        .tools-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+        
+        .tools-table th, .tools-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .tools-table th {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .tools-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
+        .architecture-flow {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .architecture-flow h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .flow-step {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 4px solid #fbbf24;
+        }
+        
+        .key-note {
+            background: #dcfce7;
+            border-left: 4px solid #16a34a;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+        }
+        
+        .key-note strong {
+            color: #15803d;
+        }
+        
+        .summary-box {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        nav {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+nav a {
+    color: #f3f4f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    letter-spacing: 0.3px;
+}
+
+nav a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* Optional: Add an underline animation effect */
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #ffd700;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+nav a:hover::after {
+    width: 70%;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    nav a {
+        text-align: center;
+        padding: 0.75rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+	<nav>
+    <a href="Home.html">Home</a>
+    <a href="CodingQuestions.html">Coding Questions</a>
+    </nav>
+        <header>
+            <h1>🚀 Handling Thousands of Requests</h1>
+            <p class="subtitle">Complete Guide to Scalable System Architecture</p>
+        </header>
+
+        <div class="section no-break">
+            <h2><span class="section-number">1</span> Horizontal Scaling</h2>
+            
+            <div class="subsection">
+                <h3>📋 How It Works</h3>
+                <div class="content-box">
+                    <p>Instead of buying a bigger server (<span class="highlight">Vertical Scaling</span>), you add multiple small servers (<span class="highlight">Horizontal Scaling</span>).</p>
+                    <ul>
+                        <li>Add more servers/nodes to share the load</li>
+                        <li>Each server runs identical application code</li>
+                        <li>Requests distributed across multiple instances</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>✅ Why Use It</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>High Availability:</strong> If one server crashes, others keep running</li>
+                        <li><strong>Cost-Effective:</strong> Cheaper than upgrading to massive servers</li>
+                        <li><strong>Better Traffic Handling:</strong> Handle more traffic than a single server</li>
+                        <li><strong>Geographic Distribution:</strong> Lower latency for global users</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>⚙️ How to Implement (ASP.NET)</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Cloud:</strong> Azure App Service Plans (Auto-scaling) or Kubernetes (AKS)</li>
+                        <li><strong>Container Orchestration:</strong> Docker Swarm, Kubernetes</li>
+                        <li><strong>Critical:</strong> Your app must be <span class="highlight">Stateless</span> (don't store sessions in local memory)</li>
+                        <li><strong>Cloud Auto-scaling:</strong> AWS EC2 Auto Scaling, Google Cloud MIG</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="key-note">
+                <strong>🔑 Key Note:</strong> Always design applications to be stateless. Store session data in external stores like Redis, not in-memory.
+            </div>
+        </div>
+
+        <div class="section no-break">
+            <h2><span class="section-number">2</span> Load Balancing</h2>
+            
+            <div class="subsection">
+                <h3>📋 How It Works</h3>
+                <div class="content-box">
+                    <p>A <span class="highlight">"Traffic Cop"</span> sits in front of your servers and distributes incoming requests evenly.</p>
+                    <ul>
+                        <li>Distributes requests across multiple servers</li>
+                        <li>Performs health checks to remove unhealthy instances</li>
+                        <li>Provides session persistence options</li>
+                        <li>Handles SSL termination</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>✅ Why Use It</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Prevents Overload:</strong> No single server gets overwhelmed</li>
+                        <li><strong>Even Distribution:</strong> All servers utilized efficiently</li>
+                        <li><strong>Automatic Failover:</strong> Routes around failed servers</li>
+                        <li><strong>Zero-Downtime Deployments:</strong> Update servers without service interruption</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>🔄 Load Balancing Algorithms</h3>
+                <div class="grid-2">
+                    <div class="content-box">
+                        <strong>Round Robin:</strong> Sequential distribution (Server 1 → 2 → 3 → 1...)
+                    </div>
+                    <div class="content-box">
+                        <strong>Least Connections:</strong> Route to least busy server
+                    </div>
+                    <div class="content-box">
+                        <strong>IP Hash:</strong> Same client always goes to same server
+                    </div>
+                    <div class="content-box">
+                        <strong>Weighted:</strong> Distribute based on server capacity
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>⚙️ How to Implement (ASP.NET)</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Software:</strong> Nginx, HAProxy, Apache</li>
+                        <li><strong>.NET Tool:</strong> YARP (Yet Another Reverse Proxy) - Microsoft's toolkit</li>
+                        <li><strong>Cloud:</strong> Azure Front Door, Azure Application Gateway, AWS ELB/ALB, Google Cloud Load Balancing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section no-break">
+            <h2><span class="section-number">3</span> Database Sharding</h2>
+            
+            <div class="subsection">
+                <h3>📋 How It Works</h3>
+                <div class="content-box">
+                    <p>Splitting a giant database into smaller pieces (Shards). Example: Users A-M go to DB1, Users N-Z go to DB2.</p>
+                    <ul>
+                        <li>Split database into smaller pieces on separate servers</li>
+                        <li>Data distributed by shard key (user_id, location, date range)</li>
+                        <li><strong>Horizontal Sharding:</strong> Split by rows (Users 1-1000 → Shard A)</li>
+                        <li><strong>Vertical Sharding:</strong> Split by tables (Users → DB1, Orders → DB2)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="diagram">
+┌─────────────────────────────────────────┐
+│         Original Database               │
+├─────────────┬─────────────┬─────────────┤
+│  Shard 1    │  Shard 2    │  Shard 3    │
+│  UserID     │  UserID     │  UserID     │
+│  1-1000     │  1001-2000  │  2001-3000  │
+└─────────────┴─────────────┴─────────────┘
+            </div>
+
+            <div class="subsection">
+                <h3>✅ Why Use It</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Overcome Limits:</strong> Single database has hardware limits (CPU/Disk I/O)</li>
+                        <li><strong>Distribute Load:</strong> Spread read/write operations</li>
+                        <li><strong>Parallel Processing:</strong> Query multiple shards simultaneously</li>
+                        <li><strong>Geographic Locality:</strong> Store data closer to users</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>⚙️ How to Implement (ASP.NET)</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>EF Core:</strong> Custom "Connection String Provider" based on TenantId or UserId</li>
+                        <li><strong>EF Core Interceptors:</strong> Dynamically select database connection</li>
+                        <li><strong>Cloud:</strong> Azure SQL Elastic Pools</li>
+                        <li><strong>Built-in Support:</strong> MongoDB, Cassandra, Vitess for MySQL</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section no-break">
+            <h2><span class="section-number">4</span> Caching</h2>
+            
+            <div class="subsection">
+                <h3>📋 How It Works</h3>
+                <div class="content-box">
+                    <p>Storing frequently accessed data in <span class="highlight">lightning-fast RAM</span> instead of slow Hard Drive (Database).</p>
+                    <ul>
+                        <li>Store frequently accessed data in fast memory</li>
+                        <li>Multiple cache layers (L1: In-Memory, L2: Redis)</li>
+                        <li>Reduce database load by 80-90%</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="diagram">
+┌─────────┐  1. Request   ┌────────────┐
+│ Client  ├──────────────►│   App      │
+└─────────┘               └─────┬──────┘
+                                │ 2. Check L1
+                                ▼
+                    ┌─────────────────────┐
+                    │  In-Memory Cache    │
+                    │      (L1)           │
+                    └──────────┬──────────┘
+                               │ 3. If miss, check L2
+                               ▼
+                    ┌─────────────────────┐
+                    │   Redis Cache       │
+                    │      (L2)           │
+                    └──────────┬──────────┘
+                               │ 4. If miss, query DB
+                               ▼
+                    ┌─────────────────────┐
+                    │   Database          │
+                    └─────────────────────┘
+            </div>
+
+            <div class="subsection">
+                <h3>✅ Why Use It</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Speed:</strong> Response time drops from 200ms to 5ms</li>
+                        <li><strong>Reduced DB Load:</strong> 80-90% fewer database queries</li>
+                        <li><strong>Handle Spikes:</strong> Traffic spikes don't overwhelm database</li>
+                        <li><strong>Cost Savings:</strong> Lower infrastructure costs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>⚙️ How to Implement (ASP.NET)</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>In-Memory:</strong> IMemoryCache for L1 caching</li>
+                        <li><strong>Distributed:</strong> IDistributedCache with Redis for L2</li>
+                        <li><strong>Cloud:</strong> Azure Cache for Redis</li>
+                        <li><strong>Strategies:</strong> LRU (Least Recently Used), TTL (Time To Live)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-block">// ASP.NET Caching Example
+var user = await _cache.GetAsync&lt;User&gt;(key);
+if (user == null) {
+    user = await _db.Users.FindAsync(id);
+    await _cache.SetAsync(key, user, TimeSpan.FromMinutes(30));
+}
+return user;</div>
+        </div>
+
+        <div class="section no-break">
+            <h2><span class="section-number">5</span> Message Queues</h2>
+            
+            <div class="subsection">
+                <h3>📋 How It Works</h3>
+                <div class="content-box">
+                    <p><span class="highlight">"Fire and Forget"</span> - User uploads video → put message in queue → tell user "We're processing" → background worker handles it later.</p>
+                    <ul>
+                        <li>Decouple components with async messaging</li>
+                        <li>Buffer requests during traffic spikes</li>
+                        <li>Background processing of heavy tasks</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="diagram">
+┌─────────┐     ┌────────────┐     ┌─────────────┐
+│ Web App ├────►│  Message   ├────►│  Worker     │
+│         │     │   Queue    │     │  Process    │
+└─────────┘     └────────────┘     └──────┬──────┘
+                                          │
+                                          ▼
+                                   ┌─────────────┐
+                                   │  Database   │
+                                   │  Email Svc  │
+                                   └─────────────┘
+            </div>
+
+            <div class="subsection">
+                <h3>✅ Why Use It</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Quick Response:</strong> Users don't wait for heavy processing</li>
+                        <li><strong>Handle Bursts:</strong> Traffic spikes don't overwhelm servers</li>
+                        <li><strong>Reliable Processing:</strong> Retry logic for failed tasks</li>
+                        <li><strong>Parallel Processing:</strong> Multiple workers process simultaneously</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>⚙️ How to Implement (ASP.NET)</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Message Brokers:</strong> RabbitMQ, Apache Kafka, Redis Queue</li>
+                        <li><strong>.NET Libraries:</strong> MassTransit (popular), MediatR</li>
+                        <li><strong>Cloud:</strong> Azure Service Bus, AWS SQS, Storage Queues</li>
+                        <li><strong>Use Cases:</strong> Email sending, image processing, report generation, notifications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section no-break">
+            <h2><span class="section-number">6</span> CDN (Content Delivery Network)</h2>
+            
+            <div class="subsection">
+                <h3>📋 How It Works</h3>
+                <div class="content-box">
+                    <p>Stores copies of your images, CSS, and JS on servers <span class="highlight">all over the world</span>.</p>
+                    <ul>
+                        <li>Cache static content at edge locations globally</li>
+                        <li>Serve from nearest geographical point to user</li>
+                        <li>Dynamic content acceleration available</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>✅ Why Use It</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Reduced Latency:</strong> User in London gets content from London server, not New York</li>
+                        <li><strong>Bandwidth Savings:</strong> Reduce load on origin server</li>
+                        <li><strong>Handle Large Files:</strong> Videos, images efficiently delivered</li>
+                        <li><strong>DDoS Protection:</strong> Built-in security features</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>⚙️ How to Implement (ASP.NET)</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Providers:</strong> Cloudflare, AWS CloudFront, Akamai, Fastly</li>
+                        <li><strong>Cloud:</strong> Azure CDN</li>
+                        <li><strong>Implementation:</strong> Change URLs from <code>/logo.png</code> to <code>https://cdn.myapp.com/logo.png</code></li>
+                        <li><strong>Configuration:</strong> Set proper cache headers on static assets</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section no-break">
+            <h2><span class="section-number">7</span> Rate Limiting</h2>
+            
+            <div class="subsection">
+                <h3>📋 How It Works</h3>
+                <div class="content-box">
+                    <p>Limits how many requests a user can make per time window (e.g., <span class="highlight">100 requests/minute</span>).</p>
+                    <ul>
+                        <li>Limit requests per time window</li>
+                        <li>Protect against abuse and DDoS attacks</li>
+                        <li>Enforce fair usage policies</li>
+                        <li>Return HTTP 429 (Too Many Requests) when exceeded</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>✅ Why Use It</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>Prevent Abuse:</strong> Stop bots and hackers from overwhelming system</li>
+                        <li><strong>Resource Protection:</strong> Prevent resource exhaustion</li>
+                        <li><strong>Fair Usage:</strong> Ensure all users get fair access</li>
+                        <li><strong>API Monetization:</strong> Enforce tier-based limits</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>⚙️ How to Implement (ASP.NET)</h3>
+                <div class="content-box">
+                    <ul>
+                        <li><strong>.NET Built-in:</strong> Microsoft.AspNetCore.RateLimiting (.NET 7+)</li>
+                        <li><strong>Algorithms:</strong> Fixed Window, Sliding Window, Token Bucket, Leaky Bucket</li>
+                        <li><strong>Tools:</strong> Nginx, Kong, Redis-based counters</li>
+                        <li><strong>Cloud:</strong> Azure API Management (APIM)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-block">// ASP.NET Rate Limiting Example
+builder.Services.AddRateLimiter(options => {
+    options.AddFixedWindowLimiter("fixed", opt => {
+        opt.PermitLimit = 10;
+        opt.Window = TimeSpan.FromSeconds(10);
+    });
+});</div>
+        </div>
+
+        <div class="architecture-flow">
+            <h2>🔄 High-Level Architecture Flow</h2>
+            
+            <div class="flow-step">
+                <strong>Step 1:</strong> User Request → <strong>CDN</strong> (Static Files: CSS/JS/Images) → If static, return immediately
+            </div>
+            
+            <div class="flow-step">
+                <strong>Step 2:</strong> Dynamic request passes through <strong>Rate Limiter</strong> (Safety Gate)
+            </div>
+            
+            <div class="flow-step">
+                <strong>Step 3:</strong> <strong>Load Balancer</strong> (Traffic Cop) distributes to available server
+            </div>
+            
+            <div class="flow-step">
+                <strong>Step 4:</strong> <strong>Web Server</strong> (ASP.NET Core API) checks <strong>Redis Cache</strong> first
+            </div>
+            
+            <div class="flow-step">
+                <strong>Step 5:</strong> If cache miss, query <strong>Sharded Database</strong> (SQL Server/PostgreSQL)
+            </div>
+            
+            <div class="flow-step">
+                <strong>Step 6:</strong> Heavy tasks sent to <strong>Message Queue</strong> (RabbitMQ) for async processing
+            </div>
+            
+            <div class="flow-step">
+                <strong>Step 7:</strong> <strong>Background Workers</strong> process queued tasks independently
+            </div>
+        </div>
+
+        <div class="summary-box">
+            <h2>📊 ASP.NET Implementation Summary</h2>
+            
+            <table class="tools-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>.NET Tool / Library</th>
+                        <th>Cloud Service (Azure)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Horizontal Scaling</strong></td>
+                        <td>Kubernetes / Docker</td>
+                        <td>Azure App Service, AKS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Load Balancing</strong></td>
+                        <td>YARP (Yet Another Reverse Proxy)</td>
+                        <td>Azure Front Door, Application Gateway</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Caching</strong></td>
+                        <td>IMemoryCache, IDistributedCache</td>
+                        <td>Azure Cache for Redis</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Message Queues</strong></td>
+                        <td>MassTransit, MediatR</td>
+                        <td>Azure Service Bus, Storage Queues</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rate Limiting</strong></td>
+                        <td>Microsoft.AspNetCore.RateLimiting</td>
+                        <td>Azure API Management (APIM)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database Sharding</strong></td>
+                        <td>EF Core Interceptors</td>
+                        <td>Azure SQL Elastic Pools</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CDN</strong></td>
+                        <td>Static File Middleware</td>
+                        <td>Azure CDN, Front Door</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>🏗️ Complete ASP.NET High-Traffic Architecture</h2>
+            
+            <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────┐
+│                   High-Traffic ASP.NET Architecture                 │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────┐    ┌──────────────┐    ┌──────────────┐              │
+│  │ Clients │───►│   CDN        │───►│ Load Balancer│              │
+│  │         │    │ (Cloudflare) │    │  (Nginx/YARP)│              │
+│  └─────────┘    └──────────────┘    └──────┬───────┘              │
+│                                             │                       │
+│                 ┌───────────────────────────┼─────────────────┐    │
+│                 │ Rate Limiting & API Gateway                 │    │
+│                 └──────────────┬────────────┘                 │    │
+│                                │                              │    │
+│           ┌─────────┬──────────┼──────────┬──────────┐        │    │
+│           │         │          │          │          │        │    │
+│      ┌────▼──┐ ┌────▼──┐ ┌────▼──┐ ┌────▼──┐ ┌────▼──┐       │    │
+│      │ App   │ │ App   │ │ App   │ │ App   │ │ App   │       │    │
+│      │ Srv 1 │ │ Srv 2 │ │ Srv 3 │ │ Srv 4 │ │ Srv 5 │       │    │
+│      └───┬───┘ └───┬───┘ └───┬───┘ └───┬───┘ └───┬───┘       │    │
+│          │         │         │         │         │           │    │
+│      ┌───┴─────────┴─────────┴─────────┴─────────┴───┐       │    │
+│      │      Shared Redis Cache Layer                  │       │    │
+│      │      (Session, Cache, Rate Limiting)           │       │    │
+│      └───────────────────────┬────────────────────────┘       │    │
+│                              │                                │    │
+│      ┌───────────────────────┴────────────────────────┐       │    │
+│      │      Message Queue
+│      │      Message Queue (RabbitMQ/Kafka)            │       │    │
+│      │      (Async Processing)                        │       │    │
+│      └───────┬─────────────────────────┬──────────────┘       │    │
+│              │                         │                      │    │
+│        ┌─────▼─────┐             ┌─────▼─────┐               │    │
+│        │  Worker   │             │  Worker   │               │    │
+│        │ Processes │             │ Processes │               │    │
+│        └─────┬─────┘             └─────┬─────┘               │    │
+│              │                         │                      │    │
+│      ┌───────┴─────────────────────────┴───────┐             │    │
+│      │           Database Layer                 │             │    │
+│      │  ┌─────────┐  ┌─────────┐  ┌─────────┐  │             │    │
+│      │  │ Shard 1 │  │ Shard 2 │  │ Shard 3 │  │             │    │
+│      │  │ (Users) │  │(Orders) │  │(Products)│  │             │    │
+│      │  └─────────┘  └─────────┘  └─────────┘  │             │    │
+│      └──────────────────────────────────────────┘             │    │
+│                                                               │    │
+└───────────────────────────────────────────────────────────────┘    │
+                                                                     │
+┌────────────────────────────────────────────────────────────────────┘
+│                   Monitoring & Observability
+│  ┌────────────┐ ┌───────────┐ ┌──────────┐ ┌──────────┐
+│  │ App        │ │ Log       │ │ Metrics  │ │ Tracing  │
+│  │ Insights   │ │ Analytics │ │(Prometheus││(Jaeger/  │
+│  │ (Azure)    │ │ (ELK)     │ │ /Grafana)││ Zipkin)   │
+│  └────────────┘ └───────────┘ └──────────┘ └──────────┘
+└────────────────────────────────────────────────────────────────────
+            </div>
+        </div>
+		 <div class="key-note">
+        <strong>🎯 Key Implementation Notes:</strong>
+        <ul>
+            <li><strong>Stateless Design:</strong> Externalize sessions to Redis - never store in server memory</li>
+            <li><strong>Health Checks:</strong> Implement readiness/liveness probes for each service</li>
+            <li><strong>Configuration Management:</strong> Use Azure App Configuration or similar</li>
+            <li><strong>Comprehensive Monitoring:</strong> Logging, metrics, and distributed tracing</li>
+            <li><strong>Auto-scaling:</strong> Configure cloud-native auto-scaling based on CPU/memory metrics</li>
+            <li><strong>Disaster Recovery:</strong> Multi-region deployment with automatic failover</li>
+        </ul>
+    </div>
+
+    <div class="summary-box">
+        <h2>💡 Why This Works: The Elasticity Principle</h2>
+        <p><strong>Peak Traffic (9:00 AM - 10,000 users):</strong></p>
+        <ul>
+            <li>✅ Load Balancer spins up more ASP.NET instances</li>
+            <li>✅ CDN handles all static content (images, CSS, JS)</li>
+            <li>✅ Redis Cache prevents database from melting</li>
+            <li>✅ Message Queue handles heavy background work</li>
+            <li>✅ Rate Limiter protects from abuse</li>
+        </ul>
+        
+        <p style="margin-top: 15px;"><strong>Low Traffic (12:00 PM - 100 users):</strong></p>
+        <ul>
+            <li>✅ System scales down automatically</li>
+            <li>✅ Cost savings on unused resources</li>
+            <li>✅ Maintains performance for active users</li>
+        </ul>
+    </div>
+
+    <div class="key-note" style="background: #fee2e2; border-color: #dc2626;">
+        <strong style="color: #991b1b;">⚠️ Critical Performance Metrics:</strong>
+        <ul>
+            <li><strong>Response Time:</strong> Without caching: 200ms | With caching: 5ms (40x faster)</li>
+            <li><strong>Database Load:</strong> Caching reduces by 80-90%</li>
+            <li><strong>Throughput:</strong> Single server: 100 req/s | Horizontal scaling: 10,000+ req/s</li>
+            <li><strong>Availability:</strong> Single server: 95% | Load balanced: 99.9%</li>
+        </ul>
+    </div>
+
+    <footer style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280;">
+        <p><strong>This architecture can handle thousands of requests per second while maintaining performance, reliability, and scalability.</strong></p>
+        <p style="margin-top: 10px; font-size: 0.9em;">Design Pattern: Distributed, Scalable, High-Availability System Architecture</p>
+    </footer>
+</div>
+</body>
+</html>

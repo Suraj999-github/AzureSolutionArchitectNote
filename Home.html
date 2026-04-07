@@ -126,9 +126,75 @@
     .container-fluid {
       max-width: 1600px;
     }
+    nav {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+nav a {
+    color: #f3f4f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    letter-spacing: 0.3px;
+}
+
+nav a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* Optional: Add an underline animation effect */
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #ffd700;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+nav a:hover::after {
+    width: 70%;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    nav a {
+        text-align: center;
+        padding: 0.75rem;
+    }
+}  
   </style>
+  
 </head>
 <body>
+
+<nav>    
+  <a href="ManyApiRequest.html">Handling Thousands of Requests</a>
+	<a href="CodingQuestions.html">Coding Questions</a>
+</nav>
 
   <!-- minimal header only with cert tabs (no extra badges) -->
   <div class="dashboard-tabs">
@@ -426,7 +492,13 @@
 	    <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
         <iframe   src="Pdfs/Azure Notes.pdf"     width="100%"     height="100%"     style="border:0;"     allowfullscreen   ></iframe>
       </div>
-	   
+	    <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <iframe   src="Pdfs/Top 172 Interview.pdf"     width="100%"     height="100%"     style="border:0;"     allowfullscreen   ></iframe>
+      </div>
+      <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <iframe   src="Pdfs/DSA workbook.pdf"     width="100%"     height="100%"     style="border:0;"     allowfullscreen   ></iframe>
+      </div>
+      
     </div>
   </div>
 </div>
@@ -446,6 +518,23 @@
 	   <div class="tab-pane fade" id="sql" role="tabpanel">
       <div class="row g-4 mt-2">
         <!-- SQL Interview Questions pdf-->
+        <div class="col-12">
+          <div class="card p-4">
+            <div class="card-body">
+        
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="fas fa-shield-alt"></i> Sql Queries
+              </h5>
+              <p class="card-text">Best practices for securing APIs in  solutions.</p>
+              <img src="Images/sql1.jpg" alt="" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+        <img src="Images/sql2.jpg" alt="" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+        <img src="Images/sql3.jpg" alt="" class="img-fluid rounded mb-3" style="max-height:1000px; object-fit:contain;">
+                
+            </div>
+          </div>
+        </div> 
+      </div>
         <div class="col-12">
           <div class="card p-4">
             <div class="card-body text-center">
@@ -472,7 +561,17 @@
               </div>
             </div>
           </div>
+        </div> 
+        <div class="col-12">
+          <div class="card p-4">
+            <div class="card-body text-center">
+              <div style="height: 1000px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                <iframe src="db/SQl Interviews.pdf" width="100%" height="100%" style="border:0;" allowfullscreen></iframe>
+              </div>
+            </div>
+          </div>
         </div>
+     
       </div>
     </div>
     
@@ -713,7 +812,8 @@
       
           </div>
         </div>
-      </div> </div>
+      </div> 
+    </div>
       <!-- Architecture Concept -->
      
       <div class="col-12">
