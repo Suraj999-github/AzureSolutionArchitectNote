@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead .NET Engineer Interview Questions & Answers</title>
+    <style>
+        :root {
+            --primary: #1a56db;
+            --primary-light: #e8f0fe;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #475569;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+            --radius: 12px;
+            --gap: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 48px 24px 60px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px 32px;
+            margin: 32px 0;
+            border: 1px solid var(--border);
+        }
+        .toc h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: var(--secondary);
+        }
+        .toc ol {
+            columns: 2;
+            column-gap: 32px;
+            padding-left: 20px;
+        }
+        @media (max-width: 640px) {
+            .toc ol {
+                columns: 1;
+            }
+        }
+        .toc li {
+            margin-bottom: 6px;
+            break-inside: avoid;
+        }
+        .toc a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        /* Topic Cards */
+        .topic-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            margin-bottom: var(--gap);
+            border: 1px solid var(--border);
+        }
+        .topic-card h2 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .topic-card h2 .number {
+            background: var(--primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .qa-block {
+            margin-bottom: 24px;
+            border-left: 4px solid var(--primary);
+            padding-left: 20px;
+        }
+        .qa-block:last-child {
+            margin-bottom: 0;
+        }
+        .question {
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .answer {
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+        .follow-up {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 8px;
+            font-style: italic;
+            color: #334155;
+            border-left: 3px solid #94a3b8;
+        }
+        .follow-up strong {
+            font-style: normal;
+            color: var(--secondary);
+        }
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            margin: 10px 0;
+        }
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: #64748b;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .topic-card {
+                padding: 20px;
+            }
+        }
+        nav {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+nav a {
+    color: #f3f4f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    letter-spacing: 0.3px;
+}
+
+nav a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* Optional: Add an underline animation effect */
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #ffd700;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+nav a:hover::after {
+    width: 70%;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    nav a {
+        text-align: center;
+        padding: 0.75rem;
+    }
+}  
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="Home.html">Home</a>
+        <a href="CodingQuestions.html">Coding Questions</a>
+        <a href="Authentication.html">Authentication in .NET Core</a>
+        <a href="ManyApiRequest.html">Handling Thousands of Requests</a>
+        <a href="dotnet_senior_interview_guide.html">Real-World .NET Interview</a>
+        </nav>
+    <!-- Header -->
+    <header class="hero">
+        <h1>🧠 Lead .NET Engineer Interview Questions & Answers</h1>
+        <p>Architecture, scalability, security, and resilience — with real‑world .NET examples</p>
+    </header>
+
+    <div class="container">
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h2>📋 Topics Covered</h2>
+            <ol>
+                <li><a href="#t1">API Gateway vs Load Balancer</a></li>
+                <li><a href="#t2">Reverse Proxy vs Forward Proxy</a></li>
+                <li><a href="#t3">Horizontal vs Vertical Scaling</a></li>
+                <li><a href="#t4">Microservices vs Monolithic Architecture</a></li>
+                <li><a href="#t5">Caching Strategies</a></li>
+                <li><a href="#t6">Rate Limiting</a></li>
+                <li><a href="#t7">Single Sign‑On (SSO)</a></li>
+                <li><a href="#t8">Apache Kafka</a></li>
+                <li><a href="#t9">Kafka vs ActiveMQ vs RabbitMQ</a></li>
+                <li><a href="#t10">JWT vs OAuth vs SAML</a></li>
+                <li><a href="#t11">Database Scaling</a></li>
+                <li><a href="#t12">Database Replication vs Sharding</a></li>
+                <li><a href="#t13">JWT vs Session‑Based Authentication</a></li>
+                <li><a href="#t14">Consistent Hashing</a></li>
+                <li><a href="#t15">Message Queues</a></li>
+                <li><a href="#t16">REST vs gRPC</a></li>
+                <li><a href="#t17">Leader Election (Raft, Paxos)</a></li>
+                <li><a href="#t18">Circuit Breakers</a></li>
+                <li><a href="#t19">Failover and Disaster Recovery</a></li>
+                <li><a href="#t20">Heartbeats and Health Checks</a></li>
+                <li><a href="#t21">CQRS</a></li>
+                <li><a href="#t22">Event‑Driven Architecture</a></li>
+                <li><a href="#t23">Microservices vs Monolith – Deep Comparison</a></li>
+                <li><a href="#t24">Saga Pattern</a></li>
+                <li><a href="#t25">Idempotency</a></li>
+            </ol>
+        </div>
+
+        <!-- Topics -->
+        <!-- Topic 1 -->
+        <div class="topic-card" id="t1">
+            <h2><span class="number">1</span> API Gateway vs Load Balancer</h2>
+            <div class="qa-block">
+                <div class="question">Q: At a high level, what distinguishes an API Gateway from a Load Balancer? In a microservices architecture, where does each sit, and why would you use both?</div>
+                <div class="answer">
+                    <p>A <strong>Load Balancer</strong> operates at transport/network layer (L4) or application layer (L7), distributing incoming traffic across multiple backend servers for availability and fault tolerance. It’s typically transparent, using algorithms like round‑robin or least connections.</p>
+                    <p>An <strong>API Gateway</strong> works exclusively at L7, acting as a reverse proxy that routes, composes, and transforms API requests. It centralizes cross‑cutting concerns: authentication, rate limiting, request/response transformation, logging, and routing based on path/header. It may also aggregate responses from multiple microservices.</p>
+                    <p><strong>Using both:</strong> In a .NET deployment, a load balancer (e.g., Azure Load Balancer or AWS ALB) distributes traffic among instances of the API Gateway for high availability. The gateway then routes to individual microservices, applying policies. This decouples scaling of the gateway tier from backend services.</p>
+                    <p><strong>Real‑world .NET example:</strong> YARP (Yet Another Reverse Proxy) can be configured as an API Gateway in ASP.NET Core. Behind it, internal services communicate via gRPC or HTTP, while an L4 load balancer ensures multiple gateway instances are available.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you implement rate limiting and authentication in an API Gateway built with YARP in .NET 8?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 2 -->
+        <div class="topic-card" id="t2">
+            <h2><span class="number">2</span> Reverse Proxy vs Forward Proxy</h2>
+            <div class="qa-block">
+                <div class="question">Q: Explain the fundamental difference between a forward proxy and a reverse proxy. Give a scenario where each is used in a .NET ecosystem.</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Forward Proxy:</strong> Sits between internal clients and the internet. Clients explicitly configure it; the proxy makes requests on their behalf (e.g., hiding client IPs, enforcing corporate web filtering). In .NET, you might set `HttpClientHandler.Proxy` to route outbound calls through an enterprise proxy.</li>
+                        <li><strong>Reverse Proxy:</strong> Sits in front of web servers, intercepting requests from the internet. It provides load balancing, SSL termination, caching, and security. The client thinks it’s talking to the origin server directly. In ASP.NET Core, YARP or IIS ARR serves as a reverse proxy.</li>
+                    </ul>
+                    <p><strong>Real‑world scenario:</strong> A .NET back‑end might use a forward proxy (e.g., Squid) to scrape external APIs while masking IPs. A reverse proxy (like YARP) shields internal microservices, terminates TLS, and routes by paths.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you handle WebSocket connections through a reverse proxy in ASP.NET Core and what configuration is required?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 3 -->
+        <div class="topic-card" id="t3">
+            <h2><span class="number">3</span> Horizontal scaling vs Vertical scaling</h2>
+            <div class="qa-block">
+                <div class="question">Q: Compare horizontal and vertical scaling. As a Lead Engineer, how do you decide which approach is appropriate for a .NET monolith vs a set of microservices?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Vertical scaling (scaling up):</strong> Adding more resources (CPU, RAM) to a single server. Simple but hits physical limits, creates a single point of failure, often requires downtime.</li>
+                        <li><strong>Horizontal scaling (scaling out):</strong> Adding more instances. Demands statelessness or distributed state management. In .NET, session state must be externalized (e.g., Redis via `IDistributedCache`) and file storage moved to blob storage or a network share.</li>
+                    </ul>
+                    <p><strong>Decision factors:</strong> Monoliths often initially scaled vertically because they are stateful. Beyond a point, horizontal scaling requires containerization and careful session management. Microservices are designed for horizontal scaling; each service can scale independently. Kubernetes or Azure App Service auto‑scale adjusts instance counts.</p>
+                    <p>Vertical scaling is cheaper until you need extreme scale; horizontal scaling increases operational complexity (service discovery, distributed tracing, eventual consistency). A .NET lead plans for horizontal scaling from the start if traffic is unpredictable.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you migrate a session‑heavy ASP.NET Framework app to support horizontal scaling on .NET Core?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 4 -->
+        <div class="topic-card" id="t4">
+            <h2><span class="number">4</span> Microservices vs Monolithic architecture</h2>
+            <div class="qa-block">
+                <div class="question">Q: When would you argue <em>against</em> breaking an existing well‑structured .NET monolith into microservices?</div>
+                <div class="answer">
+                    <p>Microservices add substantial complexity. Reasons to stay monolithic:</p>
+                    <ul>
+                        <li><strong>Team size &amp; maturity:</strong> Small teams can maintain a modular monolith with clear interfaces, avoiding distributed‑system overhead.</li>
+                        <li><strong>Performance requirements:</strong> Monoliths have zero network latency between modules; breaking them adds serialization, network hops, and eventual consistency challenges.</li>
+                        <li><strong>Data integrity:</strong> Strong ACID transactions across domains are trivial in a monolith but require sagas or 2PC in microservices.</li>
+                        <li><strong>Development velocity:</strong> A monolith allows simpler debugging, integrated testing, and deployments until the codebase becomes unmanageable.</li>
+                        <li><strong>Cost:</strong> Running dozens of microservices with separate databases, message brokers, and orchestrators is expensive for low‑traffic apps.</li>
+                    </ul>
+                    <p>Many successful projects start as an ASP.NET Core modular monolith using MediatR and vertical slices, only extracting services when a module requires independent scaling or a different tech stack.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you migrate a tightly coupled module out of the monolith using the Strangler Fig pattern in .NET?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 5 -->
+        <div class="topic-card" id="t5">
+            <h2><span class="number">5</span> Caching strategies</h2>
+            <div class="qa-block">
+                <div class="question">Q: Walk through the major caching patterns (cache‑aside, read‑through, write‑through, write‑behind). Which one would you use for a high‑read product catalog in an ASP.NET Core API, and why?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Cache‑aside (lazy loading):</strong> Application first checks cache; on miss, fetches from DB and populates cache. Control logic lives in application code.</li>
+                        <li><strong>Read‑through:</strong> Cache sits between app and DB; application only talks to cache. Cache loads data on miss transparently.</li>
+                        <li><strong>Write‑through:</strong> Writes go to cache, which synchronously writes to DB. Cache always up‑to‑date but increases write latency.</li>
+                        <li><strong>Write‑behind (write‑back):</strong> Writes go to cache, which asynchronously flushes to DB. Lower write latency, risk of data loss.</li>
+                    </ul>
+                    <p><strong>For a product catalog (read‑heavy, infrequent writes):</strong> Cache‑aside is simple and widely supported. Using `IDistributedCache` (Redis) with `Microsoft.Extensions.Caching.StackExchangeRedis`, the code checks Redis; on miss, fetches from SQL Server and caches with TTL. Change propagation via cache invalidation through pub/sub (e.g., Redis Pub/Sub or a message queue) when a product updates.</p>
+                    <p>Lead‑level: set appropriate TTLs, use staggered expiration to avoid thundering herds, and consider stampede prevention (e.g., `GetOrCreateAsync` with a semaphore or lock).</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you handle cache stampede in a distributed cache using Redis with .NET, and what are the pitfalls of lock‑based solutions?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 6 -->
+        <div class="topic-card" id="t6">
+            <h2><span class="number">6</span> Rate limiting</h2>
+            <div class="qa-block">
+                <div class="question">Q: Design a rate‑limiting strategy for a multi‑tenant SaaS API built with ASP.NET Core where each tenant has different subscription levels.</div>
+                <div class="answer">
+                    <p><strong>Requirement:</strong> Per‑tenant limits (Free: 100 req/min, Pro: 1000 req/min) and global DDoS protection.</p>
+                    <p><strong>Algorithm:</strong> Token bucket (allows bursts), sliding window, or fixed window. Token bucket is often preferred for smoothing.</p>
+                    <p><strong>Implementation in .NET:</strong> Use the built‑in `System.Threading.RateLimiting` namespace (introduced in .NET 7/8) with `AddRateLimiter()` middleware. A custom `IRateLimiterPolicy<string>` resolves the tenant from JWT claim/API key and selects the appropriate `RateLimiterOptions`. Store state in a distributed cache (Redis) for multi‑instance consistency. For extreme scale, use Redis‑Lua scripts for atomic counters.</p>
+                    <p><strong>Architecture:</strong> Place rate‑limiting at the API Gateway (YARP) to offload backend services, and propagate headers like `X-RateLimit-Remaining`.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you communicate rate‑limit status to clients (e.g., headers) and handle retries gracefully in a .NET SPA?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 7 -->
+        <div class="topic-card" id="t7">
+            <h2><span class="number">7</span> Single Sign‑On (SSO)</h2>
+            <div class="qa-block">
+                <div class="question">Q: You need to implement SSO across three ASP.NET Core web apps on different subdomains. What authentication protocol would you choose, and how would you configure the middleware?</div>
+                <div class="answer">
+                    <p><strong>Protocol:</strong> OpenID Connect (OIDC) with OAuth 2.0 is the modern standard. SAML may be used for legacy enterprise providers, but OIDC is simpler and widely supported in .NET.</p>
+                    <p><strong>Implementation:</strong></p>
+                    <ul>
+                        <li>Run an identity provider (Duende IdentityServer, Azure AD) at `auth.example.com`.</li>
+                        <li>Each app uses `AddOpenIdConnect()` with authorization code flow + PKCE for SPAs if needed.</li>
+                        <li>Share authentication cookie across subdomains by setting `Cookie.Domain = ".example.com"`.</li>
+                        <li>Configure the OIDC options with `Authority`, `ClientId`, `ClientSecret`, `ResponseType = "code"`, and `SaveTokens = true`.</li>
+                        <li>For API backends, the same authority issues JWT access tokens; APIs validate them with `AddJwtBearer()`.</li>
+                    </ul>
+                    <p><strong>Security:</strong> Enforce HTTPS, use `SameSite=Lax`/`Strict` cookies, configure CORS, and use token refresh with sliding expiration for long‑lived sessions.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you handle single logout across all subdomains using the OIDC back‑channel logout specification in .NET Core?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 8 -->
+        <div class="topic-card" id="t8">
+            <h2><span class="number">8</span> Apache Kafka</h2>
+            <div class="qa-block">
+                <div class="question">Q: What makes Kafka extremely fast for high‑throughput messaging, and how would you integrate it into a .NET event‑driven system using Confluent.Kafka?</div>
+                <div class="answer">
+                    <p><strong>Speed factors:</strong></p>
+                    <ul>
+                        <li><strong>Sequential disk I/O:</strong> Append‑only log segments, leveraging sequential writes.</li>
+                        <li><strong>Zero‑copy transfer:</strong> `sendfile()` syscall from page cache to socket buffer without copying to user space.</li>
+                        <li><strong>Batch processing &amp; compression:</strong> Producers batch messages; compression (LZ4, Zstd) reduces network/storage overhead.</li>
+                        <li><strong>Partitioning:</strong> Topics are split into partitions for parallelism across brokers and consumers.</li>
+                        <li><strong>Page cache reliance:</strong> Frequently accessed data sits in OS page cache, avoiding disk reads.</li>
+                    </ul>
+                    <p><strong>Integration in .NET:</strong> Use `Confluent.Kafka` with `ProducerBuilder` and `ConsumerBuilder`. For reliability, use idempotent producers (`EnableIdempotence = true`), manual offset commits, and implement the outbox pattern with EF Core to atomically update DB and publish events. For high availability, configure multiple bootstrap servers and retries.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you guarantee exactly‑once semantics end‑to‑end when using Kafka with a .NET application and a relational database?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 9 -->
+        <div class="topic-card" id="t9">
+            <h2><span class="number">9</span> Kafka vs ActiveMQ vs RabbitMQ</h2>
+            <div class="qa-block">
+                <div class="question">Q: Compare Apache Kafka, ActiveMQ, and RabbitMQ in terms of message delivery guarantees, throughput, and typical use cases.</div>
+                <div class="answer">
+                    <table style="width:100%; border-collapse: collapse; margin:10px 0;">
+                        <tr style="background:#f1f5f9;"><th style="padding:8px; text-align:left;">Feature</th><th style="padding:8px; text-align:left;">RabbitMQ</th><th style="padding:8px; text-align:left;">Kafka</th><th style="padding:8px; text-align:left;">ActiveMQ</th></tr>
+                        <tr><td style="padding:8px;">Messaging model</td><td style="padding:8px;">AMQP exchanges/queues</td><td style="padding:8px;">Distributed log, partitions</td><td style="padding:8px;">JMS queues and topics</td></tr>
+                        <tr><td style="padding:8px;">Throughput</td><td style="padding:8px;">Moderate (~20k msg/s)</td><td style="padding:8px;">Very high (~millions)</td><td style="padding:8px;">Moderate to high</td></tr>
+                        <tr><td style="padding:8px;">Persistence</td><td style="padding:8px;">Message‑centric, deleted after consumption</td><td style="padding:8px;">Log‑centric, retained based on retention policy</td><td style="padding:8px;">Both persistent/non‑persistent</td></tr>
+                        <tr><td style="padding:8px;">Use cases</td><td style="padding:8px;">Task queues, reliable commands</td><td style="padding:8px;">Event streaming, analytics</td><td style="padding:8px;">Legacy JMS integration</td></tr>
+                    </table>
+                    <p>For .NET microservices: use <strong>RabbitMQ</strong> (with MassTransit) for command/request‑response patterns. Use <strong>Kafka</strong> (Confluent.Kafka) for event‑driven architectures, data pipelines, and replayability. ActiveMQ is less common in new .NET projects unless integrating with Java/JMS systems.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How does RabbitMQ's quorum queue feature compare to Kafka's durability and availability for a .NET application requiring data safety?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 10 -->
+        <div class="topic-card" id="t10">
+            <h2><span class="number">10</span> JWT vs OAuth vs SAML</h2>
+            <div class="qa-block">
+                <div class="question">Q: Many developers confuse JWT, OAuth, and SAML. Clarify the roles each plays, and describe a scenario where you would use all three together in a .NET ecosystem.</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>JWT (JSON Web Token):</strong> Compact, URL‑safe token format carrying claims. Often used as access tokens, ID tokens, or refresh tokens.</li>
+                        <li><strong>OAuth 2.0:</strong> Authorization framework allowing third‑party apps to obtain limited access. Defines flows (authorization code, client credentials) but not token format.</li>
+                        <li><strong>SAML (Security Assertion Markup Language):</strong> XML‑based standard for exchanging authentication/authorization data, mainly for enterprise SSO.</li>
+                    </ul>
+                    <p><strong>Scenario:</strong> A corporate .NET app uses SAML to authenticate against Active Directory Federation Services (AD FS). The identity server (Duende IdentityServer) accepts the SAML assertion and issues a JWT access token (per OAuth 2.0) for the API gateway and downstream services. SAML for legacy IDP, OAuth 2.0 for modern token‑based security, JWT as the lightweight token.</p>
+                    <p>.NET libraries: `Sustainsys.Saml2`, `AddOpenIdConnect()`, `AddJwtBearer()`.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you map SAML attributes to JWT claims when bridging between the two protocols in a .NET identity service, and what security considerations apply?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 11 -->
+        <div class="topic-card" id="t11">
+            <h2><span class="number">11</span> Database scaling</h2>
+            <div class="qa-block">
+                <div class="question">Q: You are architecting a .NET e‑commerce platform that initially runs on a single SQL Server instance but must scale to handle 10x read traffic and 5x write traffic. Outline a comprehensive scaling strategy.</div>
+                <div class="answer">
+                    <p><strong>Read scaling:</strong></p>
+                    <ul>
+                        <li>Add read replicas (Always On Availability Groups, Azure SQL Geo‑Replication).</li>
+                        <li>Implement read‑write split in data access layer, routing queries to replicas via custom `DbContext` or libraries like `EFCoreSecondLevelCacheInterceptor`.</li>
+                        <li>Introduce Redis cache for frequently accessed data (product details, pricing).</li>
+                        <li>Materialized views or denormalized read models via CQRS.</li>
+                    </ul>
+                    <p><strong>Write scaling:</strong></p>
+                    <ul>
+                        <li>Vertical scaling first; then sharding by tenant/region.</li>
+                        <li>Message queue (RabbitMQ/Kafka) to buffer writes, eventual consistency for non‑critical operations.</li>
+                        <li>Optimize connection pooling (`Max Pool Size`).</li>
+                    </ul>
+                    <p><strong>Supporting patterns:</strong> Outbox pattern + change data capture (Debezium) for syncing. Consider NoSQL (Cosmos DB, DynamoDB) for specific workloads if relational limits are exceeded.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you implement sharding transparently in Entity Framework Core, and what are the limitations?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 12 -->
+        <div class="topic-card" id="t12">
+            <h2><span class="number">12</span> Database replication vs sharding</h2>
+            <div class="qa-block">
+                <div class="question">Q: Differentiate database replication from database sharding. When would you choose one over the other, and how does the .NET application layer change?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Replication:</strong> Copies data to one or more replicas. Provides read scalability, HA, DR. Writes go to primary, reads can be routed to replicas. .NET needs read/write splitting (connection strings or routing `DbContext`).</li>
+                        <li><strong>Sharding:</strong> Splits data into independent partitions based on a shard key. Enables write scalability because writes are distributed. Application must route to the correct shard, often via a shard map manager or custom logic based on tenant ID.</li>
+                    </ul>
+                    <p><strong>Choice:</strong> Replication when read load overwhelms a single instance but write load is manageable. Sharding when dataset size or write throughput exceeds a single server’s capacity, or for multi‑tenant isolation.</p>
+                    <p>Application changes: replication requires minimal code changes; sharding demands careful key design, cross‑shard query constraints, and potential use of sagas for data spanning shards.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you handle a query that needs data from multiple shards in a .NET application? What patterns (e.g., scatter‑gather) would you apply?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 13 -->
+        <div class="topic-card" id="t13">
+            <h2><span class="number">13</span> JWT vs session‑based authentication</h2>
+            <div class="qa-block">
+                <div class="question">Q: As a Lead Engineer, you must choose between JWT‑based and session‑based authentication for a new ASP.NET Core web app that serves both a server‑rendered UI and a public API. Compare the two and explain your decision.</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>JWT:</strong> Stateless, client stores token. Server validates signature, no server‑side session storage. Ideal for APIs, SPAs, mobile. Challenges: revocation, token size. .NET: `AddJwtBearer()`.</li>
+                        <li><strong>Session‑based:</strong> Server creates session, stores cookie with session ID. Stateful; requires session storage (Redis). Simple revocation, smaller client footprint. .NET: `AddCookie()` with `ISession` or `ITicketStore`.</li>
+                    </ul>
+                    <p><strong>Hybrid approach:</strong> Register both schemes. Cookie auth for browser interactions (MVC/Razor), JWT for API calls via `Authorization: Bearer` header, using schemes policies (`[Authorize(AuthenticationSchemes = "...")]`). This gives the best of both worlds. Public API gets JWT; server‑rendered part benefits from cookie auth’s ease of invalidation and built‑in CSRF protection.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you secure a JWT against XSS attacks in a browser‑based application, and how does that compare with HttpOnly cookies used in session authentication?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 14 -->
+        <div class="topic-card" id="t14">
+            <h2><span class="number">14</span> Consistent hashing</h2>
+            <div class="qa-block">
+                <div class="question">Q: Explain consistent hashing and its advantages over simple modulo‑based distribution. How would you implement a consistent hash ring in a .NET distributed caching layer using Redis?</div>
+                <div class="answer">
+                    <p><strong>Consistent hashing</strong> maps nodes and keys to a circular space (0 to 2^32‑1). Adding/removing a node remaps only a fraction of keys, minimizing cache invalidation. Modulo `hash(key) % N` invalidates almost all keys when N changes.</p>
+                    <p><strong>In .NET:</strong> Use a `SortedDictionary&lt;long, string&gt;` to represent the ring. Compute hash (e.g., MurmurHash) for each node with virtual nodes to balance load. For a key, find the closest node in the ring via binary search. In practice, distributed cache clients like `StackExchange.Redis` with Redis Cluster handle consistent hashing internally; you rarely write it from scratch. Understanding it is essential when designing sharded services or custom key‑value stores.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do virtual nodes improve consistent hashing load distribution, and how would you configure them in a .NET‑based distributed key‑value store?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 15 -->
+        <div class="topic-card" id="t15">
+            <h2><span class="number">15</span> Message queues</h2>
+            <div class="qa-block">
+                <div class="question">Q: Describe how message queues improve system resilience and scalability. Walk through a specific scenario in .NET where you would use an asynchronous command queue with dead‑letter handling.</div>
+                <div class="answer">
+                    <p><strong>Benefits:</strong> decoupling, buffering, resilience (retries, dead‑letter), scalability (competing consumers).</p>
+                    <p><strong>Scenario:</strong> Order placement API receives high load. Instead of synchronous inventory/payment/email, it publishes `PlaceOrderCommand` to an Azure Service Bus queue. A .NET `BackgroundService` with `ServiceBusProcessor` consumes messages. On transient failure, retries 3 times with exponential backoff, then moves to dead‑letter queue. Another process monitors DLQ and alerts operations.</p>
+                    <p>Implementation can use `Azure.Messaging.ServiceBus` or MassTransit with RabbitMQ, which provides retry, circuit breaker, and DLQ middleware.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you maintain message ordering when scaling out consumers in a competing consumer pattern in .NET, and what alternatives exist (e.g., partitioned queues)?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 16 -->
+        <div class="topic-card" id="t16">
+            <h2><span class="number">16</span> REST vs gRPC</h2>
+            <div class="qa-block">
+                <div class="question">Q: When would you choose gRPC over REST for service‑to‑service communication in a .NET microservices ecosystem? What performance and tooling trade‑offs exist?</div>
+                <div class="answer">
+                    <p><strong>gRPC advantages:</strong> HTTP/2 multiplexing, binary Protobuf serialization → lower latency, smaller payloads, strong typing, bidirectional streaming, built‑in deadlines/cancellation. In .NET, `Grpc.AspNetCore` provides first‑class support.</p>
+                    <p><strong>REST advantages:</strong> Human‑readable JSON, wide tooling (curl, Postman, Swagger), browser‑friendly.</p>
+                    <p>For internal .NET‑to‑.NET microservices where latency matters, gRPC is strongly preferred. For external/public APIs, REST with JSON remains standard due to interoperability. gRPC’s binary nature complicates debugging; you may need `grpcurl`.</p>
+                    <p>Lead note: In a polyglot environment, ensure all platforms have solid gRPC support. You can expose dual REST/gRPC APIs using ASP.NET Core’s ability to run both, but weigh the maintenance cost.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you implement service discovery and client‑side load balancing for gRPC services in a .NET environment deployed on Kubernetes?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 17 -->
+        <div class="topic-card" id="t17">
+            <h2><span class="number">17</span> Leader election (Raft, Paxos)</h2>
+            <div class="qa-block">
+                <div class="question">Q: Why is leader election necessary in distributed systems, and how do consensus algorithms like Raft and Paxos achieve it? Provide an example of how you’d use leader election in a .NET distributed background job scheduler.</div>
+                <div class="answer">
+                    <p>Leader election ensures a single node is responsible for a task, avoiding duplicate execution and split‑brain. Raft achieves this via randomized timers and majority voting; Paxos is harder to implement but also provides consensus.</p>
+                    <p><strong>In .NET:</strong> Don’t write Raft from scratch. Use external coordination services:</p>
+                    <ul>
+                        <li><strong>Kubernetes</strong> lease mechanism (using `Microsoft.KubernetesClient`).</li>
+                        <li><strong>Azure Blob leases</strong> – acquire a lease on a blob; only one instance can hold it.</li>
+                        <li><strong>Apache ZooKeeper</strong> / <strong>etcd</strong> with .NET clients.</li>
+                    </ul>
+                    <p><strong>Example:</strong> A distributed cron job runner where only one pod should execute monthly billing. Using Kubernetes leases, each pod competes; the leader runs the job, others stand by. If the leader fails, its lease expires and another instance takes over.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "What are the pitfalls of using a simple timeout‑based leader election (heartbeat) without a consensus protocol, and how can it lead to split‑brain in .NET applications?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 18 -->
+        <div class="topic-card" id="t18">
+            <h2><span class="number">18</span> Circuit breakers</h2>
+            <div class="qa-block">
+                <div class="question">Q: Describe the circuit breaker pattern and how you’d implement resilient HTTP calls between .NET microservices using Polly.</div>
+                <div class="answer">
+                    <p>Circuit breaker prevents cascading failures by detecting repeated faults and temporarily stopping calls to a failing service.</p>
+                    <ul>
+                        <li><strong>Closed:</strong> normal operation; failures increment counter.</li>
+                        <li><strong>Open:</strong> after threshold, circuit opens and calls immediately fail (fast-fail).</li>
+                        <li><strong>Half‑Open:</strong> after timeout, limited trial calls allowed; success returns to Closed, failure re‑opens.</li>
+                    </ul>
+                    <p><strong>In .NET with Polly:</strong> Combine with `IHttpClientFactory`.</p>
+                    <pre><code>builder.Services.AddHttpClient("orders")
+    .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, retryAttempt => 
+        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+    .AddPolicyHandler(Policy.Handle&lt;HttpRequestException&gt;()
+        .AdvancedCircuitBreakerAsync(0.5, TimeSpan.FromSeconds(30), 10, TimeSpan.FromSeconds(60)));</code></pre>
+                    <p>The circuit breaker opens after 50% failures over 30s with min 10 actions, then stays open 60s. Often combined with a fallback policy for degraded responses.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you monitor and dynamically control circuit breaker states in a production .NET system using metrics and centralized logging?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 19 -->
+        <div class="topic-card" id="t19">
+            <h2><span class="number">19</span> Failover and disaster recovery</h2>
+            <div class="qa-block">
+                <div class="question">Q: Design a failover and disaster recovery plan for a .NET‑based e‑commerce platform hosted on Azure. Define RTO, RPO, and the architectural choices.</div>
+                <div class="answer">
+                    <p><strong>RPO (Recovery Point Objective):</strong> Max acceptable data loss, e.g., &lt; 1 minute (near real‑time replication).</p>
+                    <p><strong>RTO (Recovery Time Objective):</strong> Max downtime, e.g., &lt; 15 minutes.</p>
+                    <p><strong>Architecture:</strong></p>
+                    <ul>
+                        <li>Active‑Active across two Azure regions using Azure Front Door for global load balancing and failover.</li>
+                        <li>Data: Azure SQL with active geo‑replication, auto‑failover groups. Cosmos DB multi‑region writes with conflict resolution. Blob storage GRS.</li>
+                        <li>Services: AKS or App Services deployed via IaC (Bicep/Terraform) to both regions.</li>
+                        <li>Messaging: Azure Service Bus geo‑disaster recovery.</li>
+                        <li>Failover process: Front Door health probes shift traffic; database failover group triggers forced failover if needed. Runbooks automate the process.</li>
+                    </ul>
+                    <p>Regular DR drills, chaos engineering, and ensuring the .NET app handles transient faults (Polly) and reconnects gracefully after failover.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you test and validate your disaster recovery plan for a .NET system without impacting production users?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 20 -->
+        <div class="topic-card" id="t20">
+            <h2><span class="number">20</span> Heartbeats and health checks</h2>
+            <div class="qa-block">
+                <div class="question">Q: How do you implement comprehensive health checks for an ASP.NET Core microservice, and how are they consumed by Kubernetes for self‑healing?</div>
+                <div class="answer">
+                    <p>ASP.NET Core provides `Microsoft.Extensions.Diagnostics.HealthChecks`.</p>
+                    <pre><code>builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy())
+    .AddDbContextCheck&lt;AppDbContext&gt;("sql")
+    .AddRedis("redis", "connection_string")
+    .AddUrlGroup(new Uri("https://external.api/health"), "external_api");
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false }); // liveness: only self
+app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = _ => true }); // readiness: all</code></pre>
+                    <p>Kubernetes `livenessProbe` and `readinessProbe` point to these endpoints. Kubelet restarts unresponsive containers (liveness) and removes unready pods from service (readiness). This enables zero‑downtime deployments and self‑healing. Health checks should be non‑intrusive and may incorporate circuit‑breaker logic.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you implement custom, business‑logic‑aware health checks (e.g., can process a sample order) in a .NET application without overloading the production database?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 21 -->
+        <div class="topic-card" id="t21">
+            <h2><span class="number">21</span> CQRS</h2>
+            <div class="qa-block">
+                <div class="question">Q: Explain CQRS and its advantages. In a .NET application, when would you avoid it, even if you anticipate high read/write asymmetry?</div>
+                <div class="answer">
+                    <p><strong>CQRS</strong> separates read and write models. Commands update the write model (normalized, relational) and publish events that eventually update the read model (denormalized, optimized for queries). Benefits: independent scaling, simpler queries, technology flexibility.</p>
+                    <p><strong>When to avoid:</strong></p>
+                    <ul>
+                        <li><strong>Simple domains</strong> where a single EF model suffices; CQRS adds unnecessary complexity.</li>
+                        <li><strong>Tight consistency requirements:</strong> The read model is eventually consistent, which can cause UI surprises. May require compensating patterns.</li>
+                        <li><strong>Team expertise:</strong> Event handling, eventual consistency, and out‑of‑order delivery increase cognitive load.</li>
+                        <li><strong>Not true asymmetry:</strong> If reads and writes are similar, a well‑cached CRUD model may be enough.</li>
+                    </ul>
+                    <p>In .NET, using MediatR for command/query separation is not full CQRS; it’s just in‑process separation. Start simple; introduce CQRS only when proven scale or query complexity demands it.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you synchronize the read model when using CQRS with Kafka as the event bus in a .NET environment, and how do you handle eventual consistency in the UI?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 22 -->
+        <div class="topic-card" id="t22">
+            <h2><span class="number">22</span> Event‑driven architecture</h2>
+            <div class="qa-block">
+                <div class="question">Q: Design an event‑driven order processing system using .NET and Apache Kafka for an e‑commerce platform. What patterns ensure reliable publishing and consumption?</div>
+                <div class="answer">
+                    <p>Events: `OrderPlaced`, `PaymentProcessed`, `InventoryReserved`, `OrderFulfilled`.</p>
+                    <p><strong>Reliability patterns:</strong></p>
+                    <ul>
+                        <li><strong>Transactional outbox:</strong> Order service inserts order row and event record in the same EF Core transaction; a separate publisher reads the outbox and publishes to Kafka (at‑least‑once).</li>
+                        <li><strong>Idempotency:</strong> Consumers store consumed event IDs; process only once, using database unique constraints.</li>
+                        <li><strong>Kafka’s idempotent producer</strong> (`EnableIdempotence = true`) and manual offset commits after processing.</li>
+                        <li>Schema evolution via Confluent Schema Registry/Avro for backward compatibility.</li>
+                        <li>Retry with backoff, dead‑letter topics, circuit breakers (Polly).</li>
+                    </ul>
+                    <p>Tooling: MassTransit with Kafka transport simplifies many of these concerns.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you handle schema evolution and backward compatibility for Kafka messages in a .NET solution with multiple service teams, using Confluent Schema Registry and Avro?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 23 -->
+        <div class="topic-card" id="t23">
+            <h2><span class="number">23</span> Microservices vs Monolith – Deep Comparison</h2>
+            <div class="qa-block">
+                <div class="question">Q: Beyond surface‑level differences, what are the deep organizational, DevOps, and technical trade‑offs between microservices and a well‑designed modular monolith in .NET?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Organizational coupling:</strong> Microservices align with cross‑functional teams (Conway’s Law). A modular monolith can achieve similar decoupling with clear interfaces, but enforcement is harder.</li>
+                        <li><strong>Deployment complexity:</strong> Microservices require container orchestration, service discovery, distributed tracing, per‑service CI/CD. A monolith has a single pipeline, simpler debugging, but can slow down as it grows.</li>
+                        <li><strong>Data consistency:</strong> Monoliths use ACID transactions; microservices force eventual consistency, sagas, compensating transactions, which are harder to test.</li>
+                        <li><strong>Scalability:</strong> Microservices allow independent scaling of hotspots; monolith scales as a whole, wasting resources.</li>
+                        <li><strong>Technology diversity:</strong> Microservices allow different databases/languages; but for a .NET shop, a monolith with one stack often suffices.</li>
+                        <li><strong>Testing:</strong> E2E testing in microservices is challenging; contract testing becomes crucial. Monolith E2E tests are easier but slower.</li>
+                    </ul>
+                    <p>Even with a large team, a modular monolith may be preferable if the domain is not well‑understood, or if strong transactional integrity is needed. Premature microservices lead to costly refactoring. Use architecture tests (NetArchTest) to enforce module boundaries.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you enforce module boundaries in a .NET modular monolith to prevent tight coupling, using tools like NetArchTest or Roslyn analyzers?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 24 -->
+        <div class="topic-card" id="t24">
+            <h2><span class="number">24</span> Saga pattern</h2>
+            <div class="qa-block">
+                <div class="question">Q: Describe the Saga pattern for managing distributed transactions across microservices. Compare orchestration‑based and choreography‑based sagas with a .NET example.</div>
+                <div class="answer">
+                    <p>A saga is a sequence of local transactions, each updating a single service and publishing an event or command. If a step fails, compensating transactions undo preceding steps.</p>
+                    <ul>
+                        <li><strong>Choreography:</strong> Services listen to events and react. Loose coupling, but flow becomes hard to track. Example: `BookingService` emits `FlightBooked`; `HotelService` reacts; on failure emits `HotelBookingFailed`, and `BookingService` cancels the flight.</li>
+                        <li><strong>Orchestration:</strong> A central saga orchestrator tells each service what to do. Tracks state, sends compensating commands on failure. Easier to understand, but can become a single point of coupling.</li>
+                    </ul>
+                    <p>In .NET, orchestration can use state machine libraries like **Stateless** or **Workflow Core**, persisting saga state. MassTransit implements sagas with its state machine and Courier routing slip. Use the outbox pattern to atomically publish commands/events with local DB changes.</p>
+                    <p>Example: travel booking saga — `CreateBooking` → Reserve Car → Reserve Hotel → Process Payment. If payment fails, cancel hotel and car.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How do you handle idempotency and concurrency conflicts in saga operations when multiple instances could be triggered for the same booking in a .NET environment?"</div>
+            </div>
+        </div>
+
+        <!-- Topic 25 -->
+        <div class="topic-card" id="t25">
+            <h2><span class="number">25</span> Idempotency</h2>
+            <div class="qa-block">
+                <div class="question">Q: Why is idempotency critical in distributed systems, and how would you enforce it in a .NET REST API that processes payments?</div>
+                <div class="answer">
+                    <p><strong>Importance:</strong> Network failures, client retries, or message redelivery can cause duplicate requests. Without idempotency, a payment might be processed twice, leading to double charges.</p>
+                    <p><strong>Implementation in .NET API:</strong></p>
+                    <ul>
+                        <li>Client sends a unique `Idempotency-Key` header.</li>
+                        <li>Server checks a store (Redis or DB table) for the key. If not found, process, store response with key and TTL (e.g., 24h). If found, return stored response without reprocessing.</li>
+                        <li>Redis: atomic `SETNX` with TTL. SQL: unique constraint on `IdempotencyKey` column; pre‑insert a placeholder with status `Processing`, then update to `Completed` after payment.</li>
+                        <li>Custom middleware or `IAsyncActionFilter` can handle this cross‑cutting concern. Libraries like `IdempotentAPI` exist.</li>
+                    </ul>
+                    <p>Lead considerations: propagate idempotency keys across downstream calls; design all operations to be idempotent (e.g., use PUT with ETags). Combine with saga pattern for multi‑service idempotency.</p>
+                </div>
+                <div class="follow-up"><strong>Follow‑up:</strong> "How would you handle idempotency when the operation involves multiple downstream services that may partially succeed? How do you combine idempotency with the Saga pattern?"</div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Lead .NET Engineer Interview Guide — Architecture, patterns, and real‑world implementation in .NET Core / ASP.NET Core.</p>
+        <p style="margin-top:6px;">Always refer to official Microsoft documentation and stay current with the .NET ecosystem.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>International Remittance Systems: A Complete Technical Reference</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --ink-light: #2d2d4e;
+    --ink-muted: #5a5a7a;
+    --paper: #faf9f6;
+    --paper-warm: #f5f0e8;
+    --paper-dark: #ede8de;
+    --accent: #c8410a;
+    --accent-light: #e8622a;
+    --accent-muted: #f0c4b0;
+    --teal: #0a6b7a;
+    --teal-light: #e0f4f7;
+    --gold: #b8860b;
+    --gold-light: #fdf5e0;
+    --border: #d4cfc4;
+    --border-strong: #b0a898;
+    --rule: #c8410a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--ink);
+    background: var(--paper);
+    counter-reset: section;
+  }
+
+  /* ── LAYOUT ── */
+  .page-wrap { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+  /* ── HEADER ── */
+  .doc-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 5rem 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .doc-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 60px,
+      rgba(200,65,10,0.06) 60px,
+      rgba(200,65,10,0.06) 61px
+    );
+  }
+  .doc-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--gold), var(--teal));
+  }
+  .header-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+  .header-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .header-tag::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 1.5px;
+    background: var(--accent-light);
+  }
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--paper);
+    margin-bottom: 1.2rem;
+    max-width: 800px;
+  }
+  .header-sub {
+    font-size: 1.05rem;
+    color: rgba(250,249,246,0.72);
+    font-style: italic;
+    max-width: 680px;
+    line-height: 1.6;
+  }
+  .header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .meta-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: rgba(250,249,246,0.55);
+    letter-spacing: 0.08em;
+  }
+  .meta-item strong { color: rgba(250,249,246,0.85); font-weight: 500; }
+
+  /* ── TOC ── */
+  .toc-section {
+    background: var(--paper-dark);
+    border-top: 3px solid var(--accent);
+    padding: 2.5rem 3rem;
+  }
+  .toc-inner { max-width: 1100px; margin: 0 auto; }
+  .toc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.3rem 2.5rem;
+  }
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    padding: 0.3rem 0;
+    text-decoration: none;
+    color: var(--ink-light);
+    font-size: 0.92rem;
+    border-bottom: 1px dotted var(--border);
+    transition: color 0.2s;
+  }
+  .toc-item:hover { color: var(--accent); }
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    min-width: 2em;
+  }
+
+  /* ── MAIN CONTENT ── */
+  main { padding: 4rem 3rem; max-width: 1100px; margin: 0 auto; }
+
+  /* ── SECTIONS ── */
+  .doc-section {
+    margin-bottom: 5rem;
+    padding-bottom: 5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .doc-section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--accent-muted);
+    max-width: 80px;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+    line-height: 1.25;
+  }
+  h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--ink-light);
+    margin: 2.5rem 0 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent);
+  }
+  h4 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 2rem 0 0.6rem;
+    letter-spacing: 0.01em;
+  }
+
+  p { margin-bottom: 1.1rem; color: var(--ink-light); }
+
+  /* ── INTRO BOX ── */
+  .intro-box {
+    background: var(--gold-light);
+    border-left: 4px solid var(--gold);
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* ── STEPS / PROCESS ── */
+  .steps-list { list-style: none; margin: 1.5rem 0; }
+  .steps-list li {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px dotted var(--border);
+  }
+  .steps-list li:last-child { border-bottom: none; }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--paper);
+    background: var(--accent);
+    min-width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .step-content strong {
+    display: block;
+    color: var(--ink);
+    font-size: 0.98rem;
+    margin-bottom: 0.25rem;
+  }
+  .step-content span { font-size: 0.93rem; color: var(--ink-muted); line-height: 1.5; }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; margin: 2rem 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  thead {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  thead th {
+    padding: 0.85rem 1.1rem;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:nth-child(even) { background: var(--paper-warm); }
+  tbody tr:hover { background: var(--teal-light); }
+  td { padding: 0.75rem 1.1rem; color: var(--ink-light); vertical-align: top; }
+  td:first-child { font-weight: 600; color: var(--ink); }
+
+  /* ── STATE BADGES ── */
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .badge-pending { background: #fff3cd; color: #856404; }
+  .badge-processing { background: #cff4fc; color: #055160; }
+  .badge-paid { background: #d1e7dd; color: #0a3622; }
+  .badge-failed { background: #f8d7da; color: #58151c; }
+  .badge-hold { background: #e2d9f3; color: #432874; }
+  .badge-cancelled { background: #e9ecef; color: #495057; }
+  .badge-reversed { background: #fff3cd; color: #664d03; border: 1px solid #ffc107; }
+
+  /* ── DIAGRAM CONTAINER ── */
+  .diagram-container {
+    background: var(--paper-warm);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 2.5rem 0;
+    overflow-x: auto;
+  }
+  .diagram-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .diagram-label strong { color: var(--accent); }
+  .mermaid { font-size: 14px; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    padding: 1.2rem 1.5rem;
+    border-radius: 6px;
+    margin: 1.5rem 0;
+    font-size: 0.93rem;
+    line-height: 1.6;
+  }
+  .callout-warning {
+    background: #fff8e6;
+    border-left: 4px solid var(--gold);
+    color: #5a4000;
+  }
+  .callout-danger {
+    background: #fdf2f2;
+    border-left: 4px solid #dc3545;
+    color: #5a1a1a;
+  }
+  .callout-info {
+    background: var(--teal-light);
+    border-left: 4px solid var(--teal);
+    color: #0a3a42;
+  }
+  .callout-success {
+    background: #edf7f0;
+    border-left: 4px solid #198754;
+    color: #0a3a1e;
+  }
+  .callout strong { display: block; margin-bottom: 0.4rem; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── ARCH CARDS ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.2rem;
+    margin: 2rem 0;
+  }
+  .arch-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.4rem;
+    background: white;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .arch-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.08); border-color: var(--accent); }
+  .arch-card-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+  .arch-card h4 { margin: 0 0 0.5rem; font-size: 0.97rem; color: var(--ink); }
+  .arch-card p { font-size: 0.85rem; color: var(--ink-muted); margin: 0; }
+
+  /* ── PROVIDER COMPARISON ── */
+  .provider-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.8rem;
+  }
+  .provider-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .provider-header h3 {
+    margin: 0;
+    padding: 0;
+    border: none;
+    color: var(--paper);
+    font-size: 1.1rem;
+  }
+  .provider-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    background: rgba(200,65,10,0.4);
+    color: var(--accent-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .provider-body { padding: 1.5rem; }
+  .provider-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 640px) { .provider-cols { grid-template-columns: 1fr; } }
+  .provider-col h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'JetBrains Mono', monospace; color: var(--teal); margin-bottom: 0.5rem; }
+  .provider-col ul { list-style: none; font-size: 0.88rem; color: var(--ink-light); }
+  .provider-col ul li { padding: 0.2rem 0; padding-left: 1rem; position: relative; }
+  .provider-col ul li::before { content: '—'; position: absolute; left: 0; color: var(--accent); }
+
+  /* ── STATE MACHINE ── */
+  .state-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: var(--paper-warm);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .state-node {
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 2px solid transparent;
+  }
+  .state-arrow {
+    color: var(--ink-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+  }
+
+  /* ── ERROR TABLE ── */
+  .error-row-critical td:first-child { color: #dc3545; }
+  .error-row-warning td:first-child { color: var(--gold); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: rgba(250,249,246,0.5);
+    padding: 2.5rem 3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    line-height: 2;
+  }
+  footer .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+
+  /* ── CODE INLINE ── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: var(--paper-dark);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+  /* ── DIVIDER ── */
+  .section-rule {
+    border: none;
+    border-top: 2px solid var(--paper-dark);
+    margin: 3rem 0;
+  }
+  .accent-rule {
+    border: none;
+    border-top: 3px double var(--accent-muted);
+    margin: 3rem 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="doc-header">
+  <div class="header-inner">
+    <div class="header-tag">Technical Research Paper · Fintech Systems Architecture</div>
+    <h1>International Remittance Systems:<br>A Complete Technical Reference</h1>
+    <p class="header-sub">An industry-grade deep-dive into the full lifecycle of cross-border money movement — covering outbound and inbound flows, compliance architecture, settlement mechanics, and system design patterns used by modern remittance providers.</p>
+    <div class="header-meta">
+      <div class="meta-item"><strong>Domain:</strong> Payments &amp; Remittance</div>
+      <div class="meta-item"><strong>Scope:</strong> Outbound + Inbound Flows</div>
+      <div class="meta-item"><strong>Standards:</strong> SWIFT, ISO 20022, AML/CFT, FATF</div>
+      <div class="meta-item"><strong>Version:</strong> 1.0 · Research Grade</div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ TABLE OF CONTENTS ═══════════════ -->
+<nav class="toc-section">
+  <div class="toc-inner">
+    <div class="toc-title">Table of Contents</div>
+    <div class="toc-grid">
+      <a href="#overview" class="toc-item"><span class="toc-num">01</span>Overview &amp; Industry Context</a>
+      <a href="#outbound" class="toc-item"><span class="toc-num">02</span>Outbound Remittance Flow</a>
+      <a href="#inbound" class="toc-item"><span class="toc-num">03</span>Inbound Remittance Flow</a>
+      <a href="#diagrams" class="toc-item"><span class="toc-num">04</span>Flow Diagrams</a>
+      <a href="#architecture" class="toc-item"><span class="toc-num">05</span>Technical Architecture</a>
+      <a href="#compliance" class="toc-item"><span class="toc-num">06</span>Compliance &amp; Regulatory Layer</a>
+      <a href="#settlement" class="toc-item"><span class="toc-num">07</span>Settlement &amp; Reconciliation</a>
+      <a href="#states" class="toc-item"><span class="toc-num">08</span>Transaction State Machine</a>
+      <a href="#errors" class="toc-item"><span class="toc-num">09</span>Error Scenarios</a>
+      <a href="#providers" class="toc-item"><span class="toc-num">10</span>Provider Comparison</a>
+      <a href="#security" class="toc-item"><span class="toc-num">11</span>Security &amp; Regulation</a>
+      <a href="#conclusion" class="toc-item"><span class="toc-num">12</span>Conclusion</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main>
+
+<!-- ══════════════════════════════════════
+     SECTION 1: OVERVIEW
+══════════════════════════════════════ -->
+<section class="doc-section" id="overview">
+  <div class="section-label">Section 01</div>
+  <h2>Overview &amp; Industry Context</h2>
+
+  <div class="intro-box">
+    International remittance refers to the transfer of funds from one country to another, typically by migrant workers sending money to their home countries. According to the World Bank, remittance flows to low- and middle-income countries exceed $650 billion annually, making this one of the most significant financial flows globally.
+  </div>
+
+  <p>A remittance system is a multi-party, multi-jurisdiction financial infrastructure that facilitates the movement of value across borders. It involves the <strong>sending entity</strong> (sender), <strong>receiving entity</strong> (recipient), <strong>originating payment service provider (PSP)</strong>, <strong>correspondent or partner network</strong>, and the <strong>beneficiary PSP</strong>. Each transaction must navigate regulatory requirements in at minimum two jurisdictions.</p>
+
+  <h3>Key Participants in a Remittance Network</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Participant</th>
+          <th>Role</th>
+          <th>Regulatory Obligation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sender (Remitter)</td>
+          <td>Initiates the transfer from the source country</td>
+          <td>Subject to KYC, AML, transaction limits in source country</td>
+        </tr>
+        <tr>
+          <td>Originating PSP / MSB</td>
+          <td>Licensed money service business accepting funds from sender</td>
+          <td>Must hold MTL/MSB license; file SARs, CTRs; comply with BSA/FinCEN (US) or equivalent</td>
+        </tr>
+        <tr>
+          <td>Corridor Partner / Agent</td>
+          <td>Pays out funds in the destination country</td>
+          <td>Must be licensed in destination country; performs local KYC on beneficiary</td>
+        </tr>
+        <tr>
+          <td>Beneficiary / Recipient</td>
+          <td>Receives funds in destination country</td>
+          <td>May be subject to local KYC for cash payouts above thresholds</td>
+        </tr>
+        <tr>
+          <td>Correspondent Bank</td>
+          <td>Holds Nostro/Vostro accounts; facilitates cross-border settlement</td>
+          <td>Subject to home-country banking regulations; screens for sanctions</td>
+        </tr>
+        <tr>
+          <td>Regulatory Bodies</td>
+          <td>FINCEN, FCA, MAS, RBI, NBP, etc. — oversee licensing and compliance</td>
+          <td>Define AML/CFT rules, reporting thresholds, licensing requirements</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Remittance Business Models</h3>
+  <p>Modern remittance operators generally fall into one of three models:</p>
+  <ul style="margin: 1rem 0 1rem 1.5rem; color: var(--ink-light); line-height: 2.2;">
+    <li><strong>Bank-led model:</strong> The sending bank directly initiates a SWIFT MT103 or SWIFT gpi message through its correspondent banking network. Used for wire transfers.</li>
+    <li><strong>Non-bank PSP / MTL holder model:</strong> A licensed money transmitter (e.g., Western Union, Remitly) collects funds locally, pools them, and pays out through local agents or bank partners. No individual SWIFT per transaction in real-time.</li>
+    <li><strong>Fintech / API-driven model:</strong> Modern operators (e.g., Wise, Remitly) use local collection accounts in each corridor and net settle, using the mid-market FX rate and domestic transfers on both ends to minimize cost.</li>
+  </ul>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 2: OUTBOUND FLOW
+══════════════════════════════════════ -->
+<section class="doc-section" id="outbound">
+  <div class="section-label">Section 02</div>
+  <h2>Outbound Remittance Flow</h2>
+  <p>The outbound flow represents the full journey from customer onboarding through to fund dispatch from the sending country. This section documents each stage in operational detail.</p>
+
+  <h3>Stage 1: Customer Onboarding &amp; Identity Verification</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>Customer Registration</strong>
+        <span>Customer provides full legal name, date of birth, residential address, nationality, contact details, and government-issued ID. A unique customer profile (CIF — Customer Information File) is created in the core system.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>KYC Verification (Know Your Customer)</strong>
+        <span>Document verification via OCR + liveness check (eKYC). Identity documents cross-referenced against government databases, PEP (Politically Exposed Persons) lists, and adverse media databases. Risk scoring assigns the customer a risk tier: Low / Medium / High. Enhanced Due Diligence (EDD) required for High-risk customers.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>OFAC / Sanctions Screening (Onboarding)</strong>
+        <span>Customer name and identifiers screened against OFAC SDN list (US), HM Treasury list (UK), EU Consolidated Sanctions List, UN Consolidated List. Fuzzy matching algorithms used (Jaro-Winkler, Levenshtein distance) to catch name variations. Positive hits trigger a manual review queue. False positives resolved and documented.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">4</span>
+      <div class="step-content">
+        <strong>Source of Funds &amp; Wealth Declaration</strong>
+        <span>For high-risk profiles or high-value senders, source of funds documentation required (payslips, tax returns, business documents). This satisfies FATF Recommendation 10 for CDD.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">5</span>
+      <div class="step-content">
+        <strong>Bank / Payment Method Verification</strong>
+        <span>Linked bank account verified via micro-deposit, open banking (Plaid/TrueLayer), or instant bank verification. Card details tokenized via PCI-DSS compliant vault (never stored in plain text). Debit/credit card BIN validation, 3DS2 authentication for card payments.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">6</span>
+      <div class="step-content">
+        <strong>Transaction Limit Assignment</strong>
+        <span>Based on KYC tier, the customer is assigned daily, weekly, and per-transaction send limits. Unverified accounts may be restricted to lower thresholds (e.g., $999/day to stay below CTR filing triggers). Fully verified accounts receive higher limits. Velocity rules tracked in real-time.</span>
+      </div>
+    </li>
+  </ol>
+
+  <h3>Stage 2: Transaction Initiation</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">7</span>
+      <div class="step-content">
+        <strong>Recipient / Beneficiary Setup</strong>
+        <span>Sender adds recipient: full name, address, bank account number (IBAN or local format), bank BIC/SWIFT code, and relationship to sender. Recipient details validated against local bank routing databases (SWIFT BIC directory, national bank registries). Account number format validated per destination country rules (e.g., IBAN checksum for SEPA countries).</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">8</span>
+      <div class="step-content">
+        <strong>FX Rate Quote Generation</strong>
+        <span>System fetches live mid-market rates from providers (Reuters Eikon, Bloomberg FX, OpenExchangeRates, internal treasury pricing). Applies the operator's spread or service fee. Rate is locked for a defined validity window (typically 30 seconds to 5 minutes). Rate snapshot stored with rate source, timestamp, mid-rate, and applied rate for audit trail. FX rate risk is managed by the operator's treasury function.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">9</span>
+      <div class="step-content">
+        <strong>Fee Calculation &amp; Disclosure</strong>
+        <span>Total cost disclosed upfront (per regulatory requirements including CFPB Remittance Transfer Rule in the US, PSD2 in EU): send amount, fees, FX rate, recipient receives amount, estimated delivery time, and exchange rate expiry. This pre-transaction disclosure is a legal requirement in most regulated markets.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">10</span>
+      <div class="step-content">
+        <strong>Real-Time Fraud Scoring</strong>
+        <span>ML-based fraud model evaluates: device fingerprint, IP geolocation vs. registered address, behavioral biometrics (typing speed, session behavior), transaction velocity (frequency, amounts), recipient risk profile, corridor risk (high-risk corridors flagged), time-of-day patterns, and historical user behavior. Score determines: auto-approve, 3DS challenge, step-up verification, or decline.</span>
+      </div>
+    </li>
+  </ol>
+
+  <h3>Stage 3: Pre-Transaction Validation</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">11</span>
+      <div class="step-content">
+        <strong>Compliance Rule Engine</strong>
+        <span>Transaction evaluated against configurable rule sets: corridor-specific limits and restrictions (some corridors may be blocked), product rules (cash payout vs. bank deposit vs. mobile wallet), regulatory limits (CTR triggers at $10,000 in the US), sending frequency rules, recipient country sanctions status, and operator-defined business rules.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">12</span>
+      <div class="step-content">
+        <strong>Transaction-Level OFAC / Sanctions Screening</strong>
+        <span>Both sender and recipient screened at transaction time (not just at onboarding). Recipient name, bank details, and country cross-checked against all applicable sanctions lists. Blocked transactions placed in pending-review queue; compliance officer notified. Regulatory hold can last up to 5 business days during review.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">13</span>
+      <div class="step-content">
+        <strong>AML Transaction Monitoring (Pre-Submission)</strong>
+        <span>Rule-based and ML transaction monitoring: structuring detection (multiple transactions below CTR threshold), unusual pattern detection (spike in frequency or amount), high-risk beneficiary country check, PEP/adverse media check on recipient. Suspicious transactions flagged for SAR consideration; not blocked unless there is a regulatory hold obligation.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">14</span>
+      <div class="step-content">
+        <strong>Sender Balance / Funding Verification</strong>
+        <span>For wallet-funded transactions: real-time balance check against sender's stored-value account. For bank-funded: payment authorization pre-check (card auth hold or ACH notification of credit). Insufficient funds results in immediate decline with clear error code and user notification.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">15</span>
+      <div class="step-content">
+        <strong>Limit &amp; Velocity Check</strong>
+        <span>Aggregated transaction counters checked: daily/weekly/monthly sent amount, number of transactions in rolling period, recipient-level limits. Checks are atomic to prevent race conditions in high-concurrency environments. Distributed locks (e.g., Redis) used for real-time counter updates.</span>
+      </div>
+    </li>
+  </ol>
+
+  <h3>Stage 4: Transaction Creation &amp; Dispatch</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">16</span>
+      <div class="step-content">
+        <strong>Transaction Record Creation</strong>
+        <span>Immutable transaction record created in database with unique transaction ID (UUID), status <code>PENDING</code>, locked FX rate, fees, send amount, payout amount, sender/recipient details, corridor reference, and compliance check results. All fields are write-once; state transitions are append-only in an audit log table.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">17</span>
+      <div class="step-content">
+        <strong>Funds Collection (Debit)</strong>
+        <span>Customer's payment method is charged: card authorization capture, ACH debit submission, or wallet balance debit. Funds moved to the operator's pooled collection account (not yet disbursed). This step is idempotent — retries will not result in double charges (idempotency key pattern).</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">18</span>
+      <div class="step-content">
+        <strong>Message Queue Submission (Async Processing)</strong>
+        <span>Transaction event published to a message broker (e.g., Apache Kafka, RabbitMQ, AWS SQS). Consumers include: partner API dispatcher, accounting service, notification service, AML monitoring service, and analytics pipeline. Decoupling via event-driven architecture ensures resilience — partner API failures do not affect the collection step.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">19</span>
+      <div class="step-content">
+        <strong>Partner / Correspondent API Submission</strong>
+        <span>Transaction payload sent to payout partner API (may be a bank, fintech payout aggregator, or proprietary agent network). Payload includes: transaction ID, recipient bank details, payout amount in local currency, sender reference, and compliance attestation. Partner acknowledges with their reference ID. Transaction status updated to <code>PROCESSING</code>.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">20</span>
+      <div class="step-content">
+        <strong>Accounting / Voucher Entry</strong>
+        <span>Double-entry bookkeeping entries created: Debit — Customer Liability / Collection Account; Credit — Nostro Account / Partner Payable. These entries reflect the operator's obligation to deliver funds. Entries posted to the general ledger in real time or in near-real-time batch, depending on system architecture.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">21</span>
+      <div class="step-content">
+        <strong>Sender Notification</strong>
+        <span>Customer notified via email, SMS, and/or push notification with: confirmation number, expected delivery time, locked exchange rate, recipient name, and payout amount. Regulatory receipt generated (required under CFPB Rule / PSD2) with cancellation rights and contact information for disputes.</span>
+      </div>
+    </li>
+  </ol>
+
+  <h3>Stage 5: Status Tracking &amp; Completion</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">22</span>
+      <div class="step-content">
+        <strong>Status Polling / Webhook</strong>
+        <span>System polls partner for status updates via periodic API calls or receives webhook notifications. Status transitions: <code>PROCESSING → PAID</code>, <code>PROCESSING → FAILED</code>, <code>PROCESSING → ON_HOLD</code>. Retry logic with exponential backoff for failed polls. Dead-letter queue for unresolvable partner communication failures.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">23</span>
+      <div class="step-content">
+        <strong>Post-Transaction AML Monitoring</strong>
+        <span>Completed transaction fed into batch AML analysis: pattern analysis across customer portfolio, STR/SAR consideration for suspicious patterns, CTR filing if aggregate daily cash exceeds $10,000 (US), FBAR obligations for large cross-border transactions. AML alerts reviewed by compliance team within defined SLA.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">24</span>
+      <div class="step-content">
+        <strong>Liquidity Management Update</strong>
+        <span>Treasury notified of disbursed amount per corridor. Nostro account balance updated. If corridor balance falls below pre-defined threshold, treasury initiates replenishment transfer to corridor partner. Liquidity positions tracked in real-time dashboard across all corridors.</span>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 3: INBOUND FLOW
+══════════════════════════════════════ -->
+<section class="doc-section" id="inbound">
+  <div class="section-label">Section 03</div>
+  <h2>Inbound Remittance Flow</h2>
+  <p>The inbound flow describes the process from the perspective of the receiving country — from the moment the payout instruction arrives at the correspondent/agent to the moment funds reach the recipient.</p>
+
+  <h3>Stage 1: Instruction Receipt &amp; Validation</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>Payout Instruction Receipt</strong>
+        <span>Payout partner in the receiving country receives the transaction instruction from the originating PSP via API, SWIFT MT103, ISO 20022 pacs.008, or proprietary message format. Instruction contains: unique reference ID, recipient name, account details, payout amount in local currency, and sender reference.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>Inbound Compliance Screening</strong>
+        <span>Receiving-country regulations require a fresh screening at the payout end. Recipient name screened against local sanctions lists and any applicable OFAC/UN lists. Inbound transaction value checked against local threshold reporting requirements (e.g., FINTRAC in Canada, AUSTRAC in Australia, FIU-IND in India). Suspicious patterns flagged to local financial intelligence unit.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>Recipient Account Validation</strong>
+        <span>Bank account number validated: IBAN checksum (Europe), IFSC + account number (India), BSB + account number (Australia), sort code + account (UK). Some corridors support pre-validation via national bank APIs (e.g., India's IMPS name-matching, UK's Confirmation of Payee). Invalid account details result in a <code>PAYOUT_FAILED</code> status returned to originating PSP.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">4</span>
+      <div class="step-content">
+        <strong>Local FX Conversion (if applicable)</strong>
+        <span>If the payout instruction arrives in a foreign currency and local conversion is needed (e.g., USD instruction to PHP payout), the payout partner applies the agreed exchange rate from the corridor contract. Some corridors operate on a pre-funded USD basis; others net-settle in local currency.</span>
+      </div>
+    </li>
+  </ol>
+
+  <h3>Stage 2: Payout Execution</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">5</span>
+      <div class="step-content">
+        <strong>Liquidity Check at Payout Partner</strong>
+        <span>Payout partner checks their local nostro/prefunded account balance to ensure sufficient local currency is available. If balance is low, payout may be queued pending liquidity replenishment. This is a key operational risk managed through daily liquidity reporting and rolling forecasts.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">6</span>
+      <div class="step-content">
+        <strong>Payout Rail Selection</strong>
+        <span>System selects the optimal local payout rail based on: recipient account type, amount, time-of-day (cut-off times), and rail availability. Options include: real-time gross settlement (RTGS — for high-value), automated clearing house (ACH/NEFT/BACS — for standard), instant payment networks (UPI in India, FPS in UK, RTP in US, PromptPay in Thailand), or cash-agent network for cash payout.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">7</span>
+      <div class="step-content">
+        <strong>Credit Instruction Submission</strong>
+        <span>Payout partner submits the credit instruction to the local interbank network. Instruction carries originator reference for end-to-end traceability. ISO 20022 pain.001 / pacs.008 used in modern implementations. Acknowledgement received from local bank or clearing system.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">8</span>
+      <div class="step-content">
+        <strong>Recipient Account Credit</strong>
+        <span>Recipient's bank account credited. For instant rails, this happens in seconds. For batch rails (ACH, NEFT), credit occurs at next settlement cycle (T+0 to T+2 depending on rail and country). Mobile wallet payouts credited directly to the wallet provider's API.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">9</span>
+      <div class="step-content">
+        <strong>Recipient Notification</strong>
+        <span>Recipient notified via SMS (most common in developing corridors), email, or app notification. Message includes: amount credited, sender name (if disclosed), reference number. In some markets, the originating PSP also triggers a recipient notification via a separate channel.</span>
+      </div>
+    </li>
+  </ol>
+
+  <h3>Stage 3: Confirmation &amp; Reconciliation</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">10</span>
+      <div class="step-content">
+        <strong>Status Confirmation to Originating PSP</strong>
+        <span>Payout partner returns a <code>PAID</code> confirmation with: payout timestamp, local transaction reference, payout amount, and recipient account last digits. This triggers the final status update in the originating PSP system and confirmation notification to the sender.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">11</span>
+      <div class="step-content">
+        <strong>Settlement Instruction</strong>
+        <span>Payout partner records the disbursed amount against the originating PSP's pre-funded account (Nostro/Vostro balance deduction). At end-of-day, a net settlement file is generated. The originating PSP reconciles the settlement file against its own transaction records and initiates replenishment if below minimum balance threshold.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">12</span>
+      <div class="step-content">
+        <strong>Exception Handling — Returned Payments</strong>
+        <span>If a payout fails post-submission (e.g., closed account, incorrect details, beneficiary deceased), the payout partner returns funds and issues a return notification. Originating PSP initiates a refund to sender, reversing accounting entries and notifying the customer. Refund processing time varies by funding method: card refunds 3–5 business days, wallet refunds are instant.</span>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 4: DIAGRAMS
+══════════════════════════════════════ -->
+<section class="doc-section" id="diagrams">
+  <div class="section-label">Section 04</div>
+  <h2>Flow Diagrams</h2>
+
+  <!-- DIAGRAM 1: OUTBOUND SEQUENCE -->
+  <h3>Diagram 1: Outbound Remittance — Full Sequence Diagram</h3>
+  <p>This sequence diagram illustrates the message flow between all parties in an outbound remittance transaction, from customer initiation to payout confirmation.</p>
+  <div class="diagram-container">
+    <div class="diagram-label"><strong>FIGURE 1</strong> · Outbound Remittance Sequence Diagram</div>
+    <div class="mermaid">
+sequenceDiagram
+    participant C as Customer
+    participant UI as PSP Frontend
+    participant API as PSP Core API
+    participant KYC as KYC/AML Engine
+    participant FX as FX Rate Service
+    participant DB as Transaction DB
+    participant MQ as Message Queue
+    participant PA as Payout Partner API
+    participant BANK as Recipient Bank
+
+    C->>UI: Submit transfer request
+    UI->>API: POST /transfers/initiate
+    API->>KYC: Screen sender + recipient (OFAC, sanctions)
+    KYC-->>API: PASS / HOLD / BLOCK
+    API->>FX: Fetch & lock exchange rate
+    FX-->>API: Locked rate (30s validity)
+    API->>API: Fraud scoring (ML model)
+    API->>API: Compliance rule engine
+    API->>API: Limit & velocity check
+    API->>DB: Create transaction (status=PENDING)
+    API->>API: Collect funds (debit sender)
+    API->>DB: Update status=FUNDS_COLLECTED
+    API->>MQ: Publish transaction event
+    MQ->>PA: Dispatch payout instruction
+    PA-->>MQ: ACK + partner reference
+    MQ->>DB: Update status=PROCESSING
+    API-->>UI: Return transaction confirmation
+    UI-->>C: Show confirmation + receipt
+    PA->>BANK: Submit credit instruction
+    BANK-->>PA: Credit confirmation
+    PA-->>API: Webhook: status=PAID
+    API->>DB: Update status=PAID
+    API->>C: Send PAID notification (email/SMS)
+    </div>
+  </div>
+
+  <!-- DIAGRAM 2: OUTBOUND PROCESS FLOWCHART -->
+  <h3>Diagram 2: Outbound Transaction Process Flowchart</h3>
+  <div class="diagram-container">
+    <div class="diagram-label"><strong>FIGURE 2</strong> · Outbound Transaction Decision Flow</div>
+    <div class="mermaid">
+flowchart TD
+    A([Customer Initiates Transfer]) --> B{KYC Verified?}
+    B -- No --> B1[Trigger KYC Review / Block]
+    B -- Yes --> C[Fetch FX Rate & Fees]
+    C --> D{Sanctions Screening}
+    D -- BLOCK --> D1[Compliance Hold / Reject]
+    D -- PASS --> E{Fraud Score}
+    E -- HIGH RISK --> E1[Step-up Auth / Manual Review]
+    E -- LOW RISK --> F{Compliance Rules Pass?}
+    E1 --> F
+    F -- FAIL --> F1[Decline with Reason Code]
+    F -- PASS --> G{Sufficient Balance?}
+    G -- No --> G1[Decline: Insufficient Funds]
+    G -- Yes --> H{Velocity / Limit Check}
+    H -- EXCEED --> H1[Decline: Limit Exceeded]
+    H -- OK --> I[Create Transaction Record PENDING]
+    I --> J[Collect Funds / Debit Sender]
+    J --> K{Collection Success?}
+    K -- FAIL --> K1[Rollback & Notify Customer]
+    K -- SUCCESS --> L[Publish to Message Queue]
+    L --> M[Dispatch to Payout Partner]
+    M --> N{Partner Response}
+    N -- ACK --> O[Update Status: PROCESSING]
+    N -- REJECT --> P[Retry / Escalate]
+    O --> Q{Partner Status Callback}
+    Q -- PAID --> R[Final Status: PAID]
+    Q -- FAILED --> S[Refund & Notify Customer]
+    Q -- ON_HOLD --> T[Compliance Review Queue]
+    R --> U[Post-Tx AML Monitoring]
+    R --> V[Settlement Reconciliation]
+
+    style A fill:#1a1a2e,color:#faf9f6
+    style R fill:#198754,color:#fff
+    style D1 fill:#dc3545,color:#fff
+    style G1 fill:#dc3545,color:#fff
+    style H1 fill:#dc3545,color:#fff
+    style F1 fill:#dc3545,color:#fff
+    style S fill:#dc3545,color:#fff
+    style T fill:#b8860b,color:#fff
+    </div>
+  </div>
+
+  <!-- DIAGRAM 3: INBOUND FLOW -->
+  <h3>Diagram 3: Inbound Payout Flow</h3>
+  <div class="diagram-container">
+    <div class="diagram-label"><strong>FIGURE 3</strong> · Inbound Payout Sequence at Receiving Country</div>
+    <div class="mermaid">
+sequenceDiagram
+    participant PSP as Originating PSP
+    participant PP as Payout Partner
+    participant COMP as Local Compliance
+    participant LIQ as Liquidity Manager
+    participant RAIL as Local Payment Rail
+    participant RBANK as Recipient Bank
+    participant REC as Recipient
+
+    PSP->>PP: Send payout instruction (amount, account, reference)
+    PP->>COMP: Screen recipient (local sanctions + AML)
+    COMP-->>PP: Cleared / Flagged
+    PP->>PP: Validate recipient account format
+    PP->>LIQ: Check local currency balance
+    LIQ-->>PP: Balance OK / Insufficient
+    PP->>RAIL: Submit credit instruction (RTGS/ACH/Instant)
+    RAIL->>RBANK: Credit instruction
+    RBANK->>REC: Account credited
+    RBANK-->>RAIL: Credit confirmation
+    RAIL-->>PP: Settlement confirmation
+    PP-->>PSP: PAID webhook (timestamp, local ref)
+    PP->>LIQ: Deduct from prefunded balance
+    PP->>PSP: End-of-day settlement file
+    </div>
+  </div>
+
+  <!-- DIAGRAM 4: TRANSACTION STATE MACHINE -->
+  <h3>Diagram 4: Transaction State Machine</h3>
+  <div class="diagram-container">
+    <div class="diagram-label"><strong>FIGURE 4</strong> · Complete Transaction State Lifecycle</div>
+    <div class="mermaid">
+stateDiagram-v2
+    [*] --> PENDING : Transaction Created
+    PENDING --> FUNDS_COLLECTED : Payment Authorized
+    PENDING --> CANCELLED : Customer Cancel / Timeout
+    FUNDS_COLLECTED --> PROCESSING : Dispatched to Partner
+    FUNDS_COLLECTED --> FAILED : Collection Failed
+    PROCESSING --> PAID : Partner Confirms Payout
+    PROCESSING --> FAILED : Partner Reports Failure
+    PROCESSING --> ON_HOLD : Compliance / OFAC Hold
+    PROCESSING --> RETURNED : Account Invalid / Rejected
+    ON_HOLD --> PROCESSING : Compliance Cleared
+    ON_HOLD --> CANCELLED : Compliance Rejected
+    FAILED --> REFUNDED : Refund Initiated
+    RETURNED --> REFUNDED : Refund Initiated
+    CANCELLED --> REFUNDED : Refund (if funds collected)
+    PAID --> [*]
+    REFUNDED --> [*]
+    </div>
+  </div>
+
+  <!-- DIAGRAM 5: SYSTEM ARCHITECTURE -->
+  <h3>Diagram 5: High-Level System Architecture</h3>
+  <div class="diagram-container">
+    <div class="diagram-label"><strong>FIGURE 5</strong> · Remittance Platform Architecture Overview</div>
+    <div class="mermaid">
+graph TB
+    subgraph CLIENT["Client Layer"]
+        WEB[Web App]
+        MOB[Mobile App]
+        AGT[Agent Portal]
+    end
+
+    subgraph API_GW["API Gateway Layer"]
+        GW[API Gateway / Load Balancer]
+        AUTH[Auth Service / OAuth2]
+    end
+
+    subgraph CORE["Core Services"]
+        TXN[Transaction Service]
+        CUST[Customer Service]
+        FXS[FX Rate Service]
+        FEES[Fee Engine]
+        LIMS[Limits Service]
+    end
+
+    subgraph COMP_LAYER["Compliance Layer"]
+        KYC_S[KYC Engine]
+        OFAC_S[Sanctions Screener]
+        AML_S[AML Monitor]
+        FRAUD[Fraud Detection]
+    end
+
+    subgraph ASYNC["Async / Event Layer"]
+        KAFKA[Message Broker - Kafka]
+        DISPATCH[Partner Dispatcher]
+        NOTIF[Notification Service]
+        ACCT[Accounting Service]
+    end
+
+    subgraph EXTERNAL["External Partners"]
+        P1[Bank Partner A]
+        P2[Fintech Partner B]
+        P3[Agent Network C]
+    end
+
+    subgraph DATA["Data Layer"]
+        PGDB[(PostgreSQL - Core DB)]
+        REDIS[(Redis - Cache/Locks)]
+        DATALAKE[(Data Lake - AML/Analytics)]
+    end
+
+    WEB & MOB & AGT --> GW
+    GW --> AUTH
+    GW --> TXN & CUST & FXS
+    TXN --> KYC_S & OFAC_S & FRAUD & LIMS
+    TXN --> KAFKA
+    KAFKA --> DISPATCH & NOTIF & ACCT & AML_S
+    DISPATCH --> P1 & P2 & P3
+    TXN & CUST --> PGDB
+    LIMS --> REDIS
+    AML_S --> DATALAKE
+    </div>
+  </div>
+
+  <!-- DIAGRAM 6: NOSTRO/VOSTRO -->
+  <h3>Diagram 6: Nostro / Vostro Account Flow &amp; Settlement</h3>
+  <div class="diagram-container">
+    <div class="diagram-label"><strong>FIGURE 6</strong> · Correspondent Banking &amp; Pre-funded Account Settlement</div>
+    <div class="mermaid">
+flowchart LR
+    subgraph US["United States (Sending Country)"]
+        PSP_US[PSP Collection Account\nUSA - USD]
+        NOSTRO_US[PSP Nostro Account\nat US Correspondent Bank]
+    end
+
+    subgraph CORRIDOR["Cross-Border Settlement"]
+        SWIFT_MSG[SWIFT MT103 / ISO 20022\nor Bilateral API Settlement]
+    end
+
+    subgraph PH["Philippines (Receiving Country)"]
+        NOSTRO_PH[PSP Pre-funded Account\nat PH Partner Bank - PHP]
+        PARTNER_PH[Payout Partner\nPhilippines]
+        RECIPIENT[Recipient Bank Account]
+    end
+
+    PSP_US -- "1. Funds collected from sender" --> PSP_US
+    PSP_US -- "2. Net settlement batch (daily/T+1)" --> NOSTRO_US
+    NOSTRO_US -- "3. Wire/SWIFT to PH nostro" --> SWIFT_MSG
+    SWIFT_MSG -- "4. Credit PH pre-funded pool" --> NOSTRO_PH
+    NOSTRO_PH -- "5. Real-time payout instruction" --> PARTNER_PH
+    PARTNER_PH -- "6. Local rail credit (InstaPay/PESONet)" --> RECIPIENT
+
+    style PSP_US fill:#1a1a2e,color:#faf9f6
+    style NOSTRO_PH fill:#0a6b7a,color:#fff
+    style RECIPIENT fill:#198754,color:#fff
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 5: TECHNICAL ARCHITECTURE
+══════════════════════════════════════ -->
+<section class="doc-section" id="architecture">
+  <div class="section-label">Section 05</div>
+  <h2>Technical Architecture</h2>
+
+  <h3>Core Microservices</h3>
+  <div class="arch-grid">
+    <div class="arch-card">
+      <span class="arch-card-icon">🔐</span>
+      <h4>Customer Identity Service</h4>
+      <p>Manages customer profiles, KYC status, risk tiers, document storage. Source of truth for all identity data. Integrates with eKYC vendors (Jumio, Onfido, Socure).</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">💱</span>
+      <h4>FX Rate Service</h4>
+      <p>Polls liquidity providers for mid-market rates. Caches rates with TTL. Applies spread matrix per corridor and customer tier. Manages rate lock and expiry logic.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">📋</span>
+      <h4>Transaction Service</h4>
+      <p>Orchestrates the full transaction lifecycle. Handles state transitions, idempotency, and event publishing. The system of record for all transfers.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">🛡️</span>
+      <h4>Compliance Engine</h4>
+      <p>Rule-based engine for regulatory checks. Manages OFAC screening, AML rules, corridor restrictions, CTR/SAR triggers. Configurable without code deployments.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">🤖</span>
+      <h4>Fraud Detection Service</h4>
+      <p>ML model serving layer. Real-time scoring with sub-100ms SLA. Feature store fed by behavioral analytics, device intelligence, and transaction history.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">🏦</span>
+      <h4>Partner Connectivity Service</h4>
+      <p>Manages integrations with all payout partners. Abstracts protocol differences (REST, SOAP, SFTP). Handles retry logic, circuit breakers, and failover routing.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">📊</span>
+      <h4>Accounting / Ledger Service</h4>
+      <p>Double-entry bookkeeping engine. Maintains per-corridor ledgers, Nostro position tracking, and fee revenue accounting. Feeds general ledger for financial reporting.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">⚖️</span>
+      <h4>Limits &amp; Velocity Service</h4>
+      <p>Atomic counter management for per-customer, per-corridor limits. Uses Redis for distributed real-time counters. Prevents race conditions in high-throughput environments.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">🔔</span>
+      <h4>Notification Service</h4>
+      <p>Multi-channel delivery: email, SMS, push notifications. Template management per corridor/language. Regulatory receipt generation. Delivery tracking and retry.</p>
+    </div>
+  </div>
+
+  <h3>Message Queue Architecture</h3>
+  <p>Remittance platforms rely heavily on asynchronous, event-driven processing to achieve resilience and scalability. A message broker (Apache Kafka in high-scale environments, RabbitMQ or AWS SQS in smaller deployments) forms the backbone.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Event Topic</th><th>Producers</th><th>Consumers</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>txn.created</code></td>
+          <td>Transaction Service</td>
+          <td>Accounting, Notifications, AML Monitor</td>
+          <td>Trigger bookkeeping and customer receipt</td>
+        </tr>
+        <tr>
+          <td><code>txn.funds_collected</code></td>
+          <td>Payment Collection Service</td>
+          <td>Partner Dispatcher</td>
+          <td>Trigger payout dispatch only after funds secured</td>
+        </tr>
+        <tr>
+          <td><code>txn.status_updated</code></td>
+          <td>Partner Dispatcher (webhook)</td>
+          <td>Transaction Service, Notifications, Reconciliation</td>
+          <td>Propagate partner status changes system-wide</td>
+        </tr>
+        <tr>
+          <td><code>txn.paid</code></td>
+          <td>Transaction Service</td>
+          <td>Settlement Service, Analytics, Loyalty</td>
+          <td>Trigger settlement accounting and post-tx analytics</td>
+        </tr>
+        <tr>
+          <td><code>compliance.alert</code></td>
+          <td>Compliance Engine, AML Monitor</td>
+          <td>Case Management, Reporting Service</td>
+          <td>Route flagged transactions to compliance team</td>
+        </tr>
+        <tr>
+          <td><code>liquidity.low</code></td>
+          <td>Liquidity Monitor</td>
+          <td>Treasury Alert System</td>
+          <td>Trigger manual or automated corridor replenishment</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Idempotency &amp; Fault Tolerance</h3>
+  <p>Financial transactions require strict idempotency guarantees. Key patterns used in production systems:</p>
+  <ul style="margin: 1rem 0 1rem 1.5rem; color: var(--ink-light); line-height: 2.2;">
+    <li><strong>Idempotency keys:</strong> Every API call carries a client-generated UUID. Duplicate requests with the same key return the cached response without re-processing.</li>
+    <li><strong>Saga pattern:</strong> Distributed transactions across microservices use compensating transactions (refund, reversal) if any step fails downstream.</li>
+    <li><strong>Optimistic locking:</strong> Database records use version columns to prevent concurrent updates causing inconsistent state.</li>
+    <li><strong>Circuit breakers:</strong> Partner API integrations wrapped in circuit breakers (Hystrix/Resilience4j). If a partner fails repeatedly, traffic is cut to prevent cascading failures.</li>
+    <li><strong>Exponential backoff with jitter:</strong> Retry logic for partner API calls uses randomized backoff to avoid thundering-herd problems.</li>
+  </ul>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 6: COMPLIANCE LAYER
+══════════════════════════════════════ -->
+<section class="doc-section" id="compliance">
+  <div class="section-label">Section 06</div>
+  <h2>Compliance &amp; Regulatory Layer</h2>
+
+  <h3>KYC Tiers and CDD Requirements</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Tier</th><th>Customer Profile</th><th>Documents Required</th><th>Send Limit (Example)</th><th>EDD Required</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Tier 1 — Basic</td>
+          <td>Email verified only</td>
+          <td>Email address</td>
+          <td>$500 / month</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Tier 2 — Standard</td>
+          <td>ID verified</td>
+          <td>Government photo ID + selfie</td>
+          <td>$3,000 / month</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Tier 3 — Enhanced</td>
+          <td>Full KYC</td>
+          <td>ID + proof of address + SSN/TIN</td>
+          <td>$10,000 / month</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Tier 4 — Business</td>
+          <td>Business entity</td>
+          <td>Business registration + UBO documents + ID of directors</td>
+          <td>$50,000+ / month</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>PEP / High-Risk</td>
+          <td>Politically exposed or high-risk individual</td>
+          <td>Full KYC + source of funds + source of wealth</td>
+          <td>Case-by-case</td>
+          <td>Yes — mandatory</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>OFAC &amp; Sanctions Screening</h3>
+  <p>Sanctions screening is a non-negotiable compliance requirement under US law (OFAC), EU regulations, and equivalent regimes globally. Key implementation details:</p>
+
+  <div class="callout callout-danger">
+    <strong>⚠ Regulatory Obligation</strong>
+    US persons (including US-licensed MSBs) are legally prohibited from transacting with OFAC-designated entities. Violations carry civil penalties up to $1 million per violation and criminal sanctions. Screening must occur at both onboarding and at each transaction.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Screening List</th><th>Jurisdiction</th><th>Maintained By</th><th>Update Frequency</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>SDN List (Specially Designated Nationals)</td><td>USA</td><td>OFAC / US Treasury</td><td>Real-time</td></tr>
+        <tr><td>Consolidated Sanctions List</td><td>European Union</td><td>European External Action Service</td><td>Daily</td></tr>
+        <tr><td>HM Treasury Financial Sanctions List</td><td>United Kingdom</td><td>OFSI / HM Treasury</td><td>Real-time</td></tr>
+        <tr><td>UN Security Council Consolidated List</td><td>International</td><td>UN 1267 Committee</td><td>As amended</td></tr>
+        <tr><td>PEP Lists</td><td>Global</td><td>Commercial providers (Dow Jones, LexisNexis, Refinitiv)</td><td>Daily</td></tr>
+        <tr><td>Adverse Media</td><td>Global</td><td>Commercial providers</td><td>Real-time feeds</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>AML Monitoring Framework</h3>
+  <p>Anti-Money Laundering monitoring operates at two levels: real-time pre-transaction screening and batch post-transaction analysis.</p>
+
+  <h4>Real-Time AML Rules (examples)</h4>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Rule</th><th>Trigger Condition</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Structuring Detection</td><td>3+ transactions in 24h summing near CTR threshold (e.g., $9,500–$9,999 each)</td><td>Flag for SAR review</td></tr>
+        <tr><td>High-Risk Corridor</td><td>Transaction to FATF blacklisted or greylisted jurisdiction</td><td>Enhanced screening + manual review for high amounts</td></tr>
+        <tr><td>Velocity Spike</td><td>Transaction frequency 3× historical average in 7 days</td><td>Review queue + potential account restriction</td></tr>
+        <tr><td>Round Amount</td><td>Multiple transactions of exact round amounts (e.g., exactly $500.00)</td><td>Low-priority flag for batch analysis</td></tr>
+        <tr><td>New Recipient High Amount</td><td>First transaction to a new recipient exceeds $2,000</td><td>Step-up authentication required</td></tr>
+        <tr><td>PEP Relationship</td><td>Transaction involving a PEP or immediate family of PEP</td><td>EDD review, senior management approval for large amounts</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Regulatory Reporting Obligations</h4>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Report Type</th><th>Trigger</th><th>Filing Entity</th><th>Deadline</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Currency Transaction Report (CTR)</td><td>Cash transactions exceeding $10,000 in a single day</td><td>US MSBs → FinCEN</td><td>15 calendar days</td></tr>
+        <tr><td>Suspicious Activity Report (SAR)</td><td>Transactions suspected of involving money laundering, fraud, or terrorist financing</td><td>US MSBs → FinCEN</td><td>30 days (60 if subject unknown)</td></tr>
+        <tr><td>FBAR</td><td>Foreign bank account exceeding $10,000 at any point</td><td>US Persons → FinCEN</td><td>April 15 annually</td></tr>
+        <tr><td>Large Cash Transaction Report</td><td>Cash ≥ CAD $10,000</td><td>Canadian MSBs → FINTRAC</td><td>15 days</td></tr>
+        <tr><td>Suspicious Transaction Report (STR)</td><td>Suspicion of ML/TF regardless of amount</td><td>Varies by jurisdiction</td><td>Typically 24–72 hours</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 7: SETTLEMENT LAYER
+══════════════════════════════════════ -->
+<section class="doc-section" id="settlement">
+  <div class="section-label">Section 07</div>
+  <h2>Settlement &amp; Reconciliation Layer</h2>
+
+  <h3>Nostro / Vostro Account Model</h3>
+  <div class="callout callout-info">
+    <strong>ℹ Definition</strong>
+    A <strong>Nostro account</strong> is an account that a financial institution holds at a foreign bank in that foreign country's currency (literally "our account at your bank"). A <strong>Vostro account</strong> is the mirror perspective — the foreign bank's view of that same account ("your account at our bank"). In remittance, operators pre-fund Nostro accounts in destination country currencies to facilitate rapid payout.
+  </div>
+
+  <p>For each active corridor, a remittance operator maintains a pre-funded account at a local bank or payout partner in the destination country. This account holds local currency and is debited with each payout. The originating operator must continuously replenish these accounts to maintain liquidity.</p>
+
+  <h3>Settlement Cycle Architecture</h3>
+
+  <ol class="steps-list">
+    <li>
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>Intraday Transaction Accounting</strong>
+        <span>Each payout debits the Nostro balance in real time (or near-real-time). The accounting service maintains a real-time position of funds available per corridor, tracked in an in-memory store (Redis) and persisted to the ledger database.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>End-of-Day Settlement File Generation</strong>
+        <span>At EOD cut-off, the payout partner generates a settlement file listing all paid transactions, their amounts, local currency, and references. The originating PSP generates a corresponding file from its own system. The two files are reconciled.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>Reconciliation &amp; Breaks Management</strong>
+        <span>Automated reconciliation engine matches partner records to internal records by transaction ID. Unmatched items (breaks) classified as: timing difference (within tolerance), amount mismatch (requires investigation), partner records transaction as paid but internal record shows processing (status discrepancy). Break resolution SLA typically 24–48 hours.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">4</span>
+      <div class="step-content">
+        <strong>Replenishment / Nostro Funding</strong>
+        <span>When corridor balance falls below a defined minimum (e.g., 2 days' average payout volume), the treasury team initiates a replenishment SWIFT wire or API-based transfer to top up the Nostro account. Automated alerts and, in some systems, automated SWIFT MT202 messages trigger replenishment without manual intervention.</span>
+      </div>
+    </li>
+    <li>
+      <span class="step-num">5</span>
+      <div class="step-content">
+        <strong>FX Position Management</strong>
+        <span>The operator carries FX risk between the time a rate is locked for a customer and the time it settles. For high-volume operators, FX exposure is hedged using forward contracts or FX swaps through a treasury counterparty. Net open positions are marked to market daily.</span>
+      </div>
+    </li>
+  </ol>
+
+  <h3>Settlement Models Comparison</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Model</th><th>Description</th><th>Latency</th><th>Capital Requirement</th><th>Used By</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Pre-funded Nostro</td>
+          <td>Operator pre-deposits local currency at payout partner before transactions occur</td>
+          <td>Real-time payout possible</td>
+          <td>High — significant capital tied up</td>
+          <td>Most large MSBs (WU, MG)</td>
+        </tr>
+        <tr>
+          <td>Net Settlement (T+1/T+2)</td>
+          <td>Transactions batched; settlement wire sent to partner next business day</td>
+          <td>1–2 business days</td>
+          <td>Low — no pre-funding needed</td>
+          <td>Bank wire transfers</td>
+        </tr>
+        <tr>
+          <td>Local Collection + Local Payout (Wise Model)</td>
+          <td>Funds collected locally in source country, paid out from local pool in destination; no cross-border movement per transaction</td>
+          <td>Minutes to hours</td>
+          <td>Medium — maintain pools in each country</td>
+          <td>Wise (TransferWise)</td>
+        </tr>
+        <tr>
+          <td>Blockchain / DLT Settlement</td>
+          <td>Stablecoin or CBDC used as settlement layer between counterparties</td>
+          <td>Minutes</td>
+          <td>Low-Medium</td>
+          <td>Ripple/ODL, experimental CBDC corridors</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 8: TRANSACTION STATES
+══════════════════════════════════════ -->
+<section class="doc-section" id="states">
+  <div class="section-label">Section 08</div>
+  <h2>Transaction State Machine</h2>
+
+  <p>Every remittance transaction progresses through a defined set of states. State transitions are one-directional (with the exception of ON_HOLD) and all changes are recorded with timestamps and actor references in an immutable audit log.</p>
+
+  <div class="state-flow">
+    <span class="state-node badge badge-pending">PENDING</span>
+    <span class="state-arrow">→</span>
+    <span class="state-node badge badge-processing" style="background:#cff4fc;color:#055160">FUNDS_COLLECTED</span>
+    <span class="state-arrow">→</span>
+    <span class="state-node badge badge-processing">PROCESSING</span>
+    <span class="state-arrow">→</span>
+    <span class="state-node badge badge-paid">PAID</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>State</th><th>Description</th><th>Triggered By</th><th>Next Possible States</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-pending">PENDING</span></td>
+          <td>Transaction record created; funds not yet collected; all validations passed</td>
+          <td>Customer submits transfer</td>
+          <td>FUNDS_COLLECTED, CANCELLED</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-processing" style="background:#cff4fc;color:#055160">FUNDS_COLLECTED</span></td>
+          <td>Sender's payment method successfully debited; funds held in operator collection account</td>
+          <td>Payment processor confirmation</td>
+          <td>PROCESSING, FAILED</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-processing">PROCESSING</span></td>
+          <td>Payout instruction dispatched to partner; awaiting confirmation of credit</td>
+          <td>Partner API acknowledgement</td>
+          <td>PAID, FAILED, ON_HOLD, RETURNED</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-paid">PAID</span></td>
+          <td>Partner confirms recipient account has been credited; terminal success state</td>
+          <td>Partner webhook / status poll</td>
+          <td>— (terminal state)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-hold">ON_HOLD</span></td>
+          <td>Transaction suspended pending compliance review (OFAC hit, AML flag, or partner-initiated hold)</td>
+          <td>Compliance engine, partner callback</td>
+          <td>PROCESSING (if cleared), CANCELLED (if rejected)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-failed">FAILED</span></td>
+          <td>Transaction could not be completed (partner rejection, routing failure, account closed)</td>
+          <td>Partner error response</td>
+          <td>REFUNDED</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-failed">RETURNED</span></td>
+          <td>Partner attempted payout but it was returned by receiving bank (wrong account, dormant account)</td>
+          <td>Partner return notification</td>
+          <td>REFUNDED</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-cancelled">CANCELLED</span></td>
+          <td>Transaction cancelled before payout — by customer (within cancellation window) or by compliance</td>
+          <td>Customer request, compliance rejection</td>
+          <td>REFUNDED (if FUNDS_COLLECTED)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-reversed">REFUNDED</span></td>
+          <td>Funds returned to sender; terminal state following failure, return, or cancellation</td>
+          <td>Refund process completion</td>
+          <td>— (terminal state)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 9: ERROR SCENARIOS
+══════════════════════════════════════ -->
+<section class="doc-section" id="errors">
+  <div class="section-label">Section 09</div>
+  <h2>Error Scenarios &amp; Handling</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Error Scenario</th><th>Trigger</th><th>System Response</th><th>Customer Impact</th><th>Recovery Path</th></tr>
+      </thead>
+      <tbody class="error-rows">
+        <tr class="error-row-critical">
+          <td>OFAC / Sanctions Hit</td>
+          <td>Customer or recipient name matches SDN or other sanctions list during screening</td>
+          <td>Transaction blocked; compliance team alerted; potential SAR filing; OFAC blocking report if confirmed match</td>
+          <td>Transaction declined; customer informed of "compliance review" without revealing list match details (legally required)</td>
+          <td>Manual compliance review; escalation to OFAC for guidance on confirmed hits; false positives resolved and whitelisted</td>
+        </tr>
+        <tr class="error-row-critical">
+          <td>AML Hold / Suspicious Activity</td>
+          <td>Transaction triggers AML rule (structuring, velocity spike, high-risk corridor)</td>
+          <td>Transaction placed in ON_HOLD state; case created in compliance case management system; analyst assigned</td>
+          <td>Transaction delayed (hours to days); customer may be asked for additional documentation</td>
+          <td>Compliance analyst review; clear and process, or reject and refund with SAR filing if warranted</td>
+        </tr>
+        <tr class="error-row-critical">
+          <td>Insufficient Funds</td>
+          <td>Card decline, ACH return, or wallet balance below required amount</td>
+          <td>Immediate decline at collection stage; transaction remains in PENDING or moves to FAILED; no funds moved</td>
+          <td>Transfer not initiated; customer notified with payment failure reason code; prompted to update payment method</td>
+          <td>Customer updates payment method and re-attempts; original transaction cancelled</td>
+        </tr>
+        <tr class="error-row-warning">
+          <td>FX Rate Expiry</td>
+          <td>Customer takes longer than rate lock period (e.g., 30 seconds) to confirm transaction</td>
+          <td>Rate lock expires; new rate must be fetched; if new rate significantly different, customer re-confirmation required</td>
+          <td>Minor delay; customer shown updated rate and must re-confirm if rate has changed beyond tolerance threshold</td>
+          <td>Fresh rate quote; customer confirms or cancels</td>
+        </tr>
+        <tr class="error-row-warning">
+          <td>FX Rate Breach (Post-Lock)</td>
+          <td>Extreme FX volatility causes partner to reject transaction at locked rate (rare but possible in volatile corridors)</td>
+          <td>Partner rejects with FX rejection code; transaction moves to FAILED; operator absorbs loss or refunds customer with updated rate offer</td>
+          <td>Transfer failed; customer offered re-quote at current rate or full refund</td>
+          <td>Refund or re-initiation at new rate</td>
+        </tr>
+        <tr class="error-row-warning">
+          <td>Invalid Recipient Account</td>
+          <td>Bank account number fails validation, is closed, or belongs to a different person than the stated recipient</td>
+          <td>Payout attempt rejected by receiving bank; transaction moves to RETURNED; refund initiated</td>
+          <td>Transfer failed; funds returned within 3–5 business days; customer prompted to verify and re-enter recipient details</td>
+          <td>Customer corrects recipient details; new transaction created</td>
+        </tr>
+        <tr>
+          <td>Partner API Failure / Timeout</td>
+          <td>Payout partner API returns error, times out, or returns ambiguous status</td>
+          <td>Retry with exponential backoff (3–5 attempts); if still unresolved, fallback to secondary partner (if available) or manual queue</td>
+          <td>Transaction remains in PROCESSING with extended delivery estimate; customer notified of delay</td>
+          <td>Manual intervention by operations team; partner escalation; refund if unresolvable within SLA</td>
+        </tr>
+        <tr>
+          <td>Duplicate Transaction</td>
+          <td>Customer submits same transaction twice (e.g., double-clicks, network retry)</td>
+          <td>Idempotency key check catches duplicate; second request returns cached response of first; no double-charge</td>
+          <td>No impact; customer sees one transaction as expected</td>
+          <td>N/A — prevented by idempotency controls</td>
+        </tr>
+        <tr>
+          <td>Beneficiary Account Frozen / Garnished</td>
+          <td>Receiving bank rejects credit due to account restrictions (court order, fraud flag)</td>
+          <td>Transaction returned by receiving bank; funds returned to payout partner; return notification sent to originating PSP</td>
+          <td>Transfer failed; refund issued to sender</td>
+          <td>Customer must use alternative recipient account or payment method</td>
+        </tr>
+        <tr>
+          <td>Transaction Limit Exceeded</td>
+          <td>Transaction would push customer over daily/monthly send limit for their KYC tier</td>
+          <td>Velocity check fails at pre-transaction validation; transaction declined before collection</td>
+          <td>Decline with explanation of limit; offer to upgrade KYC tier for higher limits</td>
+          <td>Customer upgrades KYC, or waits for limit to reset, or splits transaction</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 10: PROVIDER COMPARISON
+══════════════════════════════════════ -->
+<section class="doc-section" id="providers">
+  <div class="section-label">Section 10</div>
+  <h2>Provider Implementation Comparison</h2>
+  <p>The following provides a high-level, factual overview of how major remittance and payments players implement their transfer flows, based on publicly available disclosures, regulatory filings, and industry knowledge.</p>
+
+  <div class="provider-card">
+    <div class="provider-header">
+      <h3>Western Union</h3>
+      <span class="provider-tag">Traditional Agent Network</span>
+    </div>
+    <div class="provider-body">
+      <div class="provider-cols">
+        <div class="provider-col">
+          <h4>Model &amp; Infrastructure</h4>
+          <ul>
+            <li>Proprietary global agent network (~500,000 locations in 200+ countries)</li>
+            <li>Pre-funded Nostro accounts maintained at agent locations and partner banks per corridor</li>
+            <li>Operates a centralized transaction processing platform with global real-time routing</li>
+            <li>SWIFT membership for bank-to-bank leg; proprietary messaging for agent-to-agent</li>
+            <li>Hybrid model: digital channel + cash agent network</li>
+          </ul>
+        </div>
+        <div class="provider-col">
+          <h4>Compliance &amp; Risk</h4>
+          <ul>
+            <li>Dedicated global compliance organization with jurisdiction-specific compliance officers</li>
+            <li>Proprietary sanctions screening integrated at every transaction touchpoint</li>
+            <li>Deferred Prosecution Agreement (2017) with US DOJ — significant investment in AML controls</li>
+            <li>Agent due diligence program (know-your-agent) with periodic audits of agent compliance</li>
+            <li>Centralized global AML transaction monitoring with local SAR/STR filing per jurisdiction</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="provider-card">
+    <div class="provider-header">
+      <h3>MoneyGram</h3>
+      <span class="provider-tag">Hybrid Network / DLT Experimenter</span>
+    </div>
+    <div class="provider-body">
+      <div class="provider-cols">
+        <div class="provider-col">
+          <h4>Model &amp; Infrastructure</h4>
+          <ul>
+            <li>Agent network (~350,000 locations) plus digital channel (MoneyGram Online)</li>
+            <li>Partnership with Ripple (On-Demand Liquidity / XRP) for select corridors — reduces pre-funded Nostro requirement</li>
+            <li>Settlement via correspondent banking for majority of corridors</li>
+            <li>Acquired by Madison Dearborn Partners (private equity) in 2023; continued investment in digital transformation</li>
+          </ul>
+        </div>
+        <div class="provider-col">
+          <h4>Compliance &amp; Risk</h4>
+          <ul>
+            <li>FTC and DOJ settlements in prior years drove significant compliance investment</li>
+            <li>Fraud Hotline and consumer protection program as part of regulatory settlement requirements</li>
+            <li>Agent monitoring program with automated suspicious activity detection at agent POS</li>
+            <li>Transaction monitoring system with jurisdiction-specific rules per corridor</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="provider-card">
+    <div class="provider-header">
+      <h3>PayPal / Xoom</h3>
+      <span class="provider-tag">Digital-First / Wallet-Centric</span>
+    </div>
+    <div class="provider-body">
+      <div class="provider-cols">
+        <div class="provider-col">
+          <h4>Model &amp; Infrastructure</h4>
+          <ul>
+            <li>Xoom (acquired 2015) operates as PayPal's international remittance product</li>
+            <li>Funds collected from sender's PayPal balance, linked bank, or card</li>
+            <li>Bank deposit, home delivery, and cash pickup payout options per corridor</li>
+            <li>Partnerships with local banks and payout aggregators in destination countries</li>
+            <li>Pre-funded account model for instant payout; settlement on next business day</li>
+            <li>Same-day and next-day delivery available for select corridors (India, Philippines, Mexico)</li>
+          </ul>
+        </div>
+        <div class="provider-col">
+          <h4>Compliance &amp; Risk</h4>
+          <ul>
+            <li>PayPal is a licensed MSB in all US states and holds equivalent licenses globally</li>
+            <li>Integrated with PayPal's global fraud and risk platform (risk scoring on transactions leveraging PayPal's broader network intelligence)</li>
+            <li>KYC handled through PayPal account verification</li>
+            <li>Centralized sanctions screening platform shared across PayPal products</li>
+            <li>Mandatory 2FA for cross-border transfers above thresholds</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="provider-card">
+    <div class="provider-header">
+      <h3>Wise (formerly TransferWise)</h3>
+      <span class="provider-tag">Fintech / Local Pool Model</span>
+    </div>
+    <div class="provider-body">
+      <div class="provider-cols">
+        <div class="provider-col">
+          <h4>Model &amp; Infrastructure</h4>
+          <ul>
+            <li>Pioneered the "local-to-local" model: collects in source currency, pays out from a local pool in destination country — minimizing actual cross-border wire transfers</li>
+            <li>Holds e-money and banking licenses in multiple jurisdictions (UK FCA, EU, US, Singapore MAS, etc.)</li>
+            <li>Mid-market FX rate used; fees fully transparent and disclosed upfront</li>
+            <li>Maintains local bank accounts in 40+ countries for collection and payout</li>
+            <li>SWIFT network used for corridors not covered by local pools</li>
+          </ul>
+        </div>
+        <div class="provider-col">
+          <h4>Compliance &amp; Risk</h4>
+          <ul>
+            <li>Strong KYC program with eKYC and identity verification at onboarding</li>
+            <li>Transaction monitoring using proprietary ML models</li>
+            <li>Regulated as an EMI (Electronic Money Institution) in the UK and EU, subject to PSD2 requirements</li>
+            <li>Transparent SAR/STR filing process per each jurisdiction it operates in</li>
+            <li>Regular independent audits of AML program</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 11: SECURITY & REGULATION
+══════════════════════════════════════ -->
+<section class="doc-section" id="security">
+  <div class="section-label">Section 11</div>
+  <h2>Security &amp; Regulatory Considerations</h2>
+
+  <h3>Information Security Requirements</h3>
+
+  <div class="arch-grid">
+    <div class="arch-card">
+      <span class="arch-card-icon">🔒</span>
+      <h4>Data Encryption</h4>
+      <p>All PII encrypted at rest (AES-256) and in transit (TLS 1.2+). Card data tokenized per PCI-DSS. Database encryption with key management via HSM (Hardware Security Module).</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">🪪</span>
+      <h4>Identity &amp; Access Management</h4>
+      <p>MFA required for all admin access. Role-based access control (RBAC) with least-privilege principles. Privileged Access Management (PAM) for database and infrastructure access.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">📝</span>
+      <h4>Audit Logging</h4>
+      <p>All system events, API calls, and data access logged to immutable audit trail. Logs retained per regulatory requirements (5–7 years). SIEM integration for real-time alerting.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">🌐</span>
+      <h4>API Security</h4>
+      <p>OAuth 2.0 / JWT authentication. Rate limiting per IP and API key. Input validation and output encoding to prevent injection. API gateway with WAF for perimeter defense.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">💳</span>
+      <h4>PCI-DSS Compliance</h4>
+      <p>Level 1 PCI-DSS compliance for card data handling. Annual QSA audit. Card data never stored in application databases — tokenized via certified vault provider.</p>
+    </div>
+    <div class="arch-card">
+      <span class="arch-card-icon">🔍</span>
+      <h4>Penetration Testing</h4>
+      <p>Quarterly automated vulnerability scanning. Annual third-party penetration testing. Bug bounty program. Responsible disclosure policy. SDLC security reviews (SAST/DAST).</p>
+    </div>
+  </div>
+
+  <h3>Key Regulatory Frameworks by Jurisdiction</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Jurisdiction</th><th>Primary Regulator</th><th>License Type</th><th>Key Requirements</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>United States</td>
+          <td>FinCEN (federal) + State regulators</td>
+          <td>Money Services Business (MSB) + State MTLs (Money Transmitter Licenses)</td>
+          <td>BSA compliance, AML program, SAR/CTR filing, state-by-state licensing (50 states)</td>
+        </tr>
+        <tr>
+          <td>European Union</td>
+          <td>National Competent Authorities (FCA in UK pre-Brexit, BaFin in Germany, etc.)</td>
+          <td>Payment Institution (PI) or E-Money Institution (EMI) license</td>
+          <td>PSD2 compliance, strong customer authentication (SCA), AMLD6 compliance, passporting rights within EU</td>
+        </tr>
+        <tr>
+          <td>United Kingdom</td>
+          <td>Financial Conduct Authority (FCA)</td>
+          <td>Authorised Payment Institution (API) or EMI</td>
+          <td>FCA Authorization, MLR 2017 AML compliance, Consumer Duty, safeguarding of client funds</td>
+        </tr>
+        <tr>
+          <td>Singapore</td>
+          <td>Monetary Authority of Singapore (MAS)</td>
+          <td>Major Payment Institution (MPI) license under PSA 2019</td>
+          <td>MAS Notice PSN01/PSN02 AML requirements, Technology Risk Management Guidelines</td>
+        </tr>
+        <tr>
+          <td>India (receiving)</td>
+          <td>Reserve Bank of India (RBI)</td>
+          <td>Authorised Dealer Category II or partner bank required</td>
+          <td>FEMA compliance, MTSS (Money Transfer Service Scheme) framework, reporting to RBI</td>
+        </tr>
+        <tr>
+          <td>Philippines (receiving)</td>
+          <td>Bangko Sentral ng Pilipinas (BSP)</td>
+          <td>RSSO (Remittance and Transfer Company) or Virtual Asset Service Provider</td>
+          <td>BSP Circular 942, AML Act compliance, reporting to AMLC</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-warning">
+    <strong>⚠ Licensing Note</strong>
+    Operating a remittance service without the appropriate license in each jurisdiction is a criminal offense in most markets. In the United States alone, there are 50 state-level Money Transmitter Licenses required (with the exception of Montana, which has no MTL requirement), in addition to the federal FinCEN MSB registration. Multi-year, multi-million dollar licensing programs are the norm for new market entrants.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 12: CONCLUSION
+══════════════════════════════════════ -->
+<section class="doc-section" id="conclusion">
+  <div class="section-label">Section 12</div>
+  <h2>Conclusion</h2>
+
+  <p>International remittance systems represent some of the most complex financial infrastructure in existence — operating across multiple jurisdictions, regulatory regimes, currencies, and technology stacks simultaneously. A single transaction that appears instantaneous to the end customer involves dozens of automated validation, screening, and routing decisions occurring in parallel within milliseconds.</p>
+
+  <p>The core lifecycle can be understood in five broad phases:</p>
+
+  <ol style="margin: 1rem 0 1.5rem 1.5rem; color: var(--ink-light); line-height: 2.4;">
+    <li><strong>Identity &amp; Risk Establishment</strong> — KYC, sanctions screening, fraud scoring and risk-tiering at onboarding and re-evaluated at every transaction</li>
+    <li><strong>Transaction Initiation &amp; Validation</strong> — FX quoting, compliance rule evaluation, limit checks, and atomic fund collection with idempotency guarantees</li>
+    <li><strong>Cross-Border Dispatch &amp; Routing</strong> — Async event-driven submission to correspondent partners, with retry and circuit-breaker resilience patterns</li>
+    <li><strong>Inbound Payout &amp; Credit</strong> — Local compliance re-screening, payout rail selection, recipient account credit via domestic payment infrastructure</li>
+    <li><strong>Settlement, Reconciliation &amp; Liquidity Management</strong> — Nostro/Vostro position management, EOD settlement file reconciliation, and proactive corridor replenishment</li>
+  </ol>
+
+  <p>The industry is undergoing significant transformation driven by three forces: <strong>instant payment rails</strong> (UPI, FPS, RTP, PIX) enabling real-time cross-border credit; <strong>regulatory modernization</strong> (ISO 20022 migration, open banking APIs, CBDC pilots) improving interoperability and traceability; and <strong>fintech disaggregation</strong> (Wise, Remitly, Nium) leveraging local collection models and API-first architecture to undercut traditional agent network operators on cost and speed.</p>
+
+  <p>For system architects designing or evaluating a remittance platform, the critical design principles are: <strong>immutable audit trails</strong>, <strong>idempotent operations</strong>, <strong>event-driven decoupling</strong>, <strong>real-time compliance at every state transition</strong>, and <strong>proactive liquidity monitoring</strong>. Missing any of these in production creates either regulatory exposure, operational failure, or both.</p>
+
+  <div class="callout callout-success">
+    <strong>✓ Key Takeaway</strong>
+    The most resilient remittance architectures treat compliance not as a gate at the beginning of a transaction, but as a continuous, layered process that runs at onboarding, at each transaction, during processing, and in post-transaction batch analysis. The regulatory and technical obligations are inseparable.
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <strong style="color:rgba(250,249,246,0.8)">International Remittance Systems — Technical Reference</strong><br>
+      Research Paper · Fintech Systems Architecture Domain
+    </div>
+    <div>
+      Standards Referenced: FATF Recommendations · ISO 20022 · SWIFT MT/MX · PSD2 · BSA/FinCEN · OFAC Regulations<br>
+      Frameworks: AML/CFT · KYC/CDD/EDD · PCI-DSS · SOC 2
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Initialize Mermaid
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#1a1a2e',
+      primaryTextColor: '#faf9f6',
+      primaryBorderColor: '#c8410a',
+      lineColor: '#5a5a7a',
+      secondaryColor: '#f5f0e8',
+      tertiaryColor: '#e0f4f7',
+      background: '#faf9f6',
+      mainBkg: '#1a1a2e',
+      nodeBorder: '#c8410a',
+      clusterBkg: '#f5f0e8',
+      titleColor: '#1a1a2e',
+      edgeLabelBackground: '#faf9f6',
+      fontSize: '14px'
+    },
+    sequence: {
+      actorMargin: 60,
+      boxMargin: 10,
+      noteMargin: 10,
+      messageMargin: 40,
+      mirrorActors: false,
+      useMaxWidth: true
+    },
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis'
+    }
+  });
+</script>
+</body>
+</html>

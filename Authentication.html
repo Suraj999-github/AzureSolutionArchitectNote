@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Authentication in .NET Core</title>
+    <style>
+        :root {
+            --primary: #512bd4;
+            --primary-light: #6c3ce0;
+            --secondary: #0d6efd;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8f9fc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* ── Header / Hero ─────────────────────── */
+        .hero {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #4338ca 60%, #512bd4 100%);
+            color: #ffffff;
+            padding: 60px 24px 70px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -120px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: -100px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero .subtitle {
+            font-size: 1.2rem;
+            margin-top: 12px;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .hero .dotnet-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Container ─────────────────────────── */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── Sections ──────────────────────────── */
+        section {
+            margin: 40px 0;
+        }
+        .section-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #1e1b4b;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+            letter-spacing: -0.3px;
+        }
+        .subsection-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #312e81;
+            margin: 28px 0 14px;
+            letter-spacing: -0.2px;
+        }
+
+        /* ── Cards ─────────────────────────────── */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e1b4b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card .icon-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .icon-purple {
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+        .icon-blue {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .icon-green {
+            background: #d1fae5;
+            color: #059669;
+        }
+        .icon-orange {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .icon-red {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .icon-teal {
+            background: #ccfbf1;
+            color: #0d9488;
+        }
+        .icon-slate {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .icon-indigo {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        .card .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+        .badge-api {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .badge-web {
+            background: #d1fae5;
+            color: #047857;
+        }
+        .badge-enterprise {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .badge-microservice {
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+        .badge-legacy {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .badge-m2m {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .card p {
+            color: var(--text-light);
+            margin: 6px 0;
+            font-size: 0.95rem;
+        }
+        .card ul {
+            margin: 10px 0 0 18px;
+            color: var(--text-light);
+            font-size: 0.93rem;
+        }
+        .card ul li {
+            margin-bottom: 4px;
+        }
+        .card ul li strong {
+            color: var(--text);
+        }
+
+        /* ── Diagram Section ───────────────────── */
+        .diagram-container {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 32px 16px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin: 30px 0;
+            overflow-x: auto;
+            text-align: center;
+        }
+        .diagram-container h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e1b4b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* ── Comparison Table ──────────────────── */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            font-size: 0.9rem;
+            min-width: 750px;
+        }
+        table thead th {
+            background: #1e1b4b;
+            color: #ffffff;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-light);
+            vertical-align: top;
+        }
+        table tbody tr:hover {
+            background: #f8fafc;
+        }
+        table tbody td:first-child {
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        /* ── Key Takeaways Box ─────────────────── */
+        .highlight-box {
+            background: linear-gradient(135deg, #ede9fe 0%, #faf5ff 100%);
+            border-left: 5px solid #7c3aed;
+            border-radius: var(--radius-sm);
+            padding: 24px 28px;
+            margin: 24px 0;
+        }
+        .highlight-box h3 {
+            color: #5b21b6;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .highlight-box ul {
+            margin-left: 18px;
+            color: #4a1d96;
+            font-weight: 500;
+        }
+        .highlight-box ul li {
+            margin-bottom: 6px;
+        }
+
+        .recommendation-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+            border-left: 5px solid #10b981;
+            border-radius: var(--radius-sm);
+            padding: 24px 28px;
+            margin: 24px 0;
+        }
+        .recommendation-box h3 {
+            color: #047857;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .recommendation-box ul {
+            margin-left: 18px;
+            color: #065f46;
+            font-weight: 500;
+        }
+        .recommendation-box ul li {
+            margin-bottom: 8px;
+        }
+
+        /* ── Footer ────────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 30px 24px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        /* ── Responsive ────────────────────────── */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero {
+                padding: 40px 16px 50px;
+            }
+            .card {
+                padding: 20px 18px;
+            }
+            .section-title {
+                font-size: 1.4rem;
+            }
+            .card h3 {
+                font-size: 1rem;
+                flex-wrap: wrap;
+            }
+            .card .badge {
+                margin-left: 0;
+                margin-top: 4px;
+            }
+        }
+
+        /* ── SVG tooltip-like styling ──────────── */
+        .diagram-container .node-label {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            font-weight: 600;
+        }
+        nav {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+nav a {
+    color: #f3f4f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    letter-spacing: 0.3px;
+}
+
+nav a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* Optional: Add an underline animation effect */
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #ffd700;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+nav a:hover::after {
+    width: 70%;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    nav a {
+        text-align: center;
+        padding: 0.75rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <nav>    
+        <a href="Home.html">Home</a>
+        <a href="ManyApiRequest.html">Handling Thousands of Requests</a>
+        <a href="CodingQuestions.html">Coding Questions</a>
+        <a href="dotnet_senior_interview_guide.html">Real-World .NET Interview</a>
+        <a href="Questions.html">Lead .NET Engineer Interview Questions</a>
+        
+      </nav>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- HERO SECTION -->
+    <!-- ═══════════════════════════════════════════ -->
+    <header class="hero">
+        <div class="dotnet-badge">🟣 .NET Core / ASP.NET Core</div>
+        <h1>Understanding Authentication<br>in .NET Core</h1>
+        <p class="subtitle">A clear, beginner-friendly guide to securing your modern applications</p>
+    </header>
+
+    <div class="container">
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- WHY AUTHENTICATION MATTERS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section>
+            <h2 class="section-title">🔐 Why Authentication Matters</h2>
+            <div class="card">
+                <p>
+                    Authentication is the process of <strong>verifying who a user (or service) is</strong> before granting
+                    access to your application. In modern systems, it's not optional — it's essential. Here's why:
+                </p>
+                <ul>
+                    <li><strong>Protects sensitive data</strong> — Prevents unauthorized access to personal information,
+                        financial records, and business data.</li>
+                    <li><strong>Enforces access control</strong> — Ensures that only the right people can perform specific
+                        actions (e.g., admin vs. regular user).</li>
+                    <li><strong>Builds user trust</strong> — Users expect their accounts to be safe; breaches destroy
+                        reputation.</li>
+                    <li><strong>Compliance & regulations</strong> — GDPR, HIPAA, PCI-DSS, and other frameworks mandate
+                        proper authentication.</li>
+                    <li><strong>Prevents common attacks</strong> — Mitigates risks like credential stuffing, session
+                        hijacking, and impersonation.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- DECISION FLOW DIAGRAM -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section>
+            <h2 class="section-title">🧭 Choosing an Authentication Method — Decision Flow</h2>
+            <div class="diagram-container">
+                <h3>📊 "Which authentication method should I pick?"</h3>
+                <p style="color:var(--text-light);margin-bottom:18px;">
+                    Start at the top and follow the path that matches your application type.
+                </p>
+                <svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" style="max-width:900px;width:100%;">
+                    <defs>
+                        <filter id="shadow1" x="-8%" y="-8%" width="116%" height="130%">
+                            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#c4b5fd" flood-opacity="0.5" />
+                        </filter>
+                        <filter id="shadow2" x="-8%" y="-8%" width="116%" height="130%">
+                            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#93c5fd" flood-opacity="0.5" />
+                        </filter>
+                        <filter id="shadow3" x="-8%" y="-8%" width="116%" height="130%">
+                            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#6ee7b7" flood-opacity="0.5" />
+                        </filter>
+                        <filter id="shadow4" x="-8%" y="-8%" width="116%" height="130%">
+                            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#fde68a" flood-opacity="0.5" />
+                        </filter>
+                        <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+                        </marker>
+                        <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
+                        </marker>
+                    </defs>
+
+                    <!-- Start Node -->
+                    <rect x="330" y="10" width="240" height="48" rx="24" fill="#512bd4" filter="url(#shadow1)" />
+                    <text x="450" y="40" fill="#fff" font-size="15" font-weight="700" text-anchor="middle" class="node-label">What are you building?</text>
+
+                    <!-- Q1: API or Web App? -->
+                    <rect x="310" y="90" width="280" height="40" rx="20" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+                    <text x="450" y="115" fill="#1e293b" font-size="13" font-weight="600" text-anchor="middle" class="node-label">Is it a Web API or a Web App (MVC/Razor)?</text>
+
+                    <!-- Arrows from Start to Q1 -->
+                    <line x1="450" y1="58" x2="450" y2="90" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+
+                    <!-- Branch left: API -->
+                    <text x="200" y="150" fill="#1d4ed8" font-size="13" font-weight="700" text-anchor="middle">💻 Web API / Microservice</text>
+                    <line x1="380" y1="130" x2="200" y2="165" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6,3" />
+
+                    <!-- Q2 for API: M2M or User? -->
+                    <rect x="40" y="175" width="300" height="40" rx="20" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+                    <text x="190" y="200" fill="#1e293b" font-size="13" font-weight="600" text-anchor="middle" class="node-label">Service-to-service (M2M) or user-facing?</text>
+                    <line x1="200" y1="165" x2="190" y2="175" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)" />
+
+                    <!-- M2M branch -->
+                    <text x="100" y="240" fill="#6366f1" font-size="12" font-weight="700" text-anchor="middle">🤖 Machine-to-Machine</text>
+                    <line x1="120" y1="215" x2="100" y2="250" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow)" stroke-dasharray="5,3" />
+                    <rect x="20" y="258" width="160" height="44" rx="10" fill="#e0e7ff" stroke="#818cf8" stroke-width="2" filter="url(#shadow1)" />
+                    <text x="100" y="278" fill="#3730a3" font-size="13" font-weight="700" text-anchor="middle" class="node-label">API Key</text>
+                    <text x="100" y="294" fill="#4338ca" font-size="10" text-anchor="middle">or mTLS Certificate</text>
+
+                    <!-- User-facing branch -->
+                    <text x="310" y="240" fill="#2563eb" font-size="12" font-weight="700" text-anchor="middle">👤 User-facing API</text>
+                    <line x1="260" y1="215" x2="310" y2="250" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow)" stroke-dasharray="5,3" />
+                    <rect x="210" y="258" width="190" height="44" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="2" filter="url(#shadow2)" />
+                    <text x="305" y="278" fill="#1d4ed8" font-size="13" font-weight="700" text-anchor="middle" class="node-label">JWT Bearer Tokens</text>
+                    <text x="305" y="294" fill="#2563eb" font-size="10" text-anchor="middle">+ OAuth 2.0 / OIDC for SSO</text>
+
+                    <!-- Branch right: Web App -->
+                    <text x="670" y="150" fill="#059669" font-size="13" font-weight="700" text-anchor="middle">🌐 Web App (MVC / Razor Pages)</text>
+                    <line x1="520" y1="130" x2="670" y2="165" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6,3" />
+
+                    <rect x="530" y="175" width="300" height="40" rx="20" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+                    <text x="680" y="200" fill="#1e293b" font-size="13" font-weight="600" text-anchor="middle" class="node-label">Needs SSO / external login providers?</text>
+                    <line x1="670" y1="165" x2="680" y2="175" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)" />
+
+                    <!-- Yes SSO -->
+                    <text x="580" y="240" fill="#059669" font-size="12" font-weight="700" text-anchor="middle">✅ Yes — Google, Azure AD, etc.</text>
+                    <line x1="590" y1="215" x2="580" y2="250" stroke="#10b981" stroke-width="1.8" marker-end="url(#arrow)" stroke-dasharray="5,3" />
+                    <rect x="470" y="258" width="210" height="44" rx="10" fill="#d1fae5" stroke="#34d399" stroke-width="2" filter="url(#shadow3)" />
+                    <text x="575" y="278" fill="#047857" font-size="13" font-weight="700" text-anchor="middle" class="node-label">OIDC + OAuth 2.0 (SSO)</text>
+                    <text x="575" y="294" fill="#065f46" font-size="10" text-anchor="middle">+ ASP.NET Identity for user store</text>
+
+                    <!-- No SSO / Simple -->
+                    <text x="790" y="240" fill="#b45309" font-size="12" font-weight="700" text-anchor="middle">❌ Simple login</text>
+                    <line x1="770" y1="215" x2="790" y2="250" stroke="#f59e0b" stroke-width="1.8" marker-end="url(#arrow)" stroke-dasharray="5,3" />
+                    <rect x="680" y="258" width="200" height="44" rx="10" fill="#fef3c7" stroke="#fbbf24" stroke-width="2" filter="url(#shadow4)" />
+                    <text x="780" y="278" fill="#92400e" font-size="13" font-weight="700" text-anchor="middle" class="node-label">Cookie Auth + Identity</text>
+                    <text x="780" y="294" fill="#a16207" font-size="10" text-anchor="middle">(Forms login, session-based)</text>
+
+                    <!-- Intranet / Windows -->
+                    <rect x="250" y="360" width="400" height="40" rx="20" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+                    <text x="450" y="385" fill="#1e293b" font-size="13" font-weight="600" text-anchor="middle" class="node-label">🏢 Internal corporate app / intranet?</text>
+                    <line x1="450" y1="320" x2="450" y2="360" stroke="#64748b" stroke-width="1.5" stroke-dasharray="8,4" marker-end="url(#arrow)" />
+
+                    <text x="450" y="425" fill="#475569" font-size="12" font-weight="700" text-anchor="middle">🖥️ Yes — Active Directory environment</text>
+                    <line x1="450" y1="400" x2="450" y2="430" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)" stroke-dasharray="5,3" />
+                    <rect x="290" y="440" width="320" height="44" rx="10" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2" filter="url(#shadow1)" />
+                    <text x="450" y="460" fill="#334155" font-size="13" font-weight="700" text-anchor="middle" class="node-label">🪟 Windows Authentication</text>
+                    <text x="450" y="476" fill="#475569" font-size="10" text-anchor="middle">(NTLM / Kerberos — seamless AD login)</text>
+
+                    <!-- Legend -->
+                    <rect x="30" y="530" width="840" height="70" rx="10" fill="#fafbfc" stroke="#e2e8f0" stroke-width="1" />
+                    <text x="60" y="555" fill="#64748b" font-size="11" font-weight="600">Legend:</text>
+                    <rect x="140" y="540" width="20" height="20" rx="4" fill="#e0e7ff" stroke="#818cf8" stroke-width="1.5" />
+                    <text x="168" y="555" fill="#475569" font-size="11">API Key / mTLS</text>
+                    <rect x="290" y="540" width="20" height="20" rx="4" fill="#dbeafe" stroke="#60a5fa" stroke-width="1.5" />
+                    <text x="318" y="555" fill="#475569" font-size="11">JWT Bearer</text>
+                    <rect x="420" y="540" width="20" height="20" rx="4" fill="#d1fae5" stroke="#34d399" stroke-width="1.5" />
+                    <text x="448" y="555" fill="#475569" font-size="11">OIDC + OAuth</text>
+                    <rect x="570" y="540" width="20" height="20" rx="4" fill="#fef3c7" stroke="#fbbf24" stroke-width="1.5" />
+                    <text x="598" y="555" fill="#475569" font-size="11">Cookie + Identity</text>
+                    <rect x="740" y="540" width="20" height="20" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5" />
+                    <text x="768" y="555" fill="#475569" font-size="11">Windows Auth</text>
+                    <text x="60" y="590" fill="#94a3b8" font-size="10">💡 Tip: Many modern apps combine approaches — e.g., OIDC for login + JWT for API calls.</text>
+                </svg>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- AUTHENTICATION METHODS BREAKDOWN -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section>
+            <h2 class="section-title">📚 Authentication Methods Breakdown</h2>
+            <p style="color:var(--text-light);margin-bottom:20px;">
+                Below are the most common authentication approaches in .NET Core. Each serves a different purpose —
+                understanding them will help you pick the right one.
+            </p>
+
+            <!-- 1. JWT Bearer -->
+            <div class="card">
+                <h3>
+                    <span class="icon-circle icon-blue">🔑</span> JWT Bearer Authentication
+                    <span class="badge badge-api">Best for APIs</span>
+                </h3>
+                <p>
+                    <strong>JSON Web Tokens (JWT)</strong> are compact, self-contained tokens that carry user claims
+                    (like name, email, roles). The server signs them with a secret or private key, so they can be
+                    verified without hitting a database on every request — making them <em>stateless</em> and perfect
+                    for scalable APIs.
+                </p>
+                <ul>
+                    <li><strong>How it works:</strong> Client sends the token in the <code>Authorization: Bearer
+                            &lt;token&gt;</code> header. The server validates the signature and extracts claims.</li>
+                    <li><strong>Built-in support:</strong> <code>AddAuthentication().AddJwtBearer()</code> in ASP.NET
+                        Core.</li>
+                    <li><strong>Typical use:</strong> REST APIs, microservices, SPAs (React/Angular/Vue), mobile backends.
+                    </li>
+                    <li><strong>Pros:</strong> Stateless, scalable, cross-platform, no server-side session storage needed.
+                    </li>
+                    <li><strong>Cons:</strong> Tokens can't be easily revoked before expiry; token size can grow with many
+                        claims.</li>
+                </ul>
+            </div>
+
+            <!-- 2. OAuth 2.0 -->
+            <div class="card">
+                <h3>
+                    <span class="icon-circle icon-green">🔐</span> OAuth 2.0
+                    <span class="badge badge-enterprise">Authorization Framework</span>
+                </h3>
+                <p>
+                    <strong>OAuth 2.0</strong> is an <em>authorization</em> framework — not strictly authentication — that
+                    allows a user to grant limited access to their resources without sharing credentials. It's the
+                    backbone behind "Log in with Google/Facebook/GitHub" flows.
+                </p>
+                <ul>
+                    <li><strong>Key grants (flows):</strong> Authorization Code (most secure, for web apps), Client
+                        Credentials (M2M), Device Code (TVs/IoT), PKCE (for SPAs/mobile).</li>
+                    <li><strong>Typical use:</strong> Delegated access, third-party integrations, "Login with X" buttons.
+                    </li>
+                    <li><strong>Note:</strong> OAuth 2.0 alone doesn't tell you <em>who</em> the user is — that's where
+                        OIDC comes in.</li>
+                </ul>
+            </div>
+
+            <!-- 3. OpenID Connect -->
+            <div class="card">
+                <h3>
+                    <span class="icon-circle icon-purple">🆔</span> OpenID Connect (OIDC)
+                    <span class="badge badge-web">SSO Standard</span>
+                </h3>
+                <p>
+                    <strong>OpenID Connect</strong> is a thin identity layer built <em>on top of</em> OAuth 2.0. It adds
+                    an <strong>ID Token</strong> (a JWT) that contains verified user identity information, enabling true
+                    <strong>Single Sign-On (SSO)</strong>.
+                </p>
+                <ul>
+                    <li><strong>ID Token vs Access Token:</strong> ID Token = who the user is; Access Token = what they
+                        can access.</li>
+                    <li><strong>Typical use:</strong> SSO across multiple apps, enterprise identity (Azure AD, Okta,
+                        Auth0, IdentityServer).</li>
+                    <li><strong>.NET Core support:</strong> <code>AddOpenIdConnect()</code> for web apps;
+                        <code>AddJwtBearer()</code> can validate OIDC-issued tokens for APIs.
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 4. Cookie Authentication -->
+            <div class="card">
+                <h3>
+                    <span class="icon-circle icon-orange">🍪</span> Cookie Authentication
+                    <span class="badge badge-web">Traditional Web Apps</span>
+                </h3>
+                <p>
+                    The classic approach: after a successful login, the server creates an encrypted cookie containing the
+                    user's session/identity. The browser automatically sends it with every subsequent request.
+                </p>
+                <ul>
+                    <li><strong>How it works:</strong> <code>AddAuthentication().AddCookie()</code> — the server manages
+                        the cookie, encrypts it, and validates it on each request.</li>
+                    <li><strong>Typical use:</strong> Server-rendered apps (MVC, Razor Pages), where the frontend and
+                        backend are tightly coupled.</li>
+                    <li><strong>Pros:</strong> Simple to implement, automatic cookie handling by browsers, easy to
+                        invalidate (clear the cookie).</li>
+                    <li><strong>Cons:</strong> Not ideal for SPAs or mobile apps; vulnerable to CSRF if not properly
+                        protected; requires server-side session state or cookie encryption.</li>
+                </ul>
+            </div>
+
+            <!-- 5. ASP.NET Identity -->
+            <div class="card">
+                <h3>
+                    <span class="icon-circle icon-indigo">👥</span> ASP.NET Identity
+                    <span class="badge badge-web">User Management System</span>
+                </h3>
+                <p>
+                    <strong>ASP.NET Core Identity</strong> is a full-featured membership system. It handles user
+                    registration, password hashing, email confirmation, two-factor authentication (2FA), role management,
+                    and external logins — all out of the box.
+                </p>
+                <ul>
+                    <li><strong>What it provides:</strong> User store (with EF Core), password policies, lockout, 2FA
+                        (TOTP), social login integration, and customizable UI (Scaffolded Identity pages).</li>
+                    <li><strong>Pairs perfectly with:</strong> Cookie Auth (for web apps) or JWT (for APIs — Identity can
+                        issue JWTs).</li>
+                    <li><strong>Typical use:</strong> Any app that needs a full user database with registration, login,
+                        and profile management.</li>
+                </ul>
+            </div>
+
+            <!-- 6. Windows Authentication -->
+            <div class="card">
+                <h3>
+                    <span class="icon-circle icon-slate">🪟</span> Windows Authentication
+                    <span class="badge badge-legacy">Intranet / Enterprise</span>
+                </h3>
+                <p>
+                    Uses the underlying Windows OS to authenticate users via <strong>NTLM</strong> or
+                    <strong>Kerberos</strong>. The user's Windows login is seamlessly passed to the web app — no separate
+                    login form needed.
+                </p>
+                <ul>
+                    <li><strong>Configuration:</strong> <code>AddAuthentication().AddNegotiate()</code> or
+                        <code>AddNtlm()</code>; enable Windows Authentication in IIS/Kestrel.
+                    </li>
+                    <li><strong>Typical use:</strong> Internal corporate apps, intranet portals, behind a VPN, Active
+                        Directory environments.</li>
+                    <li><strong>Pros:</strong> Zero login friction for domain users; leverages existing AD infrastructure.
+                    </li>
+                    <li><strong>Cons:</strong> Windows-only; not suitable for internet-facing apps or non-Windows clients.
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 7. API Key Authentication -->
+            <div class="card">
+                <h3>
+                    <span class="icon-circle icon-teal">🗝️</span> API Key Authentication
+                    <span class="badge badge-m2m">Simple M2M</span>
+                </h3>
+                <p>
+                    A straightforward method where clients include a pre-shared secret key in the request (usually in a
+                    custom header like <code>X-API-Key</code>). The server checks it against a known list.
+                </p>
+                <ul>
+                    <li><strong>How it works:</strong> Often implemented via custom middleware or an
+                        <code>AuthenticationHandler</code> that reads the header and validates the key.
+                    </li>
+                    <li><strong>Typical use:</strong> Simple service-to-service calls, webhooks, public APIs with
+                        registered consumers, prototyping.</li>
+                    <li><strong>Pros:</strong> Extremely simple to implement and understand; easy to revoke individual
+                        keys.</li>
+                    <li><strong>Cons:</strong> Not suitable for user-facing auth; keys can leak; no built-in expiry or
+                        claims mechanism; less secure than token-based approaches.</li>
+                </ul>
+            </div>
+
+            <!-- 8. Certificate (mTLS) -->
+            <div class="card">
+                <h3>
+                    <span class="icon-circle icon-red">📜</span> Certificate Authentication (mTLS)
+                    <span class="badge badge-m2m">High-Security M2M</span>
+                </h3>
+                <p>
+                    <strong>Mutual TLS (mTLS)</strong> requires both the client and server to present X.509 certificates.
+                    The server validates the client certificate against a trusted Certificate Authority (CA), ensuring
+                    strong, hardware-backed identity.
+                </p>
+                <ul>
+                    <li><strong>Configuration:</strong> <code>AddAuthentication().AddCertificate()</code> in ASP.NET Core;
+                        requires proper certificate setup on both ends.</li>
+                    <li><strong>Typical use:</strong> Zero-trust architectures, financial services, government systems,
+                        service mesh (e.g., Istio), highly regulated environments.</li>
+                    <li><strong>Pros:</strong> Very high security; no passwords or tokens to leak; mutual trust
+                        established at the transport layer.</li>
+                    <li><strong>Cons:</strong> Complex certificate management (issuance, rotation, revocation); higher
+                        operational overhead.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- QUICK COMPARISON TABLE -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section>
+            <h2 class="section-title">📋 Quick Comparison</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Best For</th>
+                            <th>Stateless?</th>
+                            <th>Complexity</th>
+                            <th>User Identity?</th>
+                            <th>.NET Core Setup</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>JWT Bearer</td>
+                            <td>REST APIs, SPAs, mobile</td>
+                            <td>✅ Yes</td>
+                            <td>Medium</td>
+                            <td>✅ Claims-based</td>
+                            <td><code>AddJwtBearer()</code></td>
+                        </tr>
+                        <tr>
+                            <td>OAuth 2.0</td>
+                            <td>Delegated access, 3rd-party</td>
+                            <td>✅ Yes (tokens)</td>
+                            <td>Medium-High</td>
+                            <td>❌ AuthZ only</td>
+                            <td>Via OIDC or custom handler</td>
+                        </tr>
+                        <tr>
+                            <td>OpenID Connect</td>
+                            <td>SSO, enterprise identity</td>
+                            <td>✅ Yes (tokens)</td>
+                            <td>Medium-High</td>
+                            <td>✅ ID Token</td>
+                            <td><code>AddOpenIdConnect()</code></td>
+                        </tr>
+                        <tr>
+                            <td>Cookie Auth</td>
+                            <td>MVC / Razor Pages</td>
+                            <td>❌ No (server session)</td>
+                            <td>Low</td>
+                            <td>✅ Yes</td>
+                            <td><code>AddCookie()</code></td>
+                        </tr>
+                        <tr>
+                            <td>ASP.NET Identity</td>
+                            <td>User store + management</td>
+                            <td>N/A (companion)</td>
+                            <td>Medium</td>
+                            <td>✅ Full profile</td>
+                            <td><code>AddIdentity()</code></td>
+                        </tr>
+                        <tr>
+                            <td>Windows Auth</td>
+                            <td>Intranet / AD</td>
+                            <td>❌ No</td>
+                            <td>Low (if AD exists)</td>
+                            <td>✅ AD user</td>
+                            <td><code>AddNegotiate()</code></td>
+                        </tr>
+                        <tr>
+                            <td>API Key</td>
+                            <td>Simple M2M, webhooks</td>
+                            <td>✅ Yes</td>
+                            <td>Very Low</td>
+                            <td>❌ No</td>
+                            <td>Custom middleware</td>
+                        </tr>
+                        <tr>
+                            <td>Certificate (mTLS)</td>
+                            <td>High-security M2M</td>
+                            <td>✅ Yes</td>
+                            <td>High</td>
+                            <td>✅ Via certificate</td>
+                            <td><code>AddCertificate()</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- WHEN TO USE EACH METHOD -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section>
+            <h2 class="section-title">🤔 When to Use Each Method</h2>
+            <div class="card">
+                <ul>
+                    <li><strong>Building a REST API consumed by a SPA or mobile app?</strong> → Use <strong>JWT
+                            Bearer</strong> tokens. Stateless, scalable, and works everywhere.</li>
+                    <li><strong>Need "Log in with Google/Microsoft/Facebook"?</strong> → Use <strong>OAuth 2.0 + OpenID
+                            Connect</strong>. OIDC gives you verified identity; OAuth handles delegated access.</li>
+                    <li><strong>Building a traditional server-rendered web app (MVC/Razor)?</strong> → Use <strong>Cookie
+                            Authentication + ASP.NET Identity</strong>. It's simple, battle-tested, and integrates
+                        seamlessly.</li>
+                    <li><strong>Internal corporate app on a Windows domain?</strong> → Use <strong>Windows
+                            Authentication</strong>. Users get seamless SSO with their AD credentials.</li>
+                    <li><strong>Two backend services talking to each other?</strong> → Use <strong>API Key</strong> (for
+                        simplicity) or <strong>mTLS Certificate</strong> (for high security). Also consider OAuth 2.0
+                        Client Credentials flow.</li>
+                    <li><strong>Need a full user database with registration, 2FA, roles?</strong> → Use <strong>ASP.NET
+                            Identity</strong> as your user store, then pair it with Cookie Auth (web) or JWT (API).</li>
+                    <li><strong>Zero-trust, highly regulated environment?</strong> → Use <strong>mTLS
+                            Certificates</strong> for mutual, hardware-backed trust.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- KEY TAKEAWAYS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section>
+            <h2 class="section-title">💡 Key Takeaways</h2>
+            <div class="highlight-box">
+                <h3>🧠 The Golden Rule of Authentication</h3>
+                <ul>
+                    <li><strong>Authentication choice depends entirely on your application's needs.</strong> There is no
+                        single "best" method — only the best <em>fit</em> for your scenario.</li>
+                    <li><strong>APIs ≠ Web Apps.</strong> APIs need stateless tokens (JWT); web apps thrive with
+                        session-based cookies.</li>
+                    <li><strong>OAuth 2.0 is for authorization; OIDC is for authentication.</strong> Together, they power
+                        modern SSO.</li>
+                    <li><strong>ASP.NET Identity is not an auth method — it's a user store.</strong> It works
+                        <em>alongside</em> Cookie Auth or JWT to manage users, passwords, and roles.
+                    </li>
+                    <li><strong>Security is a spectrum.</strong> API Keys are simple but less secure; mTLS is complex but
+                        highly secure. Choose based on your threat model.</li>
+                    <li><strong>Combine approaches when needed.</strong> A common pattern: OIDC for login → issues a JWT →
+                        JWT used for API calls. This gives you SSO + stateless API auth.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- PRACTICAL RECOMMENDATIONS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section>
+            <h2 class="section-title">✅ Practical Recommendations for Modern Systems</h2>
+            <div class="recommendation-box">
+                <h3>🚀 Start Here — Proven Patterns</h3>
+                <ul>
+                    <li>
+                        <strong>🌐 For Web APIs (SPA backends, mobile backends, microservices):</strong><br>
+                        Use <strong>JWT Bearer tokens</strong>. Combine with OAuth 2.0 + OIDC if you need SSO. Example
+                        stack: ASP.NET Core + <code>AddJwtBearer()</code> + IdentityServer / Azure AD / Auth0 as the
+                        token issuer.
+                    </li>
+                    <li>
+                        <strong>🖥️ For Server-Rendered Web Apps (MVC, Razor Pages, Blazor Server):</strong><br>
+                        Use <strong>ASP.NET Identity + Cookie Authentication</strong>. It's the most straightforward,
+                        well-documented path. Add OIDC for external logins (Google, Microsoft, etc.).
+                    </li>
+                    <li>
+                        <strong>🏢 For Enterprise SSO (multiple apps, one login):</strong><br>
+                        Use <strong>OpenID Connect + OAuth 2.0</strong> with a central identity provider (Azure AD,
+                        Okta, Duende IdentityServer). This gives users one login across all your apps.
+                    </li>
+                    <li>
+                        <strong>🤖 For Service-to-Service (microservices talking to each other):</strong><br>
+                        Use <strong>OAuth 2.0 Client Credentials flow</strong> (modern) or <strong>mTLS
+                            Certificates</strong> (high-security). Avoid API Keys for production inter-service auth if
+                        possible — they're harder to rotate securely.
+                    </li>
+                    <li>
+                        <strong>🛡️ Always:</strong> Use HTTPS (TLS) everywhere, hash passwords (Identity does this
+                        automatically), implement rate limiting, and plan for token/key rotation from day one.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- FOOTER -->
+    <!-- ═══════════════════════════════════════════ -->
+    <footer>
+        <p>📘 <strong>Understanding Authentication in .NET Core</strong> — A Beginner-Friendly Guide</p>
+        <p style="margin-top:4px;">Built with ❤️ for the .NET community &nbsp;|&nbsp; Always refer to the
+            <a href="https://learn.microsoft.com/en-us/aspnet/core/security/authentication/" target="_blank"
+                rel="noopener">official Microsoft docs</a> for the latest details.
+        </p>
+    </footer>
+
+</body>
+</html>

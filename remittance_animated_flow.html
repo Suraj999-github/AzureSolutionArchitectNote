@@ -1,0 +1,615 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .pres {
+    font-family: var(--font-sans);
+    padding: 0;
+    min-height: 560px;
+    position: relative;
+  }
+
+  .progress-bar {
+    display: flex;
+    gap: 4px;
+    padding: 16px 20px 0;
+    flex-wrap: wrap;
+  }
+  .pip {
+    height: 3px;
+    flex: 1;
+    min-width: 12px;
+    background: var(--color-border-tertiary);
+    border-radius: 2px;
+    transition: background 0.3s;
+    cursor: pointer;
+  }
+  .pip.done { background: var(--color-text-info); }
+  .pip.active { background: var(--color-text-primary); }
+
+  .stage-label {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    padding: 10px 20px 0;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .slide {
+    display: none;
+    padding: 16px 20px 20px;
+    animation: fadeIn 0.35s ease;
+  }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .slide-title {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step-badge {
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--color-background-info);
+    color: var(--color-text-info);
+    padding: 2px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .slide-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    max-width: 560px;
+  }
+
+  .svg-area {
+    width: 100%;
+    overflow: visible;
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 16px;
+    border-top: 0.5px solid var(--color-border-tertiary);
+  }
+  .nav-row button {
+    font-size: 13px;
+    padding: 6px 16px;
+    cursor: pointer;
+  }
+  .nav-row button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .counter {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 0 20px 12px;
+  }
+  .leg-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--color-text-secondary);
+  }
+  .leg-dot {
+    width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+  }
+</style>
+
+<div class="pres">
+  <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">International remittance flow — animated step-by-step presentation</h2>
+
+  <div class="progress-bar" id="pips"></div>
+  <div class="stage-label" id="stage-lbl"></div>
+
+  <div id="slides"></div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#3B8BD4"></div>Sender side</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>Compliance</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#BA7517"></div>Processing</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#639922"></div>Payout / success</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#A32D2D"></div>Failure path</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#888780"></div>System</div>
+  </div>
+
+  <div class="nav-row">
+    <button id="prev-btn" onclick="go(-1)">← Back</button>
+    <span class="counter" id="counter"></span>
+    <button id="next-btn" onclick="go(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  {
+    stage: "Phase 1 · Customer Onboarding",
+    title: "Customer registration & KYC",
+    badge: "Step 1–2",
+    desc: "The customer registers on the platform. KYC (Know Your Customer) verifies identity via document upload + liveness check. A risk tier (Low / Medium / High) is assigned and stored in the Customer Information File (CIF).",
+    nodes: [
+      { id:"cust",  x:60,  y:60,  w:130, h:44, color:"blue",  label:"Customer",       sub:"Initiates signup" },
+      { id:"reg",   x:250, y:60,  w:140, h:44, color:"blue",  label:"Registration",   sub:"Name, ID, address" },
+      { id:"kyc",   x:450, y:60,  w:140, h:44, color:"teal",  label:"KYC engine",     sub:"OCR + liveness check" },
+      { id:"risk",  x:350, y:160, w:140, h:44, color:"teal",  label:"Risk tier",       sub:"Low / Med / High" },
+    ],
+    arrows: [
+      { from:"cust", to:"reg", side:"right" },
+      { from:"reg",  to:"kyc", side:"right" },
+      { from:"kyc",  to:"risk", side:"down-left" },
+    ],
+    highlight: ["kyc","risk"]
+  },
+  {
+    stage: "Phase 1 · Customer Onboarding",
+    title: "OFAC & sanctions screening (onboarding)",
+    badge: "Step 3",
+    desc: "The customer's name and identifiers are screened against OFAC SDN, EU, UN, and HM Treasury sanctions lists using fuzzy matching. Positive hits go to a manual review queue. False positives are documented and whitelisted.",
+    nodes: [
+      { id:"cif",    x:60,  y:60,  w:130, h:44, color:"blue",  label:"Customer CIF",  sub:"Name, DOB, ID" },
+      { id:"ofac",   x:250, y:60,  w:160, h:44, color:"teal",  label:"Sanctions screener", sub:"SDN · EU · UN · HMT" },
+      { id:"pass",   x:480, y:30,  w:110, h:44, color:"green", label:"PASS",          sub:"Account activated" },
+      { id:"hold",   x:480, y:100, w:110, h:44, color:"amber", label:"REVIEW",        sub:"Manual queue" },
+      { id:"block",  x:480, y:170, w:110, h:44, color:"red",   label:"BLOCK",         sub:"Confirmed hit" },
+    ],
+    arrows: [
+      { from:"cif",  to:"ofac", side:"right" },
+      { from:"ofac", to:"pass", side:"fork-top" },
+      { from:"ofac", to:"hold", side:"fork-mid" },
+      { from:"ofac", to:"block", side:"fork-bot" },
+    ],
+    highlight: ["ofac"]
+  },
+  {
+    stage: "Phase 1 · Customer Onboarding",
+    title: "Bank / payment method verification",
+    badge: "Step 4",
+    desc: "The sender links a bank account or card. Bank accounts are verified via micro-deposit or open banking (Plaid / TrueLayer). Card details are tokenized via a PCI-DSS compliant vault — never stored in plain text. 3DS2 authentication applies to cards.",
+    nodes: [
+      { id:"cust",   x:60,  y:80,  w:130, h:44, color:"blue",  label:"Customer",      sub:"Links payment method" },
+      { id:"card",   x:280, y:30,  w:140, h:44, color:"blue",  label:"Card",          sub:"Tokenized · 3DS2" },
+      { id:"bank",   x:280, y:130, w:140, h:44, color:"blue",  label:"Bank account",  sub:"Micro-deposit / OB" },
+      { id:"vault",  x:490, y:80,  w:130, h:44, color:"teal",  label:"PCI vault",     sub:"Token stored" },
+    ],
+    arrows: [
+      { from:"cust", to:"card", side:"fork-top" },
+      { from:"cust", to:"bank", side:"fork-bot" },
+      { from:"card", to:"vault", side:"right" },
+      { from:"bank", to:"vault", side:"right" },
+    ],
+    highlight: ["vault"]
+  },
+  {
+    stage: "Phase 2 · Transaction Initiation",
+    title: "Customer initiates a transfer",
+    badge: "Step 5",
+    desc: "The customer enters the send amount, selects a recipient, and the system fetches a live FX rate. The rate is locked for 30–60 seconds. Full fee disclosure is shown (send amount, fee, FX rate, recipient receives, delivery estimate) as required by law.",
+    nodes: [
+      { id:"ui",     x:50,  y:80,  w:130, h:44, color:"blue",  label:"App / web UI",  sub:"Sender enters amount" },
+      { id:"fx",     x:260, y:80,  w:150, h:44, color:"amber", label:"FX rate service",sub:"Locked 30–60 s" },
+      { id:"fee",    x:260, y:170, w:150, h:44, color:"amber", label:"Fee engine",    sub:"Spread + flat fee" },
+      { id:"quote",  x:490, y:80,  w:130, h:44, color:"amber", label:"Quote shown",   sub:"Full disclosure" },
+    ],
+    arrows: [
+      { from:"ui",   to:"fx",    side:"right" },
+      { from:"ui",   to:"fee",   side:"fork-bot" },
+      { from:"fx",   to:"quote", side:"right" },
+      { from:"fee",  to:"quote", side:"right" },
+    ],
+    highlight: ["fx","fee","quote"]
+  },
+  {
+    stage: "Phase 2 · Transaction Initiation",
+    title: "Fraud scoring",
+    badge: "Step 6",
+    desc: "An ML model scores the transaction in real time (<100 ms). It analyses device fingerprint, IP vs. registered address, behavioural biometrics, transaction velocity, recipient risk, corridor risk, and time-of-day patterns.",
+    nodes: [
+      { id:"txn",    x:50,  y:80,  w:130, h:44, color:"blue",  label:"Transaction",   sub:"Amount, recipient" },
+      { id:"fraud",  x:260, y:80,  w:155, h:44, color:"teal",  label:"Fraud ML model",sub:"Score < 100 ms" },
+      { id:"approve",x:490, y:30,  w:120, h:44, color:"green", label:"Auto-approve",  sub:"Low risk" },
+      { id:"challenge",x:490,y:90, w:120, h:44, color:"amber", label:"3DS challenge", sub:"Medium risk" },
+      { id:"decline", x:490,y:155, w:120, h:44, color:"red",   label:"Decline",       sub:"High risk" },
+    ],
+    arrows: [
+      { from:"txn",   to:"fraud",    side:"right" },
+      { from:"fraud", to:"approve",  side:"fork-top" },
+      { from:"fraud", to:"challenge",side:"fork-mid" },
+      { from:"fraud", to:"decline",  side:"fork-bot" },
+    ],
+    highlight: ["fraud"]
+  },
+  {
+    stage: "Phase 3 · Pre-Transaction Validation",
+    title: "Compliance rule engine",
+    badge: "Step 7",
+    desc: "The transaction is evaluated against a configurable rule set: corridor restrictions, product rules, CTR triggers ($10 k+), sending frequency caps, and recipient country sanctions status. This is separate from OFAC — it checks business rules.",
+    nodes: [
+      { id:"txn",    x:50,  y:80,  w:130, h:44, color:"blue",  label:"Transaction",   sub:"Corridors + amount" },
+      { id:"rules",  x:260, y:80,  w:160, h:44, color:"teal",  label:"Compliance rules",sub:"Configurable engine" },
+      { id:"ok",     x:500, y:40,  w:110, h:44, color:"green", label:"PASS",          sub:"Proceed" },
+      { id:"ctr",    x:500, y:100, w:110, h:44, color:"amber", label:"CTR flag",      sub:"Report required" },
+      { id:"block",  x:500, y:160, w:110, h:44, color:"red",   label:"Block",         sub:"Corridor banned" },
+    ],
+    arrows: [
+      { from:"txn",   to:"rules", side:"right" },
+      { from:"rules", to:"ok",    side:"fork-top" },
+      { from:"rules", to:"ctr",   side:"fork-mid" },
+      { from:"rules", to:"block", side:"fork-bot" },
+    ],
+    highlight: ["rules"]
+  },
+  {
+    stage: "Phase 3 · Pre-Transaction Validation",
+    title: "Transaction-level OFAC screening",
+    badge: "Step 8",
+    desc: "Both sender AND recipient are re-screened at transaction time (not just at onboarding). Recipient name, bank details, and country are cross-checked. Blocked transactions are held for up to 5 business days for compliance review.",
+    nodes: [
+      { id:"sender",  x:50,  y:60,  w:120, h:44, color:"blue",  label:"Sender",       sub:"Re-screened" },
+      { id:"recip",   x:50,  y:130, w:120, h:44, color:"blue",  label:"Recipient",    sub:"Name + bank" },
+      { id:"screen",  x:260, y:90,  w:160, h:44, color:"teal",  label:"OFAC screener",sub:"Per-transaction" },
+      { id:"clear",   x:500, y:50,  w:110, h:44, color:"green", label:"Cleared",      sub:"Proceed to fund" },
+      { id:"pending", x:500, y:130, w:110, h:44, color:"amber", label:"Hold",         sub:"Up to 5 days" },
+    ],
+    arrows: [
+      { from:"sender", to:"screen", side:"right" },
+      { from:"recip",  to:"screen", side:"right" },
+      { from:"screen", to:"clear",  side:"fork-top" },
+      { from:"screen", to:"pending",side:"fork-bot" },
+    ],
+    highlight: ["screen"]
+  },
+  {
+    stage: "Phase 3 · Pre-Transaction Validation",
+    title: "Balance, limit & velocity checks",
+    badge: "Step 9",
+    desc: "The system checks: (1) sufficient sender balance or card authorisation, (2) daily/weekly limits for the customer's KYC tier, and (3) rolling velocity counters tracked in Redis with distributed locks to prevent race conditions.",
+    nodes: [
+      { id:"txn",    x:50,  y:80,  w:130, h:44, color:"blue",  label:"Transaction",   sub:"Amount + customer" },
+      { id:"bal",    x:260, y:30,  w:140, h:44, color:"amber", label:"Balance check", sub:"Wallet / card auth" },
+      { id:"lim",    x:260, y:90,  w:140, h:44, color:"amber", label:"Limit check",   sub:"Daily / weekly cap" },
+      { id:"vel",    x:260, y:150, w:140, h:44, color:"amber", label:"Velocity check",sub:"Redis counters" },
+      { id:"ok",     x:490, y:90,  w:110, h:44, color:"green", label:"All passed",    sub:"Create transaction" },
+    ],
+    arrows: [
+      { from:"txn", to:"bal",  side:"fork-top" },
+      { from:"txn", to:"lim",  side:"fork-mid" },
+      { from:"txn", to:"vel",  side:"fork-bot" },
+      { from:"bal", to:"ok",   side:"right" },
+      { from:"lim", to:"ok",   side:"right" },
+      { from:"vel", to:"ok",   side:"right" },
+    ],
+    highlight: ["bal","lim","vel"]
+  },
+  {
+    stage: "Phase 4 · Transaction Creation",
+    title: "Immutable transaction record created",
+    badge: "Step 10",
+    desc: "An immutable record is written to the database with status PENDING. It captures: locked FX rate, fees, send amount, payout amount, sender/recipient, corridor, and all compliance check results. State changes are append-only in an audit log.",
+    nodes: [
+      { id:"all",    x:50,  y:80,  w:140, h:44, color:"green", label:"All checks pass",sub:"Validated" },
+      { id:"db",     x:270, y:80,  w:160, h:44, color:"gray",  label:"Transaction DB", sub:"UUID · PENDING" },
+      { id:"audit",  x:510, y:80,  w:120, h:44, color:"gray",  label:"Audit log",     sub:"Append-only" },
+    ],
+    arrows: [
+      { from:"all", to:"db",    side:"right" },
+      { from:"db",  to:"audit", side:"right" },
+    ],
+    highlight: ["db"]
+  },
+  {
+    stage: "Phase 4 · Transaction Creation",
+    title: "Funds collection (debit sender)",
+    badge: "Step 11",
+    desc: "The sender's payment method is charged. Card authorisation is captured, ACH debit submitted, or wallet balance debited. Funds move to the operator's pooled collection account. This step is idempotent — duplicate requests use an idempotency key and cannot double-charge.",
+    nodes: [
+      { id:"pending", x:50,  y:80,  w:130, h:44, color:"gray",  label:"PENDING",       sub:"Transaction record" },
+      { id:"collect", x:260, y:80,  w:155, h:44, color:"amber", label:"Collect funds", sub:"Card / ACH / wallet" },
+      { id:"pool",    x:490, y:80,  w:130, h:44, color:"green", label:"Pool account",  sub:"FUNDS_COLLECTED" },
+    ],
+    arrows: [
+      { from:"pending",  to:"collect", side:"right" },
+      { from:"collect",  to:"pool",    side:"right" },
+    ],
+    highlight: ["collect","pool"]
+  },
+  {
+    stage: "Phase 4 · Transaction Creation",
+    title: "Message queue & async dispatch",
+    badge: "Step 12",
+    desc: "A transaction event is published to a message broker (Kafka / SQS). Consumers include the partner dispatcher, accounting service, notification service, and AML monitoring service. Decoupling ensures a partner API failure can't affect fund collection.",
+    nodes: [
+      { id:"pool",   x:40,  y:80,  w:120, h:44, color:"green", label:"Funds held",    sub:"Collection account" },
+      { id:"mq",     x:240, y:80,  w:140, h:44, color:"amber", label:"Message queue", sub:"Kafka / SQS" },
+      { id:"disp",   x:460, y:30,  w:150, h:44, color:"amber", label:"Partner dispatcher",sub:"API call" },
+      { id:"acct",   x:460, y:90,  w:150, h:44, color:"gray",  label:"Accounting svc",sub:"GL entries" },
+      { id:"notif",  x:460, y:150, w:150, h:44, color:"gray",  label:"Notification svc",sub:"Email / SMS" },
+    ],
+    arrows: [
+      { from:"pool",  to:"mq",   side:"right" },
+      { from:"mq",    to:"disp", side:"fork-top" },
+      { from:"mq",    to:"acct", side:"fork-mid" },
+      { from:"mq",    to:"notif",side:"fork-bot" },
+    ],
+    highlight: ["mq"]
+  },
+  {
+    stage: "Phase 4 · Transaction Creation",
+    title: "Accounting / voucher entries",
+    badge: "Step 13",
+    desc: "Double-entry bookkeeping: Debit Customer Liability / Collection Account; Credit Nostro Account / Partner Payable. These entries reflect the operator's obligation to pay. Posted in real time or near-real-time batch to the general ledger.",
+    nodes: [
+      { id:"txn",    x:50,  y:80,  w:130, h:44, color:"amber", label:"Transaction",   sub:"Funds collected" },
+      { id:"debit",  x:270, y:40,  w:150, h:44, color:"red",   label:"Debit",         sub:"Collection account" },
+      { id:"credit", x:270, y:120, w:150, h:44, color:"green", label:"Credit",        sub:"Nostro / Payable" },
+      { id:"gl",     x:510, y:80,  w:110, h:44, color:"gray",  label:"General ledger",sub:"Posted" },
+    ],
+    arrows: [
+      { from:"txn",    to:"debit",  side:"fork-top" },
+      { from:"txn",    to:"credit", side:"fork-bot" },
+      { from:"debit",  to:"gl",     side:"right" },
+      { from:"credit", to:"gl",     side:"right" },
+    ],
+    highlight: ["debit","credit","gl"]
+  },
+  {
+    stage: "Phase 5 · Partner Payout",
+    title: "Payout partner receives instruction",
+    badge: "Step 14",
+    desc: "The transaction payload is sent to the payout partner API (bank, fintech aggregator, or agent network). The payload includes: transaction ID, recipient bank details, payout amount in local currency, sender reference, and compliance attestation. The partner acknowledges with their reference ID.",
+    nodes: [
+      { id:"disp",   x:40,  y:80,  w:140, h:44, color:"amber", label:"Dispatcher",    sub:"PSP core" },
+      { id:"api",    x:270, y:80,  w:160, h:44, color:"amber", label:"Partner API",   sub:"REST / SOAP" },
+      { id:"ack",    x:510, y:80,  w:120, h:44, color:"green", label:"ACK received",  sub:"PROCESSING" },
+    ],
+    arrows: [
+      { from:"disp",  to:"api", side:"right" },
+      { from:"api",   to:"ack", side:"right" },
+    ],
+    highlight: ["api"]
+  },
+  {
+    stage: "Phase 5 · Partner Payout",
+    title: "Inbound compliance at payout end",
+    badge: "Step 15",
+    desc: "The receiving-country partner runs its own compliance pass: local sanctions lists, AML threshold checks (e.g. FINTRAC in Canada, AUSTRAC in Australia, FIU-IND in India), and recipient account format validation (IBAN checksum, IFSC, BSB, etc.).",
+    nodes: [
+      { id:"instr",  x:40,  y:80,  w:130, h:44, color:"amber", label:"Payout instruction",sub:"Received" },
+      { id:"local",  x:260, y:80,  w:165, h:44, color:"teal",  label:"Local compliance",sub:"Sanctions + AML" },
+      { id:"acctval",x:260, y:160, w:165, h:44, color:"teal",  label:"Account validation",sub:"Format + owner" },
+      { id:"clear",  x:510, y:80,  w:110, h:44, color:"green", label:"Cleared",      sub:"Proceed to pay" },
+    ],
+    arrows: [
+      { from:"instr",   to:"local",   side:"right" },
+      { from:"instr",   to:"acctval", side:"fork-bot" },
+      { from:"local",   to:"clear",   side:"right" },
+      { from:"acctval", to:"clear",   side:"right" },
+    ],
+    highlight: ["local","acctval"]
+  },
+  {
+    stage: "Phase 5 · Partner Payout",
+    title: "Liquidity check & payout rail selection",
+    badge: "Step 16",
+    desc: "The partner checks their pre-funded local currency balance (Nostro account). If balance is sufficient, the optimal payout rail is chosen based on: amount, time-of-day, cut-off times, and availability. Options: RTGS (high-value), ACH/NEFT (standard), or Instant (UPI, FPS, RTP).",
+    nodes: [
+      { id:"clear",  x:40,  y:80,  w:120, h:44, color:"green", label:"Cleared",       sub:"Compliance OK" },
+      { id:"liq",    x:240, y:80,  w:140, h:44, color:"amber", label:"Liquidity check",sub:"Nostro balance" },
+      { id:"rtgs",   x:470, y:25,  w:140, h:44, color:"green", label:"RTGS",          sub:"High-value" },
+      { id:"ach",    x:470, y:85,  w:140, h:44, color:"green", label:"ACH / NEFT",    sub:"Standard batch" },
+      { id:"instant",x:470, y:145, w:140, h:44, color:"green", label:"Instant rail",  sub:"UPI / FPS / RTP" },
+    ],
+    arrows: [
+      { from:"clear", to:"liq",     side:"right" },
+      { from:"liq",   to:"rtgs",    side:"fork-top" },
+      { from:"liq",   to:"ach",     side:"fork-mid" },
+      { from:"liq",   to:"instant", side:"fork-bot" },
+    ],
+    highlight: ["liq"]
+  },
+  {
+    stage: "Phase 5 · Partner Payout",
+    title: "Recipient account credited",
+    badge: "Step 17",
+    desc: "The credit instruction is submitted to the local interbank network. The recipient's bank account is credited — instantly on fast payment rails, or at the next clearing cycle for batch rails (T+0 to T+2). The recipient is notified by SMS or email.",
+    nodes: [
+      { id:"rail",   x:50,  y:80,  w:140, h:44, color:"green", label:"Payment rail",  sub:"Local network" },
+      { id:"rbank",  x:280, y:80,  w:150, h:44, color:"green", label:"Recipient bank",sub:"Credit posted" },
+      { id:"recip",  x:510, y:80,  w:120, h:44, color:"green", label:"Recipient",     sub:"Notified ✓" },
+    ],
+    arrows: [
+      { from:"rail",  to:"rbank", side:"right" },
+      { from:"rbank", to:"recip", side:"right" },
+    ],
+    highlight: ["rbank","recip"]
+  },
+  {
+    stage: "Phase 6 · Confirmation & Settlement",
+    title: "PAID confirmation & sender notified",
+    badge: "Step 18",
+    desc: "The partner sends a PAID webhook with payout timestamp, local transaction reference, and recipient account last digits. The originating PSP updates the transaction to PAID and sends a confirmation notification (email/SMS/push) to the sender with the final receipt.",
+    nodes: [
+      { id:"partner",x:40,  y:80,  w:140, h:44, color:"green", label:"Payout partner",sub:"PAID webhook" },
+      { id:"psp",    x:270, y:80,  w:150, h:44, color:"gray",  label:"PSP core",      sub:"Status → PAID" },
+      { id:"sender", x:510, y:80,  w:120, h:44, color:"blue",  label:"Sender",        sub:"Receipt sent" },
+    ],
+    arrows: [
+      { from:"partner", to:"psp",    side:"right" },
+      { from:"psp",     to:"sender", side:"right" },
+    ],
+    highlight: ["psp","sender"]
+  },
+  {
+    stage: "Phase 6 · Confirmation & Settlement",
+    title: "Post-transaction AML monitoring",
+    badge: "Step 19",
+    desc: "Completed transactions feed into batch AML analysis: structuring detection across the customer's portfolio, SAR/CTR consideration, and pattern analysis. AML alerts are reviewed by the compliance team within defined SLAs. No transaction is exempt from post-transaction review.",
+    nodes: [
+      { id:"paid",   x:50,  y:80,  w:120, h:44, color:"green", label:"PAID",          sub:"Transaction done" },
+      { id:"aml",    x:260, y:80,  w:160, h:44, color:"teal",  label:"AML monitor",   sub:"Batch + ML rules" },
+      { id:"clear",  x:510, y:40,  w:120, h:44, color:"green", label:"No alert",      sub:"Cleared" },
+      { id:"sar",    x:510, y:110, w:120, h:44, color:"red",   label:"SAR review",    sub:"Compliance team" },
+    ],
+    arrows: [
+      { from:"paid", to:"aml",   side:"right" },
+      { from:"aml",  to:"clear", side:"fork-top" },
+      { from:"aml",  to:"sar",   side:"fork-bot" },
+    ],
+    highlight: ["aml"]
+  },
+  {
+    stage: "Phase 6 · Confirmation & Settlement",
+    title: "Settlement & Nostro reconciliation",
+    badge: "Step 20",
+    desc: "At end-of-day, the partner generates a settlement file listing all paid transactions. The PSP reconciles it against its internal records. Unmatched items (breaks) are resolved within 24–48 h. If the Nostro balance falls below the minimum threshold, a replenishment wire is initiated.",
+    nodes: [
+      { id:"eod",    x:40,  y:80,  w:130, h:44, color:"amber", label:"EOD cut-off",   sub:"Partner file" },
+      { id:"recon",  x:260, y:80,  w:160, h:44, color:"amber", label:"Reconciliation",sub:"File vs DB match" },
+      { id:"match",  x:510, y:40,  w:120, h:44, color:"green", label:"Matched",       sub:"Books closed" },
+      { id:"break",  x:510, y:120, w:120, h:44, color:"red",   label:"Break",         sub:"24–48 h resolve" },
+      { id:"nostro", x:260, y:180, w:160, h:44, color:"amber", label:"Nostro monitor",sub:"Replenish if low" },
+    ],
+    arrows: [
+      { from:"eod",    to:"recon",  side:"right" },
+      { from:"recon",  to:"match",  side:"fork-top" },
+      { from:"recon",  to:"break",  side:"fork-bot" },
+      { from:"recon",  to:"nostro", side:"down" },
+    ],
+    highlight: ["recon","nostro"]
+  },
+];
+
+const colorMap = {
+  blue:  { fill:"#E6F1FB", stroke:"#185FA5", text:"#0C447C" },
+  teal:  { fill:"#E1F5EE", stroke:"#0F6E56", text:"#085041" },
+  amber: { fill:"#FAEEDA", stroke:"#854F0B", text:"#633806" },
+  green: { fill:"#EAF3DE", stroke:"#3B6D11", text:"#27500A" },
+  red:   { fill:"#FCEBEB", stroke:"#A32D2D", text:"#791F1F" },
+  gray:  { fill:"#F1EFE8", stroke:"#5F5E5A", text:"#444441" },
+};
+
+function buildSVG(step) {
+  const { nodes, arrows, highlight } = step;
+  const nodeMap = {};
+  nodes.forEach(n => nodeMap[n.id] = n);
+
+  const SVG_H = 260;
+
+  let svg = `<svg class="svg-area" viewBox="0 0 640 ${SVG_H}" role="img">
+  <title>${step.title}</title>
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`;
+
+  arrows.forEach(arr => {
+    const a = nodeMap[arr.from], b = nodeMap[arr.to];
+    if (!a || !b) return;
+    const ax = a.x + a.w, ay = a.y + a.h / 2;
+    const bx = b.x, by = b.y + b.h / 2;
+    let d = "";
+    const side = arr.side || "right";
+    if (side === "right") {
+      d = `M${ax} ${ay} L${bx} ${by}`;
+    } else if (side === "fork-top") {
+      d = `M${ax} ${ay} L${bx} ${by}`;
+    } else if (side === "fork-mid") {
+      d = `M${ax} ${ay} L${bx} ${by}`;
+    } else if (side === "fork-bot") {
+      d = `M${ax} ${ay} L${bx} ${by}`;
+    } else if (side === "down") {
+      const sx = a.x + a.w / 2, sy = a.y + a.h;
+      const ex = b.x + b.w / 2, ey = b.y;
+      d = `M${sx} ${sy} L${ex} ${ey}`;
+    } else if (side === "down-left") {
+      const sx = a.x + a.w / 2, sy = a.y + a.h;
+      const ex = b.x + b.w / 2, ey = b.y;
+      d = `M${sx} ${sy} Q${sx} ${ey} ${ex} ${ey}`;
+    }
+    svg += `<path d="${d}" fill="none" stroke="var(--color-border-secondary)" stroke-width="1.2" marker-end="url(#ah)"/>`;
+  });
+
+  nodes.forEach(n => {
+    const c = colorMap[n.color] || colorMap.gray;
+    const isHL = highlight && highlight.includes(n.id);
+    const fillC = isHL ? c.fill : "var(--color-background-secondary)";
+    const strokeC = isHL ? c.stroke : "var(--color-border-secondary)";
+    const textC = isHL ? c.text : "var(--color-text-secondary)";
+    const subC = isHL ? c.stroke : "var(--color-text-secondary)";
+    const sw = isHL ? "1.5" : "0.5";
+    const rx = 8;
+    const cx = n.x + n.w / 2;
+    const cy1 = n.y + (n.sub ? n.h * 0.35 : n.h / 2);
+    const cy2 = n.y + n.h * 0.68;
+
+    svg += `<g>
+      <rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="${rx}" fill="${fillC}" stroke="${strokeC}" stroke-width="${sw}"/>
+      <text x="${cx}" y="${cy1}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="${textC}" font-family="var(--font-sans)">${n.label}</text>`;
+    if (n.sub) {
+      svg += `<text x="${cx}" y="${cy2}" text-anchor="middle" dominant-baseline="central" font-size="11" fill="${subC}" font-family="var(--font-sans)" opacity="0.8">${n.sub}</text>`;
+    }
+    svg += `</g>`;
+  });
+
+  svg += `</svg>`;
+  return svg;
+}
+
+let cur = 0;
+
+function render() {
+  const pips = document.getElementById('pips');
+  pips.innerHTML = '';
+  STEPS.forEach((_, i) => {
+    const p = document.createElement('div');
+    p.className = 'pip' + (i < cur ? ' done' : i === cur ? ' active' : '');
+    p.onclick = () => { cur = i; render(); };
+    pips.appendChild(p);
+  });
+
+  document.getElementById('stage-lbl').textContent = STEPS[cur].stage;
+  document.getElementById('counter').textContent = `${cur + 1} of ${STEPS.length}`;
+  document.getElementById('prev-btn').disabled = cur === 0;
+  document.getElementById('next-btn').disabled = cur === STEPS.length - 1;
+
+  const slides = document.getElementById('slides');
+  slides.innerHTML = '';
+  const s = STEPS[cur];
+  const div = document.createElement('div');
+  div.className = 'slide active';
+  div.innerHTML = `
+    <div class="slide-title">
+      <span class="step-badge">${s.badge}</span>
+      ${s.title}
+    </div>
+    <p class="slide-desc">${s.desc}</p>
+    ${buildSVG(s)}
+  `;
+  slides.appendChild(div);
+}
+
+function go(dir) {
+  const next = cur + dir;
+  if (next < 0 || next >= STEPS.length) return;
+  cur = next;
+  render();
+}
+
+render();
+</script>
