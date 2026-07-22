@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design & Backend Engineering - Interview Prep Guide</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #495057;
+            --accent: #2563eb;
+            --accent-light: #dbeafe;
+            --border: #e2e8f0;
+            --tag-bg: #f1f5f9;
+            --tag-text: #334155;
+            --hover: #f0f4ff;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.05);
+            --radius: 10px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a5f 100%);
+            color: #fff;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.3rem;
+        }
+        header .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.85;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+        .topic-count {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 0.3rem 1rem;
+            margin-top: 0.6rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Search */
+        .search-container {
+            max-width: 700px;
+            margin: -1.2rem auto 1.5rem;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 50;
+        }
+        .search-container input {
+            width: 100%;
+            padding: 0.85rem 1.2rem 0.85rem 3rem;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition);
+            outline: none;
+        }
+        .search-container input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            left: 1.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            display: none;
+        }
+
+        /* Group Navigation */
+        .group-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            max-width: 1300px;
+            margin: 0 auto 2rem;
+            padding: 0 1.5rem;
+            justify-content: center;
+            position: sticky;
+            top: 130px;
+            z-index: 40;
+            background: var(--bg);
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+        }
+        .group-nav a {
+            text-decoration: none;
+            padding: 0.45rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+        .group-nav a:hover,
+        .group-nav a:focus {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 1.5rem 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1rem;
+        }
+        @media (min-width: 1400px) {
+            .container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 1.5rem;
+            }
+            .group-nav {
+                top: 110px;
+                gap: 0.3rem;
+            }
+            .group-nav a {
+                font-size: 0.7rem;
+                padding: 0.35rem 0.65rem;
+            }
+        }
+
+        /* Topic Card */
+        .topic-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+        .topic-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+        .topic-card.expanded {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.06), var(--shadow-lg);
+        }
+        .topic-card-header {
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            user-select: none;
+        }
+        .topic-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+        .topic-icon.blue {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .topic-icon.green {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .topic-icon.orange {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+        .topic-icon.purple {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+        .topic-icon.red {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .topic-icon.teal {
+            background: #ccfbf1;
+            color: #0d9488;
+        }
+        .topic-icon.amber {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .topic-icon.slate {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .topic-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            flex: 1;
+            letter-spacing: -0.2px;
+            line-height: 1.3;
+        }
+        .topic-chevron {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            transition: transform var(--transition);
+            flex-shrink: 0;
+        }
+        .topic-card.expanded .topic-chevron {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+        .topic-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+            padding: 0 1.2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-top: 0px solid var(--border);
+        }
+        .topic-card.expanded .topic-card-body {
+            max-height: 800px;
+            padding: 0.8rem 1.2rem 1.2rem;
+            border-top: 1px solid var(--border);
+        }
+        .topic-card-body .qa-pair {
+            margin-bottom: 0.75rem;
+        }
+        .topic-card-body .qa-pair:last-child {
+            margin-bottom: 0;
+        }
+        .topic-card-body .question {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+            letter-spacing: -0.1px;
+        }
+        .topic-card-body .answer {
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .topic-card-body .answer code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #e11d48;
+        }
+        .topic-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.6rem;
+        }
+        .topic-tag {
+            font-size: 0.7rem;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.2rem 0.55rem;
+            border-radius: 12px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+        .highlight {
+            background: #fef9c3;
+            padding: 0.05rem 0.2rem;
+            border-radius: 2px;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        /* Print styles */
+        @media print {
+            .topic-card-body {
+                max-height: none !important;
+            }
+            .group-nav,
+            .search-container {
+                display: none;
+            }
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .nav-tabs .nav-link {
+      color: #a0b3c9;
+      border: none;
+      font-weight: 600;
+      padding: 0.8rem 2rem;
+      font-size: 1.2rem;
+    }
+    .nav-tabs .nav-link i {
+      margin-right: 10px;
+      color: #00bc8c;
+    }
+    .nav-tabs .nav-link.active {
+      background-color: transparent;
+      color: #ffffff;
+      border-bottom: 4px solid #00bc8c;
+    }
+    .nav-tabs .nav-link:hover {
+      color: #ffffff;
+      border-bottom: 4px solid #3a5a6f;
+    }
+    /* section headers inside tabs (clean, minimal) */
+    .subhead {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #b2c9da;
+      margin: 1.5rem 0 0.8rem 0;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px dashed #33435c;
+    }
+    .subhead i {
+      color: #00bc8c;
+      margin-right: 8px;
+    }
+    /* card styling – clean dark */
+    .card {
+      background-color: #24243c;
+      border: none;
+      border-radius: 1.2rem;
+      transition: background 0.1s;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+      height: 100%;
+    }
+    .card:hover {
+      background-color: #2b2b4a;
+    }
+    .card-title {
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-title i {
+      color: #00bc8c;
+      width: 1.8rem;
+    }
+    .card-text {
+      color: #b5c5d4;
+      font-size: 0.88rem;
+      margin-bottom: 0.8rem;
+    }
+    .btn-sm {
+      border-radius: 30px;
+      padding: 0.3rem 1rem;
+      font-weight: 500;
+      border-width: 2px;
+    }
+    .btn-outline-success {
+      border-color: #00bc8c;
+      color: #00bc8c;
+    }
+    .btn-outline-success:hover {
+      background: #00bc8c;
+      color: #14141f;
+    }
+    .file-badge {
+      background: #1e1e32;
+      color: #7f95b0;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      border: 1px solid #35355a;
+      display: inline-block;
+    }
+    .gap-2 { gap: 0.5rem; }
+    .footer-note {
+      margin-top: 3rem;
+      color: #5f748b;
+      background: #14141f;
+      padding: 1.2rem;
+      border-radius: 30px 30px 0 0;
+      text-align: center;
+      font-size: 0.85rem;
+      border-top: 1px solid #2c3e50;
+    }
+    /* path micro style */
+    .micro-path {
+      font-size: 0.7rem;
+      color: #4f6382;
+      margin-top: 6px;
+    }
+    .micro-path i {
+      margin-right: 4px;
+    }
+    /* spacing */
+    .container-fluid {
+      max-width: 1600px;
+    }
+    nav {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+nav a {
+    color: #f3f4f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    letter-spacing: 0.3px;
+}
+
+nav a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* Optional: Add an underline animation effect */
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #ffd700;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+nav a:hover::after {
+    width: 70%;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    nav a {
+        text-align: center;
+        padding: 0.75rem;
+    }
+} 
+    </style>
+</head>
+<body>
+
+    <nav>    
+        <a href="Home.html">Home</a> 
+          <a href="ManyApiRequest.html">Handling Thousands of Requests</a>
+            <a href="CodingQuestions.html">Coding Questions</a>
+          <a href="Authentication.html">Authentication in .NET Core</a>
+          <a href="dotnet_senior_interview_guide.html">Real-World .NET Interview</a>
+          <a href="Questions.html">Lead .NET Engineer Interview Questions</a>
+          <a href="SystemDesignV2.html">System Design</a>
+        </nav>
+    <header>
+        <h1>📘 System Design & Backend Engineering</h1>
+        <p class="subtitle">Interview Preparation Guide — 100+ Essential Topics</p>
+        <span class="topic-count">✨ Q&A Format · Concise · Interview-Ready</span>
+    </header>
+
+    <!-- Search -->
+    <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search any topic... (e.g., 'Circuit Breaker', 'CAP Theorem', 'Docker')" oninput="filterTopics()">
+    </div>
+    <div class="no-results" id="noResults">😕 No topics found. Try a different search term.</div>
+
+    <!-- Group Navigation -->
+    <nav class="group-nav" id="groupNav">
+        <a href="#group-traffic">🚦 Traffic & APIs</a>
+        <a href="#group-cicd">🔄 CI/CD & Containers</a>
+        <a href="#group-resilience">🛡️ Resilience</a>
+        <a href="#group-messaging">📨 Messaging</a>
+        <a href="#group-comm">📡 Communication</a>
+        <a href="#group-database">🗄️ Databases</a>
+        <a href="#group-distributed">🌐 Distributed Systems</a>
+        <a href="#group-scaling">⚡ Scaling & Perf</a>
+        <a href="#group-deploy">🚀 Deployments</a>
+        <a href="#group-observability">📊 Observability</a>
+        <a href="#group-security">🔒 Security</a>
+        <a href="#group-infra">🏗️ Infra & Data</a>
+        <a href="#group-networking">🌍 Networking</a>
+        <a href="#group-devops">🛠️ DevOps</a>
+        <a href="#group-incidents">🚨 Incidents</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container" id="topicContainer">
+
+        <!-- ==================== GROUP: Traffic & APIs ==================== -->
+        <div id="group-traffic" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 0.5rem;">🚦 Traffic Management & APIs</div>
+
+        <!-- Rate Limiting -->
+        <div class="topic-card" data-keywords="rate limiting throttle api gateway token bucket leaky bucket fixed window sliding window" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">🚦</div>
+                <span class="topic-title">Rate Limiting</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is Rate Limiting and why is it needed?</div>
+                    <div class="answer">Rate limiting controls how many requests a client can make to an API within a time window. It prevents <span class="highlight">abuse, DDoS, resource exhaustion</span>, and ensures fair usage across tenants.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: Name common rate-limiting algorithms.</div>
+                    <div class="answer"><b>Token Bucket</b> (tokens refill at steady rate, burst allowed), <b>Leaky Bucket</b> (constant outflow, smooths bursts), <b>Fixed Window</b> (simple but boundary issues), <b>Sliding Window Log/Counter</b> (more accurate, Redis Sorted Sets).</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: How do you communicate rate limits to clients?</div>
+                    <div class="answer">Via HTTP headers: <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code>, and <code>Retry-After</code>. Return <code>429 Too Many Requests</code> when exceeded.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">API Gateway</span><span class="topic-tag">Throttling</span><span class="topic-tag">429</span></div>
+            </div>
+        </div>
+
+        <!-- Caching -->
+        <div class="topic-card" data-keywords="caching cache redis memcached cdn edge cache invalidation ttl write-through write-back" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">💾</div>
+                <span class="topic-title">Caching</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are common caching strategies?</div>
+                    <div class="answer"><b>Cache-Aside</b> (app checks cache first, loads DB on miss), <b>Write-Through</b> (write to cache & DB simultaneously), <b>Write-Behind</b> (write to cache, async flush to DB), <b>Read-Through</b> (cache handles DB fetch).</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: What is Cache Invalidation and why is it hard?</div>
+                    <div class="answer">Removing stale data when the source changes. Strategies: <b>TTL-based</b> expiration, <b>event-driven</b> invalidation, <b>write-through</b> updates. The famous quote: "There are only two hard things in CS: naming things and cache invalidation."</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: What is the difference between Redis and Memcached?</div>
+                    <div class="answer">Redis supports richer data structures (lists, sets, sorted sets, streams), persistence, replication, and Lua scripting. Memcached is simpler, purely key-value, multi-threaded, and can be faster for basic workloads.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Redis</span><span class="topic-tag">TTL</span><span class="topic-tag">Cache-Aside</span></div>
+            </div>
+        </div>
+
+        <!-- Load Balancing -->
+        <div class="topic-card" data-keywords="load balancing load balancer nginx haproxy round robin least connections sticky session" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">⚖️</div>
+                <span class="topic-title">Load Balancing</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are common load balancing algorithms?</div>
+                    <div class="answer"><b>Round Robin</b> (sequential), <b>Least Connections</b> (fewest active), <b>Least Response Time</b>, <b>IP Hash</b> (sticky sessions), <b>Weighted</b> variants. Layer 4 (TCP) vs Layer 7 (HTTP/application-level).</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: What is the difference between L4 and L7 load balancers?</div>
+                    <div class="answer">L4 operates at TCP/UDP level, faster but no content inspection. L7 understands HTTP, can route based on headers/paths, terminate TLS, and make smarter decisions. Nginx/HAProxy do L7; cloud NLB is L4.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Nginx</span><span class="topic-tag">HAProxy</span><span class="topic-tag">L4 vs L7</span></div>
+            </div>
+        </div>
+
+        <!-- Reverse Proxy -->
+        <div class="topic-card" data-keywords="reverse proxy nginx forward proxy tls termination ssl offloading" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">🔄</div>
+                <span class="topic-title">Reverse Proxy</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What does a Reverse Proxy do?</div>
+                    <div class="answer">Sits in front of backend servers, handling <b>TLS termination, caching, compression, authentication, request routing, and DDoS protection</b>. Clients only see the proxy, never the origin servers directly.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: Reverse Proxy vs Forward Proxy?</div>
+                    <div class="answer">Forward proxy sits in front of <b>clients</b> (e.g., corporate proxy, VPN), routing outbound requests. Reverse proxy sits in front of <b>servers</b>, handling inbound traffic. Different sides of the connection.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Nginx</span><span class="topic-tag">TLS Termination</span><span class="topic-tag">Gateway</span></div>
+            </div>
+        </div>
+
+        <!-- API Gateway -->
+        <div class="topic-card" data-keywords="api gateway kong apigee aws api gateway authentication authorization routing aggregation" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon teal">🌐</div>
+                <span class="topic-title">API Gateway</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is an API Gateway and its key features?</div>
+                    <div class="answer">A single entry point for all client requests. Handles <b>auth, rate limiting, request/response transformation, routing, API composition, logging, and monitoring</b>. Examples: Kong, Apigee, AWS API Gateway, Envoy.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: API Gateway vs Load Balancer vs Reverse Proxy?</div>
+                    <div class="answer">They overlap but serve different primary purposes: LB distributes traffic; Reverse Proxy shields servers; API Gateway adds <b>API management features</b> (auth, rate limiting, documentation, versioning, monetization). Modern gateways often include LB & proxy features.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Kong</span><span class="topic-tag">Apigee</span><span class="topic-tag">Microservices</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: CI/CD & Containers ==================== -->
+        <div id="group-cicd" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🔄 CI/CD & Containerization</div>
+
+        <!-- CI/CD -->
+        <div class="topic-card" data-keywords="ci/cd continuous integration continuous deployment pipeline jenkins github actions gitlab ci build test deploy" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">🔁</div>
+                <span class="topic-title">CI/CD</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What's the difference between CI, CD (Delivery), and CD (Deployment)?</div>
+                    <div class="answer"><b>CI</b>: frequently merge code, auto-build & test. <b>Continuous Delivery</b>: every change is deployable, but manual approval to prod. <b>Continuous Deployment</b>: every passing change auto-deploys to production without manual gates.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: What are common CI/CD tools?</div>
+                    <div class="answer">Jenkins, GitHub Actions, GitLab CI/CD, CircleCI, ArgoCD (GitOps for K8s), Spinnaker, Tekton. Key pipeline stages: <b>Build → Test → Security Scan → Deploy → Monitor</b>.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Jenkins</span><span class="topic-tag">GitHub Actions</span><span class="topic-tag">ArgoCD</span></div>
+            </div>
+        </div>
+
+        <!-- Docker -->
+        <div class="topic-card" data-keywords="docker container image dockerfile docker-compose containerization virtualization" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">🐳</div>
+                <span class="topic-title">Docker</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Container vs Virtual Machine?</div>
+                    <div class="answer">Containers share the host OS kernel, are lightweight (MBs), start in seconds. VMs each have a full guest OS, are heavier (GBs), slower to boot. Containers offer <b>process-level isolation</b>; VMs offer hardware-level isolation.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: What are key Docker commands for interviews?</div>
+                    <div class="answer"><code>docker build -t name .</code>, <code>docker run -d -p 8080:80</code>, <code>docker-compose up</code>, <code>docker exec -it</code>, <code>docker logs</code>, <code>docker ps</code>. Understand layers, caching, multi-stage builds, and <code>.dockerignore</code>.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Container</span><span class="topic-tag">Dockerfile</span><span class="topic-tag">Multi-stage build</span></div>
+            </div>
+        </div>
+
+        <!-- Kubernetes -->
+        <div class="topic-card" data-keywords="kubernetes k8s pod deployment service ingress helm orchestration" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">☸️</div>
+                <span class="topic-title">Kubernetes</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are the core Kubernetes components?</div>
+                    <div class="answer"><b>Control Plane</b>: API Server, etcd, Scheduler, Controller Manager. <b>Worker Nodes</b>: kubelet, kube-proxy, container runtime. Key objects: Pod, Deployment, Service, ConfigMap, Secret, Ingress, Namespace.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: What's the difference between a Deployment and a StatefulSet?</div>
+                    <div class="answer"><b>Deployment</b> is for stateless apps, pods are interchangeable. <b>StatefulSet</b> provides stable network identities, persistent storage per pod, ordered deployment/scaling — needed for databases, Kafka, etc.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: How does a Service discover Pods?</div>
+                    <div class="answer">Via <b>Labels & Selectors</b>. A Service selects pods by labels. ClusterIP gives internal VIP; NodePort exposes on each node; LoadBalancer provisions a cloud LB. DNS: <code>service-name.namespace.svc.cluster.local</code>.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Pod</span><span class="topic-tag">Deployment</span><span class="topic-tag">Service</span><span class="topic-tag">etcd</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Resilience ==================== -->
+        <div id="group-resilience" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🛡️ Resilience Patterns</div>
+
+        <!-- Service Discovery -->
+        <div class="topic-card" data-keywords="service discovery consul etcd zookeeper eureka dns client-side server-side" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon teal">🔍</div>
+                <span class="topic-title">Service Discovery</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Client-side vs Server-side service discovery?</div>
+                    <div class="answer"><b>Client-side</b>: client queries service registry directly (e.g., Eureka + Ribbon). <b>Server-side</b>: client calls a load balancer which queries registry (e.g., K8s Service, AWS ALB + Route53). Server-side is simpler for clients.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Consul</span><span class="topic-tag">Eureka</span><span class="topic-tag">DNS</span></div>
+            </div>
+        </div>
+
+        <!-- Circuit Breaker -->
+        <div class="topic-card" data-keywords="circuit breaker resilience hystrix resilience4j open closed half-open fallback" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon orange">🔌</div>
+                <span class="topic-title">Circuit Breaker</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Explain the Circuit Breaker pattern states.</div>
+                    <div class="answer"><b>Closed</b>: normal operation, requests pass through. If failures exceed threshold → <b>Open</b>: requests fail-fast immediately. After a timeout → <b>Half-Open</b>: limited trial requests; if they succeed → Closed; if they fail → Open again. Prevents cascading failures.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: What tools implement Circuit Breakers?</div>
+                    <div class="answer">Resilience4j (modern, Java), Hystrix (deprecated but famous), Istio/Envoy (sidecar-level), Polly (.NET). Often combined with <b>fallback</b> responses (cached data, default values).</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Resilience4j</span><span class="topic-tag">Hystrix</span><span class="topic-tag">Fallback</span></div>
+            </div>
+        </div>
+
+        <!-- Timeouts -->
+        <div class="topic-card" data-keywords="timeouts connect timeout read timeout request timeout socket timeout" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">⏱️</div>
+                <span class="topic-title">Timeouts</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What types of timeouts should you configure?</div>
+                    <div class="answer"><b>Connect Timeout</b>: max time to establish TCP connection (short, ~1-3s). <b>Read/Request Timeout</b>: max time waiting for response after connection (depends on endpoint SLA). Always set timeouts — never rely on defaults (often infinite!).</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Connect</span><span class="topic-tag">Read</span><span class="topic-tag">Socket</span></div>
+            </div>
+        </div>
+
+        <!-- Retries & Exponential Backoff -->
+        <div class="topic-card" data-keywords="retries exponential backoff jitter transient failures idempotency" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon amber">🔁</div>
+                <span class="topic-title">Retries & Exponential Backoff</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is Exponential Backoff with Jitter?</div>
+                    <div class="answer">After a failure, wait <code>base × 2^attempt</code> before retrying (e.g., 100ms, 200ms, 400ms...). Add <b>random jitter</b> to prevent thundering herd (all clients retrying simultaneously). Max retries & max backoff caps are essential.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: When should you NOT retry?</div>
+                    <div class="answer">On non-transient errors (4xx client errors like 400/403), when the operation isn't idempotent (duplicate charges!), or when retries would exacerbate the problem (downstream already overloaded). Use idempotency keys.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Jitter</span><span class="topic-tag">Thundering Herd</span><span class="topic-tag">Idempotency</span></div>
+            </div>
+        </div>
+
+        <!-- Idempotency -->
+        <div class="topic-card" data-keywords="idempotency idempotent idempotency key duplicate request stripe payment" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">🔑</div>
+                <span class="topic-title">Idempotency</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is idempotency and how do you implement it?</div>
+                    <div class="answer">An operation that produces the same result no matter how many times it's executed. Implementation: clients send an <b>idempotency key</b> (UUID); server stores key→response mapping. Duplicate requests return the cached response. Used by Stripe, PayPal for payments.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Idempotency Key</span><span class="topic-tag">Payments</span><span class="topic-tag">Stripe</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Messaging ==================== -->
+        <div id="group-messaging" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">📨 Messaging & Events</div>
+
+        <!-- Message Queues -->
+        <div class="topic-card" data-keywords="message queue rabbitmq kafka sqs producer consumer broker asynchronous" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon orange">📬</div>
+                <span class="topic-title">Message Queues</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Message Queue vs Pub/Sub vs Event Stream?</div>
+                    <div class="answer"><b>MQ</b> (RabbitMQ): point-to-point, consumers compete, message removed after ack. <b>Pub/Sub</b> (Google Pub/Sub): multiple subscribers receive each message. <b>Event Stream</b> (Kafka): durable log, multiple consumers can replay from any offset.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">RabbitMQ</span><span class="topic-tag">Kafka</span><span class="topic-tag">SQS</span></div>
+            </div>
+        </div>
+
+        <!-- Pub/Sub -->
+        <div class="topic-card" data-keywords="pub/sub publish subscribe topic fanout google pubsub redis pubsub" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">📢</div>
+                <span class="topic-title">Pub/Sub</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How does Pub/Sub decouple services?</div>
+                    <div class="answer">Publishers emit events to <b>topics</b> without knowing subscribers. Subscribers receive events they're interested in. This enables <b>loose coupling</b>, independent scaling, and easy addition of new consumers without modifying publishers.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Decoupling</span><span class="topic-tag">Topics</span><span class="topic-tag">Fan-out</span></div>
+            </div>
+        </div>
+
+        <!-- Event-Driven Architecture -->
+        <div class="topic-card" data-keywords="event driven architecture eda event sourcing cqrs domain events" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon teal">⚡</div>
+                <span class="topic-title">Event-Driven Architecture</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is Event-Driven Architecture (EDA)?</div>
+                    <div class="answer">Services communicate via <b>events</b> (facts that happened, e.g., "OrderPlaced"). Services react to events asynchronously. Enables loose coupling, scalability, and real-time reactivity. Often paired with Event Sourcing and CQRS.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">EDA</span><span class="topic-tag">Event Sourcing</span><span class="topic-tag">CQRS</span></div>
+            </div>
+        </div>
+
+        <!-- Distributed Transactions & Saga -->
+        <div class="topic-card" data-keywords="distributed transaction saga pattern choreography orchestration two-phase commit 2pc compensation" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">🔗</div>
+                <span class="topic-title">Distributed Transactions & Saga</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Why avoid 2PC in microservices and what's the alternative?</div>
+                    <div class="answer">Two-Phase Commit is blocking, slow, and doesn't scale. The <b>Saga Pattern</b> breaks a distributed transaction into local transactions, each with a <b>compensating action</b> (rollback). Two coordination styles: <b>Choreography</b> (events) and <b>Orchestration</b> (central coordinator).</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Saga</span><span class="topic-tag">2PC</span><span class="topic-tag">Compensation</span></div>
+            </div>
+        </div>
+
+        <!-- Dead Letter Queue -->
+        <div class="topic-card" data-keywords="dead letter queue dlq failed messages poison message reprocessing" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">💀</div>
+                <span class="topic-title">Dead Letter Queue (DLQ)</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is a DLQ and when is it used?</div>
+                    <div class="answer">A queue for messages that <b>couldn't be processed successfully</b> after all retries. Allows investigation, manual reprocessing, or automated handling of poison messages without blocking the main queue. Critical for observability.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">DLQ</span><span class="topic-tag">Poison Message</span><span class="topic-tag">SQS</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Communication ==================== -->
+        <div id="group-comm" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">📡 Communication Patterns</div>
+
+        <!-- WebSockets -->
+        <div class="topic-card" data-keywords="websocket full duplex real-time bidirectional socket.io ws" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">🔌</div>
+                <span class="topic-title">WebSockets</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do WebSockets differ from HTTP?</div>
+                    <div class="answer">WebSocket is a <b>full-duplex, persistent connection</b>. Starts as HTTP upgrade (101 Switching Protocols), then becomes a bidirectional TCP tunnel. Ideal for chat, live feeds, gaming. HTTP is request-response; WebSocket allows server push anytime.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Full-Duplex</span><span class="topic-tag">Socket.io</span><span class="topic-tag">Real-time</span></div>
+            </div>
+        </div>
+
+        <!-- Long Polling -->
+        <div class="topic-card" data-keywords="long polling polling short polling http comet" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon amber">⏳</div>
+                <span class="topic-title">Long Polling</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is Long Polling?</div>
+                    <div class="answer">Client sends HTTP request; server <b>holds it open</b> until data is available or timeout. Client immediately re-requests. Simulates real-time without WebSockets. Used when WebSockets aren't supported. Less efficient than WebSockets but simpler.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">HTTP</span><span class="topic-tag">Comet</span><span class="topic-tag">Fallback</span></div>
+            </div>
+        </div>
+
+        <!-- Server-Sent Events -->
+        <div class="topic-card" data-keywords="server-sent events sse eventstream unidirectional push" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">📤</div>
+                <span class="topic-title">Server-Sent Events (SSE)</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: SSE vs WebSockets?</div>
+                    <div class="answer">SSE is <b>unidirectional</b> (server→client only), uses standard HTTP, auto-reconnects, simpler. WebSockets are bidirectional. Use SSE for live dashboards, notifications, stock tickers. Use WebSockets for chat, collaborative editing.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">SSE</span><span class="topic-tag">EventStream</span><span class="topic-tag">Unidirectional</span></div>
+            </div>
+        </div>
+
+        <!-- Webhooks -->
+        <div class="topic-card" data-keywords="webhook callback http callback event notification stripe webhooks" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">🪝</div>
+                <span class="topic-title">Webhooks</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are Webhooks?</div>
+                    <div class="answer">User-defined HTTP callbacks: when an event occurs, the source makes an <b>HTTP POST</b> to a configured URL. Used for integrations (Stripe payment notifications, GitHub push events). Requires the receiver to have a public endpoint.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Callback</span><span class="topic-tag">Integration</span><span class="topic-tag">Webhook Security</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Databases ==================== -->
+        <div id="group-database" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🗄️ Database Fundamentals</div>
+
+        <!-- Database Indexing -->
+        <div class="topic-card" data-keywords="database index b-tree b+tree hash index composite index covering index clustered index" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon orange">📇</div>
+                <span class="topic-title">Database Indexing</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do B-Tree indexes work and why are they common?</div>
+                    <div class="answer">B-Trees maintain sorted data with <b>O(log n)</b> search/insert/delete. They're balanced, self-organizing, and optimized for disk I/O (each node fits a disk page). Support range queries efficiently. Most relational DBs default to B+Tree.</div>
+                </div>
+                <div class="qa-pair">
+                    <div class="question">Q: What is a Covering Index?</div>
+                    <div class="answer">An index that contains <b>all columns needed</b> by a query, so the DB never needs to read the actual table (index-only scan). Dramatically faster. Order matters: put equality-filter columns first, then range columns.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">B+Tree</span><span class="topic-tag">Composite</span><span class="topic-tag">Clustered</span></div>
+            </div>
+        </div>
+
+        <!-- Query Optimization -->
+        <div class="topic-card" data-keywords="query optimization explain analyze slow query execution plan database tuning" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon teal">⚡</div>
+                <span class="topic-title">Query Optimization</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do you approach slow query optimization?</div>
+                    <div class="answer">1. Use <code>EXPLAIN ANALYZE</code> to see the execution plan. 2. Look for sequential scans on large tables → add indexes. 3. Check for missing WHERE clauses, inefficient JOINs. 4. Avoid <code>SELECT *</code>, use proper JOIN types. 5. Consider denormalization or materialized views.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">EXPLAIN</span><span class="topic-tag">Execution Plan</span><span class="topic-tag">PostgreSQL</span></div>
+            </div>
+        </div>
+
+        <!-- N+1 Queries -->
+        <div class="topic-card" data-keywords="n+1 query problem eager loading lazy loading orm join fetch" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">⚠️</div>
+                <span class="topic-title">N+1 Query Problem</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is the N+1 query problem?</div>
+                    <div class="answer">Fetching a list of N entities, then executing N additional queries for each entity's associations. Instead of 1 JOIN query, you make N+1 queries. Solution: <b>Eager Loading</b> (<code>JOIN FETCH</code>, <code>.Include()</code>, <code>preload</code>) or batch loading.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">ORM</span><span class="topic-tag">Eager Loading</span><span class="topic-tag">JOIN FETCH</span></div>
+            </div>
+        </div>
+
+        <!-- Connection Pooling -->
+        <div class="topic-card" data-keywords="connection pooling database pool hikaricp pgbouncer max connections" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">🏊</div>
+                <span class="topic-title">Connection Pooling</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Why is connection pooling critical?</div>
+                    <div class="answer">Creating DB connections is expensive (TCP handshake, TLS, auth). A pool <b>reuses</b> established connections. Key settings: max pool size, connection timeout, idle timeout, max lifetime. Tools: HikariCP (Java), PgBouncer (PostgreSQL), RDS Proxy.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">HikariCP</span><span class="topic-tag">PgBouncer</span><span class="topic-tag">RDS Proxy</span></div>
+            </div>
+        </div>
+
+        <!-- Read Replicas -->
+        <div class="topic-card" data-keywords="read replica replication read scaling master-slave primary-standby" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">📖</div>
+                <span class="topic-title">Read Replicas</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do Read Replicas help scale databases?</div>
+                    <div class="answer">Writes go to the <b>primary</b>; reads are distributed across <b>read replicas</b>. This offloads read-heavy workloads. Trade-off: <b>replication lag</b> means replicas may serve slightly stale data (eventual consistency). Use when read volume >> write volume.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Replication</span><span class="topic-tag">Read Scaling</span><span class="topic-tag">Lag</span></div>
+            </div>
+        </div>
+
+        <!-- Sharding -->
+        <div class="topic-card" data-keywords="sharding horizontal partitioning shard key range sharding hash sharding" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">🧩</div>
+                <span class="topic-title">Sharding</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is Sharding and how do you choose a shard key?</div>
+                    <div class="answer">Splitting data across multiple independent databases (shards). <b>Shard key</b> determines which shard holds which data. Good keys have <b>high cardinality</b> and <b>even distribution</b>. Avoid hot shards. Challenges: cross-shard queries, rebalancing, JOINs are hard.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Horizontal</span><span class="topic-tag">Shard Key</span><span class="topic-tag">Vitess</span></div>
+            </div>
+        </div>
+
+        <!-- Partitioning -->
+        <div class="topic-card" data-keywords="partitioning table partitioning range partition list partition postgresql" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon amber">📊</div>
+                <span class="topic-title">Partitioning</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Sharding vs Partitioning?</div>
+                    <div class="answer"><b>Partitioning</b> splits a table into smaller pieces <b>within the same database</b> (e.g., by date range). <b>Sharding</b> distributes data across <b>separate database instances</b>. Partitioning helps with query performance & data management; sharding helps with write scalability.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Range</span><span class="topic-tag">List</span><span class="topic-tag">Hash</span></div>
+            </div>
+        </div>
+
+        <!-- Replication -->
+        <div class="topic-card" data-keywords="replication master-slave synchronous asynchronous semi-synchronous binlog" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon teal">📋</div>
+                <span class="topic-title">Replication</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Synchronous vs Asynchronous replication?</div>
+                    <div class="answer"><b>Synchronous</b>: primary waits for replica confirmation before committing → strong consistency but higher latency. <b>Asynchronous</b>: primary commits immediately, replicas catch up → faster but risk of data loss on failover. <b>Semi-synchronous</b>: at least one replica confirms.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Binlog</span><span class="topic-tag">WAL</span><span class="topic-tag">Failover</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Distributed Systems ==================== -->
+        <div id="group-distributed" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🌐 Distributed Systems Theory</div>
+
+        <!-- Leader Election -->
+        <div class="topic-card" data-keywords="leader election raft paxos zookeeper etcd consensus algorithm" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon orange">👑</div>
+                <span class="topic-title">Leader Election</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How does Leader Election work?</div>
+                    <div class="answer">In a cluster, one node is elected <b>leader</b> to coordinate work (e.g., Kafka controller, DB primary). Uses consensus algorithms like <b>Raft</b> or <b>Paxos</b>. Tools: ZooKeeper (ephemeral znodes), etcd (leases). Heartbeats detect leader failure → new election.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Raft</span><span class="topic-tag">ZooKeeper</span><span class="topic-tag">etcd</span></div>
+            </div>
+        </div>
+
+        <!-- CAP Theorem -->
+        <div class="topic-card" data-keywords="cap theorem consistency availability partition tolerance brewers theorem" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">🔺</div>
+                <span class="topic-title">CAP Theorem</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Explain the CAP Theorem.</div>
+                    <div class="answer">In a distributed system, during a <b>network partition (P)</b>, you must choose between <b>Consistency (C)</b> — all nodes see the same data — and <b>Availability (A)</b> — every request gets a response. You can't have both during a partition. Most systems are CP or AP; CA doesn't exist in distributed systems.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Brewer's</span><span class="topic-tag">CP vs AP</span><span class="topic-tag">Network Partition</span></div>
+            </div>
+        </div>
+
+        <!-- Eventual Consistency -->
+        <div class="topic-card" data-keywords="eventual consistency strong consistency dynamodb cassandra base acid" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon amber">⏰</div>
+                <span class="topic-title">Eventual Consistency</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Eventual Consistency vs Strong Consistency?</div>
+                    <div class="answer"><b>Strong Consistency</b>: after a write, all subsequent reads return the latest value (linearizability). <b>Eventual Consistency</b>: given enough time with no new writes, all replicas converge. BASE (Basically Available, Soft state, Eventually consistent) vs ACID.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">BASE</span><span class="topic-tag">DynamoDB</span><span class="topic-tag">Cassandra</span></div>
+            </div>
+        </div>
+
+        <!-- Optimistic Locking -->
+        <div class="topic-card" data-keywords="optimistic locking version column compare-and-swap cas concurrent update" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">🔓</div>
+                <span class="topic-title">Optimistic Locking</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How does Optimistic Locking prevent lost updates?</div>
+                    <div class="answer">Each row has a <b>version number</b>. On update: <code>UPDATE ... SET version = version + 1 WHERE version = expected_version</code>. If zero rows affected, someone else modified it → retry or fail. Good for <b>low-contention</b> scenarios. No locks held.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Version Column</span><span class="topic-tag">CAS</span><span class="topic-tag">Low Contention</span></div>
+            </div>
+        </div>
+
+        <!-- Pessimistic Locking -->
+        <div class="topic-card" data-keywords="pessimistic locking select for update row lock table lock exclusive lock" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">🔒</div>
+                <span class="topic-title">Pessimistic Locking</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: When to use Pessimistic over Optimistic Locking?</div>
+                    <div class="answer">Use <b>pessimistic</b> (<code>SELECT ... FOR UPDATE</code>) when contention is <b>high</b> and conflict probability is significant. Locks the row, blocking other writers. Trade-off: reduced concurrency, risk of deadlocks. Optimistic is better for read-heavy, low-conflict workloads.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">FOR UPDATE</span><span class="topic-tag">Row Lock</span><span class="topic-tag">High Contention</span></div>
+            </div>
+        </div>
+
+        <!-- Distributed Locks -->
+        <div class="topic-card" data-keywords="distributed lock redis redlock zookeeper lock fencing token" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">🔐</div>
+                <span class="topic-title">Distributed Locks</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How to implement a distributed lock and what are the pitfalls?</div>
+                    <div class="answer">Use <b>Redis</b> (<code>SET NX PX</code> with unique token, Lua script for safe release) or <b>ZooKeeper/etcd</b> (ephemeral sequential znodes). Pitfalls: clock skew, GC pauses causing lock expiry while holder still thinks it has the lock. Use <b>fencing tokens</b> to prevent this.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Redis</span><span class="topic-tag">Redlock</span><span class="topic-tag">Fencing Token</span></div>
+            </div>
+        </div>
+
+        <!-- Race Conditions & Deadlocks -->
+        <div class="topic-card" data-keywords="race condition deadlock mutex semaphore lock ordering deadlock prevention" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">⚔️</div>
+                <span class="topic-title">Race Conditions & Deadlocks</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do you prevent deadlocks?</div>
+                    <div class="answer"><b>Lock ordering</b>: always acquire locks in a consistent global order. <b>Lock timeout</b>: don't wait indefinitely. <b>Deadlock detection</b>: periodically check for cycles in wait-for graph. <b>Avoid nested locks</b> when possible. Use <code>tryLock()</code> with timeouts.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Mutex</span><span class="topic-tag">Lock Ordering</span><span class="topic-tag">tryLock</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Scaling & Performance ==================== -->
+        <div id="group-scaling" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">⚡ Scaling & Performance</div>
+
+        <!-- Memory Leaks & GC -->
+        <div class="topic-card" data-keywords="memory leak garbage collection gc jvm go gc reference counting mark-and-sweep" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">🧠</div>
+                <span class="topic-title">Memory Leaks & Garbage Collection</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What causes memory leaks in GC languages?</div>
+                    <div class="answer">Unintentional <b>object references</b> preventing GC: static collections growing unbounded, unclosed resources (connections, streams), listener/callback registrations never removed, thread-local variables in pooled threads, large off-heap allocations.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">GC</span><span class="topic-tag">Heap Dump</span><span class="topic-tag">Mark-Sweep</span></div>
+            </div>
+        </div>
+
+        <!-- Thread Safety -->
+        <div class="topic-card" data-keywords="thread safety concurrency race condition synchronized atomic volatile lock" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon orange">🧵</div>
+                <span class="topic-title">Thread Safety</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do you ensure thread safety?</div>
+                    <div class="answer">Use <b>immutable objects</b>, <b>synchronization</b> (synchronized blocks, locks), <b>atomic classes</b> (AtomicInteger, AtomicReference), <b>concurrent collections</b> (ConcurrentHashMap), <b>volatile</b> for visibility, <b>ThreadLocal</b> for per-thread state. Prefer higher-level abstractions over raw locks.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">ConcurrentHashMap</span><span class="topic-tag">Atomic</span><span class="topic-tag">volatile</span></div>
+            </div>
+        </div>
+
+        <!-- Backpressure -->
+        <div class="topic-card" data-keywords="backpressure reactive streams flow control rsocket rxjava project reactor" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon amber">🚰</div>
+                <span class="topic-title">Backpressure</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is Backpressure in streaming systems?</div>
+                    <div class="answer">When a <b>producer is faster than the consumer</b>, backpressure signals the producer to slow down, preventing overwhelming the consumer or running out of memory. Implemented in Reactive Streams (RxJava, Project Reactor), RSocket, and Kafka consumer polling.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Reactive</span><span class="topic-tag">Flow Control</span><span class="topic-tag">RSocket</span></div>
+            </div>
+        </div>
+
+        <!-- Autoscaling & Scaling -->
+        <div class="topic-card" data-keywords="autoscaling horizontal scaling vertical scaling hpa vpa kubernetes scale out scale up" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">📈</div>
+                <span class="topic-title">Autoscaling & Horizontal/Vertical Scaling</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Horizontal vs Vertical Scaling?</div>
+                    <div class="answer"><b>Vertical</b> (scale up): bigger machine (more CPU/RAM). Simple but has limits, single point of failure. <b>Horizontal</b> (scale out): more machines. Better scalability, fault tolerance, but requires distributed system design. K8s HPA auto-scales pods based on CPU/memory/custom metrics.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">HPA</span><span class="topic-tag">K8s</span><span class="topic-tag">Scale Out</span></div>
+            </div>
+        </div>
+
+        <!-- CDN & Edge Caching -->
+        <div class="topic-card" data-keywords="cdn edge caching cloudflare akamai cloudfront fastly pop" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">🌍</div>
+                <span class="topic-title">CDN & Edge Caching</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How does a CDN reduce latency?</div>
+                    <div class="answer">CDNs cache content at <b>edge locations (PoPs)</b> geographically close to users. Static assets (images, CSS, JS) are served from the nearest edge, reducing round-trip time. Also reduces origin server load. Examples: Cloudflare, CloudFront, Akamai, Fastly.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">CloudFront</span><span class="topic-tag">Cloudflare</span><span class="topic-tag">PoP</span></div>
+            </div>
+        </div>
+
+        <!-- Cache Invalidation -->
+        <div class="topic-card" data-keywords="cache invalidation purge ttl stale-while-revalidate cache stampede" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon amber">🗑️</div>
+                <span class="topic-title">Cache Invalidation</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are common cache invalidation strategies?</div>
+                    <div class="answer"><b>TTL</b> (time-to-live), <b>event-driven purge</b> (invalidate on data change), <b>write-through</b> (update cache on write), <b>stale-while-revalidate</b> (serve stale while refreshing in background). Watch for <b>cache stampede</b> — many concurrent cache misses overwhelming the DB.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">TTL</span><span class="topic-tag">Stale-While-Revalidate</span><span class="topic-tag">Stampede</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Deployments ==================== -->
+        <div id="group-deploy" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🚀 Deployment Strategies</div>
+
+        <!-- Feature Flags -->
+        <div class="topic-card" data-keywords="feature flags feature toggles launchdarkly rollout percentage-based canary" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">🚩</div>
+                <span class="topic-title">Feature Flags</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are Feature Flags and their use cases?</div>
+                    <div class="answer">Toggles that enable/disable features at runtime without redeploying. Use cases: <b>dark launches</b>, <b>canary testing</b>, <b>kill switches</b>, <b>A/B testing</b>, <b>gradual rollouts</b>. Tools: LaunchDarkly, Flagsmith. Always clean up stale flags to avoid technical debt.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">LaunchDarkly</span><span class="topic-tag">Dark Launch</span><span class="topic-tag">Kill Switch</span></div>
+            </div>
+        </div>
+
+        <!-- Blue-Green Deployments -->
+        <div class="topic-card" data-keywords="blue green deployment zero downtime instant rollback traffic switching" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">🔵🟢</div>
+                <span class="topic-title">Blue-Green Deployments</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How does Blue-Green deployment work?</div>
+                    <div class="answer">Maintain two identical environments: <b>Blue</b> (current live) and <b>Green</b> (new version). Deploy to Green, test thoroughly, then <b>switch all traffic</b> at once via load balancer. Instant rollback: switch back to Blue. Doubles infrastructure cost during deployment.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Zero Downtime</span><span class="topic-tag">Instant Rollback</span></div>
+            </div>
+        </div>
+
+        <!-- Canary Releases -->
+        <div class="topic-card" data-keywords="canary release gradual rollout traffic splitting monitoring" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon orange">🐤</div>
+                <span class="topic-title">Canary Releases</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is a Canary Release?</div>
+                    <div class="answer">Gradually shift a <b>small percentage of traffic</b> (e.g., 5%) to the new version while monitoring metrics. If healthy, increase to 25%, 50%, 100%. If issues detected, rollback immediately. Minimizes blast radius. Often combined with feature flags.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Gradual</span><span class="topic-tag">Blast Radius</span><span class="topic-tag">Istio</span></div>
+            </div>
+        </div>
+
+        <!-- Rolling Deployments -->
+        <div class="topic-card" data-keywords="rolling deployment kubernetes rolling update maxsurge maxunavailable" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon teal">🔄</div>
+                <span class="topic-title">Rolling Deployments</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do Rolling Deployments work in Kubernetes?</div>
+                    <div class="answer">Pods are updated <b>incrementally</b>, a few at a time. Controlled by <code>maxSurge</code> (extra pods allowed during update) and <code>maxUnavailable</code> (pods that can be down). Default in K8s Deployments. No extra infrastructure needed, but slower rollback than Blue-Green.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">K8s</span><span class="topic-tag">maxSurge</span><span class="topic-tag">Incremental</span></div>
+            </div>
+        </div>
+
+        <!-- Rollbacks -->
+        <div class="topic-card" data-keywords="rollback deployment rollback kubernetes rollback undo database rollback migration rollback" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">⏪</div>
+                <span class="topic-title">Rollbacks</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What makes a safe rollback?</div>
+                    <div class="answer"><b>Backward-compatible</b> database migrations (additive only, no destructive changes in same deploy), <b>feature flags</b> for instant disable, <b>immutable artifacts</b> (rollback to known-good version), and <b>automated rollback triggers</b> based on error rate spikes.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">K8s</span><span class="topic-tag">Backward Compatible</span><span class="topic-tag">DB Migrations</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Observability ==================== -->
+        <div id="group-observability" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">📊 Observability & Monitoring</div>
+
+        <!-- Health Checks & Probes -->
+        <div class="topic-card" data-keywords="health check liveness probe readiness probe kubernetes startup probe" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">💚</div>
+                <span class="topic-title">Health Checks & Probes</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Liveness vs Readiness vs Startup probes in K8s?</div>
+                    <div class="answer"><b>Liveness</b>: "Am I alive?" — if fails, K8s restarts the pod (deadlocked apps). <b>Readiness</b>: "Am I ready to serve traffic?" — if fails, pod removed from service endpoints (warming up, overloaded). <b>Startup</b>: for slow-starting apps, delays liveness/readiness checks.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">K8s</span><span class="topic-tag">Liveness</span><span class="topic-tag">Readiness</span></div>
+            </div>
+        </div>
+
+        <!-- Monitoring, Logging, Tracing -->
+        <div class="topic-card" data-keywords="monitoring logging distributed tracing opentelemetry jaeger elk prometheus grafana" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">📊</div>
+                <span class="topic-title">Monitoring, Logging & Distributed Tracing</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are the three pillars of observability?</div>
+                    <div class="answer"><b>Metrics</b>: numerical data over time (Prometheus). <b>Logging</b>: structured event records (ELK, Loki). <b>Tracing</b>: follows a request across services (Jaeger, Zipkin, OpenTelemetry). Together they enable debugging complex distributed systems.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">OpenTelemetry</span><span class="topic-tag">Jaeger</span><span class="topic-tag">Prometheus</span></div>
+            </div>
+        </div>
+
+        <!-- SLOs, SLIs, Error Budgets -->
+        <div class="topic-card" data-keywords="slo sli error budget sla service level objective indicator agreement" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon amber">🎯</div>
+                <span class="topic-title">SLOs, SLIs & Error Budgets</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Define SLI, SLO, and Error Budget.</div>
+                    <div class="answer"><b>SLI</b> (Service Level Indicator): measured metric (e.g., 99.5% availability). <b>SLO</b> (Objective): target for SLI (e.g., 99.9%). <b>Error Budget</b>: 100% - SLO = acceptable downtime (e.g., 0.1% = ~43 min/month). Error budgets guide release velocity — if you're within budget, you can deploy.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">SRE</span><span class="topic-tag">Google SRE</span><span class="topic-tag">Availability</span></div>
+            </div>
+        </div>
+
+        <!-- Secrets Management -->
+        <div class="topic-card" data-keywords="secrets management vault hashicorp vault aws secrets manager kubernetes secrets encryption" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">🔐</div>
+                <span class="topic-title">Secrets Management</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Why shouldn't secrets be in code or env vars?</div>
+                    <div class="answer">Code repos leak, env vars are visible in process listings/debug endpoints. Use <b>HashiCorp Vault</b>, <b>AWS Secrets Manager</b>, or K8s Secrets (with encryption at rest). Rotate secrets automatically. Use dynamic secrets when possible (short-lived, per-request).</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Vault</span><span class="topic-tag">AWS Secrets Manager</span><span class="topic-tag">Rotation</span></div>
+            </div>
+        </div>
+
+        <!-- IAM & OAuth -->
+        <div class="topic-card" data-keywords="iam oauth oauth2 openid connect jwt access token refresh token rbac abac" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">🪪</div>
+                <span class="topic-title">IAM, OAuth & JWT</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Explain OAuth 2.0 flow and JWT.</div>
+                    <div class="answer"><b>OAuth 2.0</b>: authorization framework. Client gets an access token (via authorization code, client credentials, etc.). <b>JWT</b>: JSON Web Token — self-contained, signed token with claims. <b>Access tokens</b> (short-lived) authorize API calls; <b>refresh tokens</b> (long-lived) obtain new access tokens.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">OAuth2</span><span class="topic-tag">JWT</span><span class="topic-tag">OIDC</span></div>
+            </div>
+        </div>
+
+        <!-- Security: TLS, Encryption, WAF, DDoS -->
+        <div class="topic-card" data-keywords="tls encryption at rest in transit waf ddos cors csrf sql injection xss ssrf" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">🛡️</div>
+                <span class="topic-title">Security Essentials</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Quick definitions of common security terms?</div>
+                    <div class="answer"><b>TLS</b>: encrypts data in transit. <b>Encryption at Rest</b>: encrypts stored data (AES-256). <b>WAF</b>: Web Application Firewall filters HTTP traffic. <b>DDoS</b>: Distributed Denial of Service. <b>CORS</b>: browser security for cross-origin requests. <b>CSRF</b>: forged requests from other sites. <b>XSS</b>: injecting malicious scripts. <b>SQL Injection</b>: injecting SQL via user input. <b>SSRF</b>: tricking server into making requests to internal systems.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">TLS</span><span class="topic-tag">WAF</span><span class="topic-tag">OWASP</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Infra & Data ==================== -->
+        <div id="group-infra" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🏗️ Infrastructure & Data Management</div>
+
+        <!-- Database Migrations -->
+        <div class="topic-card" data-keywords="database migration schema versioning flyway liquibase alembic backward compatible" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon teal">📦</div>
+                <span class="topic-title">Database Migrations & Schema Versioning</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do you safely manage database schema changes?</div>
+                    <div class="answer">Use migration tools (<b>Flyway, Liquibase, Alembic</b>) with versioned migration scripts. <b>Expand-Contract pattern</b>: 1) Add new column (expand), 2) Dual-write, 3) Migrate data, 4) Remove old column (contract) in a separate deploy. Never make breaking changes in a single release.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Flyway</span><span class="topic-tag">Expand-Contract</span><span class="topic-tag">Alembic</span></div>
+            </div>
+        </div>
+
+        <!-- Disaster Recovery & Failover -->
+        <div class="topic-card" data-keywords="disaster recovery failover multi-region rto rpo backup restore" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon orange">🆘</div>
+                <span class="topic-title">Disaster Recovery, Failover & Multi-Region</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are RTO and RPO?</div>
+                    <div class="answer"><b>RTO</b> (Recovery Time Objective): max acceptable downtime. <b>RPO</b> (Recovery Point Objective): max acceptable data loss (time). Active-Passive: cheaper, slower failover. Active-Active (Multi-Region): faster, more expensive. Regular DR testing is essential.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">RTO</span><span class="topic-tag">RPO</span><span class="topic-tag">Active-Active</span></div>
+            </div>
+        </div>
+
+        <!-- Chaos Engineering -->
+        <div class="topic-card" data-keywords="chaos engineering netflix chaos monkey gremlin fault injection resilience testing" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">🔥</div>
+                <span class="topic-title">Chaos Engineering</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is Chaos Engineering?</div>
+                    <div class="answer">Deliberately <b>injecting failures</b> into production (or staging) to verify system resilience. Start small (kill one pod), observe, expand blast radius. Tools: Chaos Monkey (Netflix), Gremlin, LitmusChaos. Proves that your redundancy actually works.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Chaos Monkey</span><span class="topic-tag">Gremlin</span><span class="topic-tag">Resilience</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Networking ==================== -->
+        <div id="group-networking" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🌍 Networking & Protocols</div>
+
+        <!-- Latency, Throughput, P99 -->
+        <div class="topic-card" data-keywords="latency throughput p99 tail latency p50 p95 percentile network performance" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">⏱️</div>
+                <span class="topic-title">Latency, Throughput & P99</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Why is P99 latency more important than average?</div>
+                    <div class="answer">Averages hide outliers. <b>P99</b> (99th percentile) means 1% of users experience worse latency. In large systems, <b>tail latency</b> amplifies: if a request touches 100 services, the chance of hitting a P99 slow service is ~63%! Optimize for P99/P999.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">P99</span><span class="topic-tag">Tail Latency</span><span class="topic-tag">Percentile</span></div>
+            </div>
+        </div>
+
+        <!-- DNS, TCP/UDP, HTTP -->
+        <div class="topic-card" data-keywords="dns tcp udp http2 http3 quic grpc protocol" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">🌐</div>
+                <span class="topic-title">DNS, TCP/UDP, HTTP/2 & HTTP/3, gRPC</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: TCP vs UDP? HTTP/2 vs HTTP/3?</div>
+                    <div class="answer"><b>TCP</b>: reliable, ordered, connection-oriented. <b>UDP</b>: fast, no guarantees, good for streaming/gaming. <b>HTTP/2</b>: multiplexing, header compression, server push (over TCP). <b>HTTP/3</b>: uses QUIC (UDP-based), faster handshakes, no head-of-line blocking. <b>gRPC</b>: uses HTTP/2, Protocol Buffers, great for microservices.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">QUIC</span><span class="topic-tag">gRPC</span><span class="topic-tag">Protobuf</span></div>
+            </div>
+        </div>
+
+        <!-- Clock Skew & Network Partitions -->
+        <div class="topic-card" data-keywords="clock skew network partition ntp lamport timestamp vector clock" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon amber">🕐</div>
+                <span class="topic-title">Clock Skew & Network Partitions</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Why is clock skew problematic in distributed systems?</div>
+                    <div class="answer">Different servers have slightly different times (NTP drift). Can't rely on timestamps for ordering events. Use <b>Lamport timestamps</b> or <b>vector clocks</b> for causal ordering. <b>Network partitions</b> (split-brain) require careful handling — use quorum-based decisions.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">NTP</span><span class="topic-tag">Lamport</span><span class="topic-tag">Split-Brain</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: DevOps ==================== -->
+        <div id="group-devops" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🛠️ DevOps & Tooling</div>
+
+        <!-- API Versioning & SemVer -->
+        <div class="topic-card" data-keywords="api versioning semantic versioning semver backwards compatibility breaking change" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">📌</div>
+                <span class="topic-title">API Versioning & Semantic Versioning</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How do you version APIs?</div>
+                    <div class="answer">Strategies: <b>URL path</b> (<code>/v1/users</code>), <b>header</b> (<code>Accept: application/vnd.api+json;version=1</code>), <b>query param</b>. <b>SemVer</b>: MAJOR.MINOR.PATCH — bump MAJOR for breaking changes, MINOR for new backward-compatible features, PATCH for fixes.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">SemVer</span><span class="topic-tag">Breaking Change</span><span class="topic-tag">Deprecation</span></div>
+            </div>
+        </div>
+
+        <!-- IaC & Terraform -->
+        <div class="topic-card" data-keywords="infrastructure as code iac terraform helm charts pulumi cloudformation" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon teal">🏗️</div>
+                <span class="topic-title">Infrastructure as Code & Terraform</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is IaC and why Terraform?</div>
+                    <div class="answer">IaC manages infrastructure via declarative code, enabling versioning, reproducibility, and automation. <b>Terraform</b> uses HCL, maintains <b>state</b>, plans changes before applying. <b>Helm Charts</b> package K8s manifests. Avoid manual console changes — they drift and aren't reproducible.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Terraform</span><span class="topic-tag">Helm</span><span class="topic-tag">State</span></div>
+            </div>
+        </div>
+
+        <!-- Build Caching & Dependency Hell -->
+        <div class="topic-card" data-keywords="build caching dependency hell npm maven gradle docker layer caching" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon orange">📦</div>
+                <span class="topic-title">Build Caching & Dependency Hell</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: How to speed up builds and avoid dependency conflicts?</div>
+                    <div class="answer"><b>Docker layer caching</b>: copy dependency files first, then source. <b>Incremental builds</b>. <b>Dependency lock files</b> (package-lock.json, go.sum, Cargo.lock) ensure reproducible builds. <b>Dependency hell</b>: conflicting transitive dependencies — use lock files, version pinning, and regular updates.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Docker Layers</span><span class="topic-tag">Lock Files</span><span class="topic-tag">Maven</span></div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUP: Incidents ==================== -->
+        <div id="group-incidents" style="grid-column: 1 / -1; padding: 0.5rem 0 0.3rem; font-weight: 700; font-size: 1.1rem; color: #64748b; letter-spacing: 0.3px; margin-top: 1rem;">🚨 Incident Management</div>
+
+        <!-- Production Incidents & On-call -->
+        <div class="topic-card" data-keywords="production incident on-call pagerduty opsgenie incident response runbook" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon red">🚨</div>
+                <span class="topic-title">Production Incidents & On-call</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What's a good incident response process?</div>
+                    <div class="answer"><b>Detect</b> (monitoring/alerting), <b>Respond</b> (acknowledge, escalate), <b>Mitigate</b> (stop the bleeding — rollback, scale, kill switch), <b>Resolve</b> (fix root cause), <b>Postmortem</b> (blameless, focus on learning). Tools: PagerDuty, Opsgenie. Runbooks automate common responses.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">PagerDuty</span><span class="topic-tag">Runbook</span><span class="topic-tag">Escalation</span></div>
+            </div>
+        </div>
+
+        <!-- Postmortems -->
+        <div class="topic-card" data-keywords="postmortem blameless root cause analysis rca incident review learning" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon purple">📝</div>
+                <span class="topic-title">Postmortems</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What makes a good postmortem?</div>
+                    <div class="answer"><b>Blameless</b> culture — focus on systems and processes, not individuals. Document <b>timeline</b>, <b>impact</b>, <b>root causes</b>, <b>action items</b> with owners and deadlines. Share publicly within the org. The goal is learning and preventing recurrence, not punishment.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Blameless</span><span class="topic-tag">RCA</span><span class="topic-tag">Action Items</span></div>
+            </div>
+        </div>
+
+        <!-- Additional topics -->
+        <div class="topic-card" data-keywords="cron job scheduled task cron expression spring scheduler" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon slate">⏰</div>
+                <span class="topic-title">Cron Jobs</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What are Cron Jobs and their pitfalls?</div>
+                    <div class="answer">Scheduled tasks running at fixed times/intervals (cron expressions). Pitfalls: <b>overlapping runs</b> (use locking), <b>missed runs</b> (server down), <b>timezone issues</b>, <b>silent failures</b> (need alerting). For distributed systems, ensure only one instance runs (leader election or DB lock).</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Scheduled</span><span class="topic-tag">Cron Expression</span><span class="topic-tag">K8s CronJob</span></div>
+            </div>
+        </div>
+
+        <div class="topic-card" data-keywords="cold start serverless lambda warm start init duration provisioned concurrency" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon blue">❄️</div>
+                <span class="topic-title">Cold Starts & Serverless Limits</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: What is a cold start in serverless?</div>
+                    <div class="answer">When a serverless function (AWS Lambda) hasn't been invoked recently, the cloud provider must <b>initialize a new execution environment</b> — download code, start runtime, run init code. This adds latency (100ms–several seconds). Mitigation: <b>provisioned concurrency</b>, smaller packages, faster runtimes.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">Lambda</span><span class="topic-tag">Warm Start</span><span class="topic-tag">Provisioned</span></div>
+            </div>
+        </div>
+
+        <div class="topic-card" data-keywords="cost optimization finops reserved instances spot instances right-sizing waste" onclick="toggleCard(this)">
+            <div class="topic-card-header">
+                <div class="topic-icon green">💰</div>
+                <span class="topic-title">Cost Optimization</span>
+                <span class="topic-chevron">▼</span>
+            </div>
+            <div class="topic-card-body">
+                <div class="qa-pair">
+                    <div class="question">Q: Key strategies for cloud cost optimization?</div>
+                    <div class="answer"><b>Right-sizing</b> (match resources to actual usage), <b>Reserved/Savings Plans</b> (commit for discount), <b>Spot instances</b> (cheap but interruptible), <b>Auto-scaling</b> (scale down when idle), <b>Delete unused resources</b>, <b>Storage tiering</b> (S3 Intelligent-Tiering), <b>Tagging</b> for accountability.</div>
+                </div>
+                <div class="topic-tags"><span class="topic-tag">FinOps</span><span class="topic-tag">Spot</span><span class="topic-tag">Right-sizing</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>📘 System Design & Backend Engineering Interview Prep Guide · Covers 100+ essential topics · Q&A Format</p>
+        <p style="margin-top: 0.3rem; font-size: 0.75rem;">Click any card to expand · Use search to filter · Built for quick interview review</p>
+    </footer>
+
+    <script>
+        // Toggle card expansion
+        function toggleCard(card) {
+            const wasExpanded = card.classList.contains('expanded');
+            // Close all others (optional: remove this block if you want multiple open)
+            // card.classList.toggle('expanded');
+            // Instead, let's allow multiple open but toggle the clicked one
+            card.classList.toggle('expanded');
+
+            // Update chevron rotation is handled by CSS
+        }
+
+        // Search/filter functionality
+        function filterTopics() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.topic-card');
+            const groupHeaders = document.querySelectorAll('[id^="group-"]');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const keywords = card.getAttribute('data-keywords') || '';
+                const title = card.querySelector('.topic-title')?.textContent.toLowerCase() || '';
+                const body = card.querySelector('.topic-card-body')?.textContent.toLowerCase() || '';
+
+                const matches = !query ||
+                    title.includes(query) ||
+                    keywords.includes(query) ||
+                    body.includes(query);
+
+                card.style.display = matches ? '' : 'none';
+                if (matches) visibleCount++;
+            });
+
+            // Show/hide group headers based on whether they have visible cards
+            groupHeaders.forEach(header => {
+                const groupId = header.id;
+                let hasVisibleSibling = false;
+                let nextEl = header.nextElementSibling;
+                // Check subsequent siblings until next group header
+                while (nextEl && !nextEl.id.startsWith('group-')) {
+                    if (nextEl.classList.contains('topic-card') && nextEl.style.display !== 'none') {
+                        hasVisibleSibling = true;
+                        break;
+                    }
+                    nextEl = nextEl.nextElementSibling;
+                }
+                header.style.display = (query && !hasVisibleSibling) ? 'none' : '';
+            });
+
+            noResults.style.display = (query && visibleCount === 0) ? 'block' : 'none';
+        }
+
+        // Keyboard shortcut: Ctrl+K or / to focus search
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey && e.key === 'k') || (e.key === '/' && !e.ctrlKey && !e.metaKey && document.activeElement ===
+                    document.body)) {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        // Initial state: all cards collapsed
+        document.querySelectorAll('.topic-card').forEach(card => {
+            card.classList.remove('expanded');
+        });
+
+        console.log('📘 System Design Interview Prep Guide loaded!');
+        console.log('   - Click any card to expand Q&A');
+        console.log('   - Use search bar to filter topics');
+        console.log('   - Press Ctrl+K or / to focus search');
+        console.log('   - ' + document.querySelectorAll('.topic-card').length + ' topic cards available');
+    </script>
+
+</body>
+</html>

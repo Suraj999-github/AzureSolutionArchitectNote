@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backend & System Design — Interview Notes</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --panel:#151b23;
+    --panel2:#1c2430;
+    --border:#2a3441;
+    --text:#dbe2ea;
+    --muted:#8b98a8;
+    --accent:#5ec9a8;
+    --accent2:#e8b04b;
+    --code:#e8b04b;
+    --mono: 'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+    --sans: -apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.55;
+  }
+  header{
+    padding:36px 24px 22px;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#121820,#0d1117);
+    position:sticky; top:0; z-index:5;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-size:1.6rem;
+    letter-spacing:0.3px;
+  }
+  header h1 span{color:var(--accent);}
+  header p{margin:0; color:var(--muted); font-size:0.92rem;}
+  .toolbar{
+    display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; align-items:center;
+  }
+  #search{
+    flex:1; min-width:220px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 14px;
+    border-radius:8px;
+    font-size:0.95rem;
+    outline:none;
+  }
+  #search:focus{border-color:var(--accent);}
+  .stat{
+    font-size:0.82rem; color:var(--muted);
+    font-family:var(--mono);
+  }
+  .layout{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:0;
+    max-width:1200px;
+    margin:0 auto;
+  }
+  nav{
+    padding:20px 12px;
+    position:sticky; top:132px;
+    align-self:start;
+    max-height:calc(100vh - 150px);
+    overflow-y:auto;
+  }
+  nav a{
+    display:block;
+    color:var(--muted);
+    text-decoration:none;
+    font-size:0.83rem;
+    padding:6px 10px;
+    border-radius:6px;
+    margin-bottom:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  nav a:hover{background:var(--panel2); color:var(--text);}
+  main{padding:24px;}
+  .category{
+    margin-bottom:36px;
+    scroll-margin-top:140px;
+  }
+  .category h2{
+    font-size:1.15rem;
+    color:var(--accent);
+    border-bottom:1px solid var(--border);
+    padding-bottom:8px;
+    margin-bottom:14px;
+    font-family:var(--mono);
+  }
+  .category h2 .count{
+    color:var(--muted);
+    font-weight:normal;
+    font-size:0.8rem;
+    margin-left:8px;
+  }
+  details{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:10px;
+    overflow:hidden;
+  }
+  details[open]{border-color:#33404f;}
+  summary{
+    cursor:pointer;
+    padding:13px 16px;
+    font-weight:600;
+    font-size:0.97rem;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::after{
+    content:"+";
+    color:var(--accent);
+    font-family:var(--mono);
+    font-size:1.1rem;
+    flex-shrink:0;
+  }
+  details[open] summary::after{content:"–";}
+  summary:hover{background:var(--panel2);}
+  .answer{
+    padding:2px 16px 16px;
+    color:var(--text);
+    font-size:0.92rem;
+    border-top:1px solid var(--border);
+  }
+  .answer p{margin:10px 0;}
+  .answer ul{margin:8px 0; padding-left:20px;}
+  .answer li{margin-bottom:4px;}
+  code, .k{
+    font-family:var(--mono);
+    background:#0a0f16;
+    color:var(--code);
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:0.85em;
+  }
+  .tag{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:0.68rem;
+    color:var(--accent);
+    background:rgba(94,201,168,0.1);
+    border:1px solid rgba(94,201,168,0.3);
+    padding:2px 7px;
+    border-radius:20px;
+    margin-left:8px;
+    flex-shrink:0;
+  }
+  .hidden{display:none !important;}
+  .no-results{color:var(--muted); font-style:italic; padding:30px; text-align:center;}
+  footer{
+    text-align:center; padding:30px; color:var(--muted); font-size:0.8rem;
+    border-top:1px solid var(--border);
+  }
+  @media (max-width:800px){
+    .layout{grid-template-columns:1fr;}
+    nav{position:static; max-height:none; display:flex; flex-wrap:wrap; gap:4px;}
+    nav a{font-size:0.75rem; padding:5px 8px;}
+  }
+  .menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #2c3e50;
+    padding: 12px;
+}
+
+.menu a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    background: #34495e;
+    transition: background 0.3s;
+}
+
+.menu a:hover {
+    background: #3498db;
+}
+
+</style>
+</head>
+<body>
+  <div class="menu">
+    <a href="Home.html">Home</a>
+    <a href="ManyApiRequest.html">Handling Thousands of Requests</a>
+    <a href="CodingQuestions.html">Coding Questions</a>
+    <a href="Authentication.html">Authentication in .NET Core</a>
+    <a href="dotnet_senior_interview_guide.html">Real-World .NET Interview</a>
+    <a href="Questions.html">Lead .NET Engineer Interview Questions</a>
+    <a href="SystemDesign.html">System Design</a>
+</div>
+
+<header>
+  <h1>Backend & System Design — <span>Interview Notes</span></h1>
+  <p>Quick-reference Q&A across distributed systems, infra, databases, security, and ops.</p>
+  <div class="toolbar">
+    <input type="text" id="search" placeholder="Search a topic, e.g. 'idempotency', 'sharding', 'CAP'..." />
+    <span class="stat" id="stat"></span>
+  </div>
+</header>
+
+<div class="layout">
+  <nav id="nav">
+    
+  </nav>
+  <main id="main">
+
+<!-- ==================== 1. TRAFFIC & EDGE ==================== -->
+<section class="category" id="cat-traffic">
+<h2>Traffic, Caching & Edge</h2>
+
+<details><summary>What is Rate Limiting and what are common algorithms?<span class="tag">Q1</span></summary>
+<div class="answer">
+<p>Rate limiting restricts how many requests a client can make in a time window, protecting services from abuse and overload.</p>
+<ul>
+<li><code>Token Bucket</code> — tokens refill at a fixed rate; each request consumes a token, allows bursts.</li>
+<li><code>Leaky Bucket</code> — requests processed at a constant rate; smooths bursts.</li>
+<li><code>Fixed Window</code> — simple counter per time window; can allow bursts at window edges.</li>
+<li><code>Sliding Window Log/Counter</code> — more accurate, avoids edge-burst problem, costlier to compute.</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What is Caching and what strategies exist?</summary>
+<div class="answer">
+<p>Caching stores frequently accessed data in a faster layer to reduce latency and backend load.</p>
+<ul>
+<li><code>Cache-aside (lazy load)</code> — app checks cache first, loads from DB on miss, then populates cache.</li>
+<li><code>Write-through</code> — writes go to cache and DB together; consistent but slower writes.</li>
+<li><code>Write-back</code> — writes go to cache first, flushed to DB later; fast but risk of data loss.</li>
+<li><code>Read-through</code> — cache itself is responsible for loading from DB on miss.</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What is Cache Invalidation and why is it hard?</summary>
+<div class="answer">
+<p>Cache invalidation is the process of removing or updating stale cache entries when underlying data changes. It's considered one of the two hard problems in computer science because it requires balancing freshness against performance.</p>
+<ul>
+<li><code>TTL expiry</code> — simplest, but data can be stale until expiry.</li>
+<li><code>Explicit invalidation</code> — delete/update cache on write; needs careful coordination across services.</li>
+<li><code>Versioned keys</code> — bump a version/hash in the cache key so old entries become naturally unreachable.</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What is a Load Balancer and what algorithms does it use?</summary>
+<div class="answer">
+<p>A load balancer distributes incoming traffic across multiple backend instances to improve availability and throughput.</p>
+<ul>
+<li><code>Round Robin</code> / <code>Weighted Round Robin</code> — cycles through servers, optionally weighted by capacity.</li>
+<li><code>Least Connections</code> — sends traffic to the server with fewest active connections.</li>
+<li><code>IP Hash / Consistent Hash</code> — routes based on client identity, useful for session affinity.</li>
+<li>Layer 4 (TCP/UDP) balances at the transport layer; Layer 7 (HTTP) balances with content awareness (path, headers).</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What's the difference between a Reverse Proxy and an API Gateway?</summary>
+<div class="answer">
+<p>A <code>Reverse Proxy</code> sits in front of servers, forwarding client requests and handling concerns like SSL termination, load balancing, and caching — it's largely transparent about business logic.</p>
+<p>An <code>API Gateway</code> is a specialized reverse proxy for APIs that adds routing to multiple microservices, authentication, rate limiting, request/response transformation, and aggregation of multiple backend calls into one client-facing response.</p>
+</div>
+</details>
+
+<details><summary>What is a CDN and what is Edge Caching?</summary>
+<div class="answer">
+<p>A <code>CDN (Content Delivery Network)</code> is a geographically distributed set of servers that cache and serve content close to end users, reducing latency and origin load.</p>
+<p><code>Edge caching</code> refers to caching data or even compute at these edge nodes so requests never have to travel back to a central origin server — useful for static assets, API responses, and increasingly edge functions.</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 2. DEVOPS & DEPLOYMENT ==================== -->
+<section class="category" id="cat-devops">
+<h2>DevOps, Containers & Deployment</h2>
+
+<details><summary>What is CI/CD?</summary>
+<div class="answer">
+<p><code>Continuous Integration</code> is the practice of frequently merging code into a shared branch, with automated builds and tests running on every change to catch issues early.</p>
+<p><code>Continuous Delivery/Deployment</code> automates the release pipeline so validated changes can be shipped to staging/production quickly and reliably, either with a manual approval gate (delivery) or fully automatically (deployment).</p>
+</div>
+</details>
+
+<details><summary>What is Docker and how does it differ from a VM?</summary>
+<div class="answer">
+<p>Docker packages an application with its dependencies into a lightweight, portable <code>container</code> that shares the host OS kernel, unlike a <code>Virtual Machine</code> which virtualizes an entire OS and hardware stack.</p>
+<p>Containers start in seconds, use far less memory/disk, and give consistent environments across dev, test, and prod — at the cost of weaker isolation compared to VMs.</p>
+</div>
+</details>
+
+<details><summary>What is Kubernetes and what problem does it solve?</summary>
+<div class="answer">
+<p>Kubernetes (K8s) is a container orchestration platform that automates deployment, scaling, networking, and self-healing of containerized applications across a cluster of machines.</p>
+<ul>
+<li><code>Pod</code> — smallest deployable unit, one or more containers.</li>
+<li><code>Deployment</code> — manages replica sets and rolling updates.</li>
+<li><code>Service</code> — stable network endpoint for a set of pods.</li>
+<li><code>ConfigMap/Secret</code> — externalized configuration and sensitive values.</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What is Service Discovery?</summary>
+<div class="answer">
+<p>Service discovery lets services find each other's network locations dynamically in environments where instances are frequently created, destroyed, or rescheduled (e.g., Kubernetes, autoscaling groups).</p>
+<ul>
+<li><code>Client-side discovery</code> — client queries a registry (e.g., Consul, Eureka) and load-balances itself.</li>
+<li><code>Server-side discovery</code> — client calls a load balancer/router which queries the registry (typical in K8s via DNS + Services).</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What is Infrastructure as Code (IaC)? What are Terraform and Helm Charts?</summary>
+<div class="answer">
+<p><code>IaC</code> means defining and provisioning infrastructure through machine-readable config files instead of manual processes — enabling versioning, review, and repeatability.</p>
+<p><code>Terraform</code> is a declarative, cloud-agnostic IaC tool that manages resources (VMs, networks, DNS, etc.) via a state file and provider plugins.</p>
+<p><code>Helm Charts</code> package Kubernetes manifests as reusable, parameterized templates — the de-facto "package manager" for K8s applications.</p>
+</div>
+</details>
+
+<details><summary>What are Blue-Green, Canary, and Rolling Deployments?</summary>
+<div class="answer">
+<ul>
+<li><code>Blue-Green</code> — two identical environments; traffic is switched entirely from old (blue) to new (green) at once, enabling instant rollback.</li>
+<li><code>Canary</code> — new version is released to a small subset of traffic/users first, gradually increased if healthy.</li>
+<li><code>Rolling Deployment</code> — instances are updated incrementally, a few at a time, so the app stays available throughout.</li>
+</ul>
+<p>All three aim to minimize downtime and blast radius; <code>Rollback</code> is the act of reverting to the previous known-good version when a deployment misbehaves.</p>
+</div>
+</details>
+
+<details><summary>What are Health Checks and Liveness/Readiness Probes?</summary>
+<div class="answer">
+<p>A <code>health check</code> is an endpoint or mechanism that reports whether a service instance is functioning correctly.</p>
+<ul>
+<li><code>Liveness probe</code> — asks "is this process alive?" If it fails repeatedly, the orchestrator restarts the container.</li>
+<li><code>Readiness probe</code> — asks "is this instance ready to receive traffic?" If it fails, the instance is removed from the load balancer pool but not restarted.</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What is Autoscaling, Horizontal vs Vertical Scaling?</summary>
+<div class="answer">
+<p><code>Autoscaling</code> automatically adjusts the number (or size) of running instances based on metrics like CPU, memory, or request rate.</p>
+<p><code>Horizontal scaling</code> (scale out) adds more instances/machines — better for fault tolerance and near-limitless growth. <code>Vertical scaling</code> (scale up) adds more resources (CPU/RAM) to an existing instance — simpler but has a hardware ceiling and a single point of failure.</p>
+</div>
+</details>
+
+<details><summary>What are Cold Starts and Serverless Limits?</summary>
+<div class="answer">
+<p>A <code>cold start</code> is the added latency when a serverless function (e.g., AWS Lambda) has to initialize a new execution environment because none is warm/idle, as opposed to a "warm" invocation reusing an existing one.</p>
+<p><code>Serverless limits</code> include maximum execution duration, memory/CPU caps, payload size limits, limited local disk, and cost/latency tradeoffs for long-running or stateful workloads — meaning serverless suits short, bursty, stateless tasks best.</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 3. RESILIENCE ==================== -->
+<section class="category" id="cat-resilience">
+<h2>Resilience Patterns</h2>
+
+<details><summary>What is a Circuit Breaker pattern?</summary>
+<div class="answer">
+<p>A circuit breaker prevents a failing downstream service from being hammered with requests, by "tripping open" after a failure threshold and short-circuiting calls (failing fast) for a cooldown period.</p>
+<ul>
+<li><code>Closed</code> — requests flow normally.</li>
+<li><code>Open</code> — requests fail immediately without calling downstream.</li>
+<li><code>Half-Open</code> — a few test requests are allowed through to check if the dependency recovered.</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What's the difference between Timeouts, Retries, and Exponential Backoff?</summary>
+<div class="answer">
+<p><code>Timeouts</code> bound how long a caller waits for a response before giving up, preventing threads/connections from hanging indefinitely.</p>
+<p><code>Retries</code> re-attempt a failed operation, useful for transient errors — but naive retries can amplify load during an outage ("retry storm").</p>
+<p><code>Exponential backoff</code> increases the wait time between retries exponentially (often with jitter/randomness added) to spread out retry attempts and avoid overwhelming a recovering service.</p>
+</div>
+</details>
+
+<details><summary>What is Idempotency and why does it matter?</summary>
+<div class="answer">
+<p>An operation is <code>idempotent</code> if performing it multiple times has the same effect as performing it once — critical for safe retries in distributed systems where a client can't always tell if a request actually succeeded.</p>
+<p>Common technique: an <code>idempotency key</code> (client-generated unique ID) sent with a request; the server stores results keyed by that ID and returns the cached result on duplicate submissions instead of re-processing (e.g., preventing double payment charges).</p>
+</div>
+</details>
+
+<details><summary>What is Backpressure?</summary>
+<div class="answer">
+<p>Backpressure is a mechanism for a system to signal upstream producers to slow down when it can't keep up with the incoming rate of work, preventing memory exhaustion or cascading failure.</p>
+<p>Implementations include bounded queues that reject or block on overflow, reactive streams with demand signaling, and HTTP-level flow control in protocols like HTTP/2.</p>
+</div>
+</details>
+
+<details><summary>What is Chaos Engineering?</summary>
+<div class="answer">
+<p>Chaos engineering is the practice of deliberately injecting failures (killing instances, adding network latency, simulating region outages) into a system, typically in production, to proactively discover weaknesses before they cause real incidents.</p>
+<p>Popularized by Netflix's Chaos Monkey; done carefully with a hypothesis, blast-radius control, and monitoring in place.</p>
+</div>
+</details>
+
+<details><summary>What is Disaster Recovery, and what are Backups vs Failover vs Multi-Region?</summary>
+<div class="answer">
+<p><code>Disaster Recovery (DR)</code> is the strategy and processes for restoring service after a major failure (data center outage, corruption, region loss).</p>
+<ul>
+<li><code>Backups</code> — periodic copies of data to restore from; measured by RPO (how much data you can lose) and RTO (how fast you can recover).</li>
+<li><code>Failover</code> — automatic or manual switch to a standby system when the primary fails.</li>
+<li><code>Multi-Region Deployment</code> — running active infrastructure in multiple geographic regions for both lower latency and resilience against a whole-region outage.</li>
+</ul>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 4. MESSAGING & ASYNC ==================== -->
+<section class="category" id="cat-messaging">
+<h2>Messaging & Event-Driven Systems</h2>
+
+<details><summary>What is a Message Queue and how does it differ from Pub/Sub?</summary>
+<div class="answer">
+<p>A <code>Message Queue</code> (e.g., RabbitMQ, SQS) delivers each message to exactly one consumer, typically used for task distribution/work queues.</p>
+<p><code>Pub/Sub</code> (e.g., Kafka topics, SNS) broadcasts each message to all subscribed consumers/topics, decoupling producers from an arbitrary number of interested consumers.</p>
+</div>
+</details>
+
+<details><summary>What is Event-Driven Architecture?</summary>
+<div class="answer">
+<p>An architectural style where services communicate by producing and reacting to events (facts about something that happened) rather than direct synchronous calls, improving decoupling and scalability.</p>
+<p>Trade-offs include eventual consistency, harder debugging/tracing across async flows, and the need for idempotent event handlers since events can be delivered more than once.</p>
+</div>
+</details>
+
+<details><summary>What are Distributed Transactions and the Saga Pattern?</summary>
+<div class="answer">
+<p>A <code>distributed transaction</code> spans multiple services/databases and needs all-or-nothing semantics, but classic two-phase commit (2PC) doesn't scale well across microservices.</p>
+<p>The <code>Saga pattern</code> breaks a distributed transaction into a sequence of local transactions, each with a compensating action to undo it if a later step fails — implemented either via <code>choreography</code> (services react to each other's events) or <code>orchestration</code> (a central coordinator directs the steps).</p>
+</div>
+</details>
+
+<details><summary>What is a Dead Letter Queue (DLQ)?</summary>
+<div class="answer">
+<p>A DLQ is a separate queue where messages are routed after they repeatedly fail processing (exceeding a retry limit), so they don't block the main queue or get silently dropped.</p>
+<p>It lets engineers inspect, debug, and potentially replay failed messages without impacting the throughput of healthy message processing.</p>
+</div>
+</details>
+
+<details><summary>What are Cron Jobs?</summary>
+<div class="answer">
+<p>Cron jobs are scheduled tasks that run automatically at fixed times or intervals (e.g., nightly reports, cleanup jobs). In distributed systems, care is needed to avoid duplicate execution across multiple instances — typically solved with distributed locks or a dedicated scheduler like Quartz.NET.</p>
+</div>
+</details>
+
+<details><summary>What are Webhooks?</summary>
+<div class="answer">
+<p>Webhooks are user-defined HTTP callbacks: instead of a client polling for updates, the server sends an HTTP POST to a client-provided URL when an event occurs, enabling real-time, push-based integration between systems.</p>
+<p>Reliable implementations include signature verification (HMAC), retries with backoff, and idempotency handling on the receiver side.</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 5. REAL-TIME COMM ==================== -->
+<section class="category" id="cat-realtime">
+<h2>Real-Time Communication & Protocols</h2>
+
+<details><summary>WebSockets vs Long Polling vs Server-Sent Events — what's the difference?</summary>
+<div class="answer">
+<ul>
+<li><code>WebSockets</code> — a persistent, full-duplex TCP connection allowing both client and server to send messages anytime; best for chat, gaming, live collaboration.</li>
+<li><code>Long Polling</code> — client sends a request, server holds it open until new data is available (or timeout), then client immediately re-requests; simulates real-time over plain HTTP.</li>
+<li><code>Server-Sent Events (SSE)</code> — a one-way stream from server to client over HTTP, simpler than WebSockets, good for live feeds/notifications that don't need client-to-server push.</li>
+</ul>
+</div>
+</details>
+
+<details><summary>TCP vs UDP — key differences?</summary>
+<div class="answer">
+<p><code>TCP</code> is connection-oriented, guarantees ordered and reliable delivery via acknowledgments and retransmission — used for HTTP, file transfer, email.</p>
+<p><code>UDP</code> is connectionless with no delivery guarantees or ordering, but has lower overhead and latency — used for video streaming, gaming, DNS, and VoIP where speed matters more than perfect reliability.</p>
+</div>
+</details>
+
+<details><summary>What's new in HTTP/2 and HTTP/3?</summary>
+<div class="answer">
+<p><code>HTTP/2</code> introduced multiplexing (many requests over one TCP connection, fixing head-of-line blocking at the HTTP layer), header compression (HPACK), and server push.</p>
+<p><code>HTTP/3</code> runs over <code>QUIC</code> (built on UDP) instead of TCP, eliminating TCP-level head-of-line blocking, enabling faster connection setup, and better performance on unreliable networks.</p>
+</div>
+</details>
+
+<details><summary>What is gRPC?</summary>
+<div class="answer">
+<p>gRPC is a high-performance RPC framework built on HTTP/2 that uses Protocol Buffers for compact, strongly-typed binary serialization. It supports unary calls plus streaming (client, server, and bidirectional), making it popular for internal microservice-to-microservice communication where performance matters more than human-readability (vs REST/JSON).</p>
+</div>
+</details>
+
+<details><summary>What is DNS and how does resolution work?</summary>
+<div class="answer">
+<p>DNS (Domain Name System) translates human-readable domain names into IP addresses through a hierarchical, distributed lookup: recursive resolver → root servers → TLD servers → authoritative name server.</p>
+<p>Caching (via TTLs) happens at multiple layers (browser, OS, ISP resolver) to reduce lookup latency; DNS is also commonly used for load balancing and service discovery.</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 6. DATABASES ==================== -->
+<section class="category" id="cat-db">
+<h2>Databases & Data Layer</h2>
+
+<details><summary>What is Database Indexing and how does it help Query Optimization?</summary>
+<div class="answer">
+<p>An index is a separate data structure (commonly a B-tree or hash) that lets the database find rows without scanning the entire table, dramatically speeding up reads at the cost of extra storage and slower writes (since indexes must also be updated).</p>
+<p><code>Query optimization</code> involves choosing the right indexes, analyzing execution plans, avoiding unnecessary columns/joins, and rewriting queries so the optimizer can use indexes effectively (e.g., avoiding functions on indexed columns in WHERE clauses).</p>
+</div>
+</details>
+
+<details><summary>What is the N+1 Query problem?</summary>
+<div class="answer">
+<p>The N+1 problem occurs when code fetches a list of N parent records with one query, then issues a separate query per record to fetch related data — resulting in N+1 total queries instead of a single join or batched query.</p>
+<p>Fixed via eager loading/joins (e.g., <code>Include()</code> in EF Core), batching, or DataLoader-style patterns.</p>
+</div>
+</details>
+
+<details><summary>What is Connection Pooling?</summary>
+<div class="answer">
+<p>Connection pooling reuses a set of pre-established database connections instead of opening/closing a new TCP + auth handshake per request, which is expensive. A pool manager hands connections out to threads and returns them when done, controlling max concurrency to the DB.</p>
+</div>
+</details>
+
+<details><summary>Read Replicas vs Sharding vs Partitioning vs Replication — how do they differ?</summary>
+<div class="answer">
+<ul>
+<li><code>Replication</code> — copying data across multiple database nodes for redundancy and read scaling (leader-follower or multi-leader setups).</li>
+<li><code>Read Replicas</code> — a specific replication use case: read-only copies that offload read traffic from the primary/leader, which still handles all writes.</li>
+<li><code>Partitioning</code> — splitting a large table into smaller pieces (partitions) within the same database, often by range or list, to improve manageability and query performance.</li>
+<li><code>Sharding</code> — a form of horizontal partitioning where data is split across multiple separate database instances/servers, each holding a subset of data (e.g., by user ID hash), enabling near-limitless horizontal scale.</li>
+</ul>
+</div>
+</details>
+
+<details><summary>What are Database Migrations and Schema Versioning?</summary>
+<div class="answer">
+<p>Migrations are versioned, incremental scripts that evolve a database schema over time (add column, create index, etc.) in a repeatable, trackable way, usually applied via tooling (EF Core Migrations, Flyway, Liquibase).</p>
+<p><code>Schema versioning</code> ensures every environment's database structure can be traced to a specific version in source control, supporting rollbacks and safe team collaboration.</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 7. DISTRIBUTED SYSTEMS THEORY ==================== -->
+<section class="category" id="cat-distributed">
+<h2>Distributed Systems Theory</h2>
+
+<details><summary>What is the CAP Theorem?</summary>
+<div class="answer">
+<p>CAP theorem states that a distributed data store can only guarantee two of three properties simultaneously during a network partition:</p>
+<ul>
+<li><code>Consistency</code> — every read receives the most recent write.</li>
+<li><code>Availability</code> — every request receives a (non-error) response.</li>
+<li><code>Partition Tolerance</code> — the system continues to operate despite network failures between nodes.</li>
+</ul>
+<p>Since network partitions are unavoidable in real distributed systems, the practical choice is between <code>CP</code> (consistent but may reject requests during a partition) and <code>AP</code> (available but may return stale data).</p>
+</div>
+</details>
+
+<details><summary>What is Eventual Consistency?</summary>
+<div class="answer">
+<p>Eventual consistency guarantees that if no new updates are made, all replicas will eventually converge to the same value — but reads immediately after a write might return stale data. It trades strict consistency for higher availability and lower latency, common in NoSQL systems like DynamoDB and Cassandra.</p>
+</div>
+</details>
+
+<details><summary>What is Leader Election?</summary>
+<div class="answer">
+<p>Leader election is the process by which nodes in a distributed system agree on a single coordinator ("leader") responsible for a task (e.g., accepting writes, scheduling jobs), even in the presence of failures.</p>
+<p>Algorithms/tools: <code>Raft</code>, <code>Paxos</code>, or coordination services like <code>ZooKeeper</code>/<code>etcd</code> that use consensus protocols to ensure only one leader is active at a time.</p>
+</div>
+</details>
+
+<details><summary>Optimistic Locking vs Pessimistic Locking?</summary>
+<div class="answer">
+<p><code>Pessimistic locking</code> acquires a lock on data before reading/modifying it, blocking other transactions until released — safe but can hurt concurrency and risks deadlocks.</p>
+<p><code>Optimistic locking</code> assumes conflicts are rare: it lets transactions proceed without locking, then checks a version/timestamp column at commit time to detect conflicts, retrying if another transaction changed the data first.</p>
+</div>
+</details>
+
+<details><summary>What are Distributed Locks?</summary>
+<div class="answer">
+<p>A distributed lock coordinates exclusive access to a shared resource across multiple processes/machines (not just threads in one process), commonly implemented with Redis (<code>SET NX PX</code>), ZooKeeper, or etcd.</p>
+<p>Key challenges: handling lock expiry vs. process pauses (GC, network delay) safely — the Redlock algorithm and fencing tokens are common mitigations.</p>
+</div>
+</details>
+
+<details><summary>Race Conditions vs Deadlocks — what's the difference?</summary>
+<div class="answer">
+<p>A <code>race condition</code> occurs when the outcome of a program depends on the unpredictable timing/interleaving of concurrent operations, leading to inconsistent results (e.g., two threads incrementing a counter without synchronization).</p>
+<p>A <code>deadlock</code> occurs when two or more processes each hold a resource the other needs and wait forever, with no thread able to proceed — commonly caused by inconsistent lock ordering.</p>
+</div>
+</details>
+
+<details><summary>What are Network Partitions and Clock Skew?</summary>
+<div class="answer">
+<p>A <code>network partition</code> ("split-brain") happens when a network failure divides a cluster into groups that can't communicate with each other, forcing a choice between consistency and availability (see CAP theorem).</p>
+<p><code>Clock skew</code> is the difference between clocks on different machines; since distributed systems can't rely on perfectly synchronized wall clocks, techniques like logical clocks (Lamport timestamps), vector clocks, or hybrid clocks (Google's TrueTime) are used to order events correctly.</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 8. CONCURRENCY & MEMORY ==================== -->
+<section class="category" id="cat-concurrency">
+<h2>Concurrency & Memory</h2>
+
+<details><summary>What are Memory Leaks and how does Garbage Collection relate?</summary>
+<div class="answer">
+<p>A memory leak occurs when a program allocates memory it no longer needs but never releases it, gradually exhausting available memory — common causes include unsubscribed event handlers, static references, and caches without eviction.</p>
+<p><code>Garbage Collection (GC)</code> automatically reclaims memory for objects no longer reachable from program roots (e.g., .NET's generational GC), but it doesn't prevent all leaks — objects still referenced (even unintentionally) will never be collected.</p>
+</div>
+</details>
+
+<details><summary>What is Thread Safety?</summary>
+<div class="answer">
+<p>Code is thread-safe if it behaves correctly when accessed by multiple threads concurrently, without requiring external synchronization from the caller. Achieved via locks/mutexes, immutable data structures, thread-local storage, or lock-free/atomic operations (e.g., <code>Interlocked</code> in C#).</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 9. OBSERVABILITY ==================== -->
+<section class="category" id="cat-observability">
+<h2>Observability & Monitoring</h2>
+
+<details><summary>Monitoring vs Logging vs Distributed Tracing — how do they differ?</summary>
+<div class="answer">
+<ul>
+<li><code>Monitoring</code> — collecting and visualizing metrics (CPU, request rate, error rate) to understand system health over time.</li>
+<li><code>Logging</code> — recording discrete events with context, used for debugging and audit trails.</li>
+<li><code>Distributed Tracing</code> — tracks a single request as it flows across multiple services, giving a timeline (spans) to pinpoint where latency or errors occur in a microservices call chain (e.g., OpenTelemetry, Jaeger).</li>
+</ul>
+<p>Together with <code>Metrics</code>, these three form the "pillars of <code>Observability</code>" — the ability to infer internal system state from external outputs.</p>
+</div>
+</details>
+
+<details><summary>What is Alerting and how does it relate to SLOs, SLIs, and Error Budgets?</summary>
+<div class="answer">
+<ul>
+<li><code>SLI (Service Level Indicator)</code> — a measured metric, e.g., request latency or error rate.</li>
+<li><code>SLO (Service Level Objective)</code> — a target for an SLI, e.g., "99.9% of requests succeed."</li>
+<li><code>Error Budget</code> — the allowed amount of failure (100% − SLO) before violating the SLO; used to balance reliability work against feature velocity.</li>
+</ul>
+<p><code>Alerting</code> notifies engineers when metrics cross thresholds that put SLOs at risk, ideally tuned to minimize noise (alert fatigue) while catching real issues.</p>
+</div>
+</details>
+
+<details><summary>Latency vs Throughput, and what is P99/Tail Latency?</summary>
+<div class="answer">
+<p><code>Latency</code> is the time to complete a single request; <code>Throughput</code> is the number of requests a system can handle per unit time. They're related but distinct — a system can have high throughput with high latency (batching) or low latency with limited throughput.</p>
+<p><code>P99 latency</code> is the value below which 99% of requests complete — i.e., the worst 1% take longer. <code>Tail latency</code> refers to this slow end of the distribution; it matters because average latency can look great while a meaningful fraction of users have a bad experience.</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 10. SECURITY ==================== -->
+<section class="category" id="cat-security">
+<h2>Security</h2>
+
+<details><summary>What is Secrets Management and IAM?</summary>
+<div class="answer">
+<p><code>Secrets management</code> is the secure storage, rotation, and access control of sensitive values (API keys, passwords, certificates) using tools like Vault, AWS Secrets Manager, or Azure Key Vault — instead of hardcoding them in source or config files.</p>
+<p><code>IAM (Identity and Access Management)</code> is the framework for defining who (users, services) can access what resources, typically via roles and policies following the principle of least privilege.</p>
+</div>
+</details>
+
+<details><summary>What is OAuth and how does JWT rotation work?</summary>
+<div class="answer">
+<p><code>OAuth 2.0</code> is an authorization framework that lets a user grant a third-party application limited access to their resources without sharing credentials, using tokens issued by an authorization server.</p>
+<p><code>JWT (JSON Web Token)</code> is a self-contained, signed token often used as an OAuth access token. <code>JWT rotation</code> refers to using short-lived access tokens paired with longer-lived refresh tokens, periodically issuing new tokens and invalidating old ones to limit the damage window if a token is compromised.</p>
+</div>
+</details>
+
+<details><summary>TLS, Encryption at Rest, and Encryption in Transit — what's the difference?</summary>
+<div class="answer">
+<p><code>TLS (Transport Layer Security)</code> encrypts data as it travels over the network (the mechanism behind HTTPS), protecting against eavesdropping and tampering — this is <code>encryption in transit</code>.</p>
+<p><code>Encryption at rest</code> protects stored data (databases, disks, backups) so that if storage media is stolen or accessed improperly, the data remains unreadable without the decryption key.</p>
+</div>
+</details>
+
+<details><summary>What are WAF and DDoS Protection?</summary>
+<div class="answer">
+<p>A <code>WAF (Web Application Firewall)</code> inspects HTTP traffic and blocks common application-layer attacks (SQL injection, XSS, malicious bots) based on rules or ML-based detection.</p>
+<p><code>DDoS protection</code> mitigates Distributed Denial of Service attacks — floods of traffic meant to overwhelm a service — using techniques like traffic scrubbing, rate limiting, and large-scale edge/CDN absorption capacity.</p>
+</div>
+</details>
+
+<details><summary>CORS vs CSRF — what's the difference?</summary>
+<div class="answer">
+<p><code>CORS (Cross-Origin Resource Sharing)</code> is a browser security mechanism that restricts which origins (domains) are allowed to make requests to a given API, controlled by server-sent headers like <code>Access-Control-Allow-Origin</code>.</p>
+<p><code>CSRF (Cross-Site Request Forgery)</code> is an attack where a malicious site tricks a logged-in user's browser into making an unwanted authenticated request to another site. Defended against with CSRF tokens, <code>SameSite</code> cookies, and checking request origins.</p>
+</div>
+</details>
+
+<details><summary>SQL Injection, XSS, and SSRF — what are they?</summary>
+<div class="answer">
+<ul>
+<li><code>SQL Injection</code> — attacker inserts malicious SQL through unsanitized input, potentially reading/modifying/destroying data. Prevented with parameterized queries/ORMs.</li>
+<li><code>XSS (Cross-Site Scripting)</code> — attacker injects malicious scripts into pages viewed by other users. Prevented by output encoding and Content Security Policy.</li>
+<li><code>SSRF (Server-Side Request Forgery)</code> — attacker tricks the server into making requests to internal/unintended resources (e.g., cloud metadata endpoints) via a server-side fetch feature. Prevented with strict allow-lists and network segmentation.</li>
+</ul>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 11. API DESIGN ==================== -->
+<section class="category" id="cat-api">
+<h2>API Design</h2>
+
+<details><summary>What is API Versioning and Semantic Versioning?</summary>
+<div class="answer">
+<p><code>API versioning</code> lets an API evolve without breaking existing clients, commonly via URL path (<code>/v1/</code>), header, or query parameter — allowing old and new versions to coexist during a migration window.</p>
+<p><code>Semantic Versioning (SemVer)</code> uses a <code>MAJOR.MINOR.PATCH</code> scheme where MAJOR bumps signal breaking changes, MINOR adds backward-compatible functionality, and PATCH is for backward-compatible bug fixes — giving consumers a predictable signal of impact.</p>
+</div>
+</details>
+
+</section>
+
+<!-- ==================== 12. OPERATIONS ==================== -->
+<section class="category" id="cat-ops">
+<h2>Operations & Delivery Practices</h2>
+
+<details><summary>What are Feature Flags?</summary>
+<div class="answer">
+<p>Feature flags (toggles) let teams enable/disable functionality at runtime without deploying new code, supporting gradual rollouts, A/B testing, kill-switches for risky features, and decoupling deployment from release.</p>
+</div>
+</details>
+
+<details><summary>What is Cost Optimization in cloud/backend systems?</summary>
+<div class="answer">
+<p>Cost optimization involves right-sizing infrastructure (avoiding over-provisioning), using autoscaling, choosing appropriate pricing models (reserved vs on-demand vs spot instances), efficient caching to reduce compute/DB load, and monitoring spend with tools/dashboards to catch waste (idle resources, oversized instances, unused storage).</p>
+</div>
+</details>
+
+<details><summary>What are Production Incidents, On-call, and Postmortems?</summary>
+<div class="answer">
+<p>A <code>production incident</code> is an unplanned event impacting service availability or correctness, typically triaged by severity and resolved via an incident response process (detect → mitigate → resolve).</p>
+<p><code>On-call</code> is a rotation where an engineer is responsible for responding to alerts/incidents outside normal hours.</p>
+<p>A <code>postmortem</code> (or retrospective) is a blameless written analysis after an incident covering root cause, timeline, impact, and concrete follow-up action items to prevent recurrence.</p>
+</div>
+</details>
+
+<details><summary>What is Dependency Hell?</summary>
+<div class="answer">
+<p>Dependency hell refers to problems arising from conflicting or incompatible versions of libraries/packages a project depends on — e.g., two dependencies requiring different major versions of the same shared library. Mitigated with lockfiles, semantic versioning discipline, dependency isolation (containers, virtual environments), and regular, incremental upgrades rather than large infrequent ones.</p>
+</div>
+</details>
+
+</section>
+
+  </main>
+</div>
+
+<footer>Backend & System Design Interview Notes · built for quick review before interviews</footer>
+
+<script>
+  const categories = [
+    ["cat-traffic","Traffic, Caching & Edge"],
+    ["cat-devops","DevOps & Deployment"],
+    ["cat-resilience","Resilience Patterns"],
+    ["cat-messaging","Messaging & Async"],
+    ["cat-realtime","Real-Time & Protocols"],
+    ["cat-db","Databases"],
+    ["cat-distributed","Distributed Systems"],
+    ["cat-concurrency","Concurrency & Memory"],
+    ["cat-observability","Observability"],
+    ["cat-security","Security"],
+    ["cat-api","API Design"],
+    ["cat-ops","Operations"]
+  ];
+  const nav = document.getElementById('nav');
+  categories.forEach(([id,label])=>{
+    const a = document.createElement('a');
+    a.href = '#'+id;
+    a.textContent = label;
+    nav.appendChild(a);
+  });
+
+  const allDetails = Array.from(document.querySelectorAll('details'));
+  const stat = document.getElementById('stat');
+  stat.textContent = allDetails.length + ' questions';
+
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    const q = search.value.trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('.category').forEach(cat=>{
+      let catVisible = 0;
+      cat.querySelectorAll('details').forEach(d=>{
+        const text = d.textContent.toLowerCase();
+        const match = q === '' || text.includes(q);
+        d.classList.toggle('hidden', !match);
+        if(match){ catVisible++; visible++; }
+        if(q !== '' && match){ d.setAttribute('open',''); } else if(q===''){ d.removeAttribute('open'); }
+      });
+      cat.classList.toggle('hidden', catVisible===0);
+    });
+    stat.textContent = visible + ' / ' + allDetails.length + ' questions';
+  });
+</script>
+
+</body>
+</html>
