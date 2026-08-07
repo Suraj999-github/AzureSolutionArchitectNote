@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostForge – Social Image Generator</title>
+    <!-- html2canvas for exporting to image -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js">
+    </script>
+    <style>
+        /* ── Reset & base ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0b0b;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* ── Main card ── */
+        .app {
+            max-width: 820px;
+            width: 100%;
+            background: #1a1a1a;
+            border-radius: 28px;
+            padding: 36px 40px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+            border: 1px solid #2e2e2e;
+            transition: border-color 0.2s;
+        }
+
+        .app:hover {
+            border-color: #3d3d3d;
+        }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header h1 {
+            color: #f0f0f0;
+            font-weight: 600;
+            font-size: 22px;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 span {
+            background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .badge {
+            background: #2a2a2a;
+            color: #aaa;
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            border: 1px solid #333;
+        }
+
+        /* ── Controls row ── */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 22px;
+            align-items: center;
+        }
+
+        .controls label {
+            color: #ccc;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls input[type="range"] {
+            -webkit-appearance: none;
+            width: 120px;
+            height: 4px;
+            background: #333;
+            border-radius: 4px;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        .controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6c5ce7;
+            cursor: pointer;
+            border: 2px solid #1a1a1a;
+            box-shadow: 0 0 0 2px #6c5ce7;
+            transition: 0.15s;
+        }
+
+        .controls input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .controls input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6c5ce7;
+            cursor: pointer;
+            border: 2px solid #1a1a1a;
+        }
+
+        .size-value {
+            color: #f0f0f0;
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 34px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .controls .sep {
+            color: #333;
+            font-size: 18px;
+            font-weight: 200;
+            padding: 0 2px;
+        }
+
+        /* ── Input rows ── */
+        .input-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .input-row textarea {
+            flex: 1;
+            min-width: 200px;
+            background: #111;
+            border: 1px solid #2c2c2c;
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: #eee;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 72px;
+            max-height: 250px;
+            transition: border-color 0.25s, box-shadow 0.25s;
+            line-height: 1.6;
+        }
+
+        .input-row textarea:focus {
+            outline: none;
+            border-color: #6c5ce7;
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.12);
+        }
+
+        .input-row textarea::placeholder {
+            color: #555;
+        }
+
+        .input-row .btn-generate {
+            background: #6c5ce7;
+            border: none;
+            border-radius: 16px;
+            padding: 0 32px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+            height: 56px;
+            align-self: flex-end;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-row .btn-generate:hover {
+            background: #7c6df0;
+        }
+
+        .input-row .btn-generate:active {
+            transform: scale(0.96);
+        }
+
+        /* ── Preview (the "post") ── */
+        .preview-wrapper {
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 1px #2a2a2a, 0 12px 40px rgba(0, 0, 0, 0.7);
+            margin-bottom: 24px;
+            position: relative;
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #postCanvas {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            background: #000;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #postText {
+            font-weight: 700;
+            text-align: center;
+            word-break: break-word;
+            max-width: 100%;
+            max-height: 100%;
+            padding: 4px 8px;
+            line-height: 1.4;
+            z-index: 2;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        #postText .line {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 0 4px;
+        }
+
+        #postText .word {
+            display: inline;
+            white-space: pre-wrap;
+        }
+
+        /* ── Rainbow footer ── */
+        #postFooter {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            z-index: 5;
+            word-break: break-word;
+            line-height: 1.4;
+            background: linear-gradient(to right, 
+                #ff0000, #ff7700, #ffff00, #00ff00, #0000ff, #8b00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.9;
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.15));
+        }
+
+        /* ── Export bar ── */
+        .export-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 6px;
+        }
+
+        .export-bar button {
+            background: #282828;
+            border: 1px solid #3a3a3a;
+            border-radius: 40px;
+            padding: 12px 28px;
+            color: #eee;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+            font-family: inherit;
+        }
+
+        .export-bar button:hover {
+            background: #333;
+            border-color: #555;
+        }
+
+        .export-bar button:active {
+            transform: scale(0.96);
+        }
+
+        .export-bar .btn-download {
+            background: #6c5ce7;
+            border-color: #6c5ce7;
+            color: #fff;
+        }
+
+        .export-bar .btn-download:hover {
+            background: #7c6df0;
+            border-color: #7c6df0;
+        }
+
+        .export-bar .btn-copy {
+            background: #1e2a3a;
+            border-color: #2a3a4a;
+        }
+
+        .export-bar .btn-copy:hover {
+            background: #2a3a4a;
+            border-color: #3a4a5a;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #2a2a2a;
+            color: #eee;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid #3d3d3d;
+            opacity: 0;
+            transition: opacity 0.35s, transform 0.35s;
+            pointer-events: none;
+            z-index: 999;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 700px) {
+            .app {
+                padding: 24px 18px 28px;
+                border-radius: 20px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .input-row .btn-generate {
+                width: 100%;
+                justify-content: center;
+                height: 48px;
+            }
+
+            .input-row textarea {
+                min-width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .controls label {
+                justify-content: space-between;
+            }
+
+            .controls input[type="range"] {
+                width: 100%;
+                max-width: 180px;
+            }
+
+            .preview-wrapper {
+                max-width: 100%;
+            }
+
+            .export-bar button {
+                flex: 1;
+                justify-content: center;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            #postFooter {
+                font-size: 14px;
+                bottom: 16px;
+                left: 16px;
+                right: 16px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .app {
+                padding: 16px 12px 20px;
+            }
+            .header h1 {
+                font-size: 16px;
+            }
+            .input-row textarea {
+                font-size: 14px;
+                padding: 12px 14px;
+                min-height: 56px;
+            }
+            #postCanvas {
+                padding: 16px;
+            }
+            #postFooter {
+                font-size: 12px;
+                bottom: 12px;
+            }
+        }
+
+        /* ── Scrollbar styling ── */
+        textarea::-webkit-scrollbar {
+            width: 6px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── APP ─── -->
+    <div class="app">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>✦ <span>PostForge</span></h1>
+            <span class="badge">social · 1:1 · word color</span>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <label>
+                Size
+                <input type="range" id="sizeSlider" min="16" max="120" value="25" />
+                <span class="size-value" id="sizeDisplay">25</span>
+            </label>
+            <span class="sep">·</span>
+            <label>
+                <span style="color:#888;">🎲</span>
+                <button id="reshuffleBtn" style="background:transparent;border:1px solid #333;border-radius:30px;padding:4px 16px;color:#ccc;font-size:13px;cursor:pointer;font-family:inherit;transition:0.2s;">reshuffle colors</button>
+            </label>
+        </div>
+
+        <!-- Main text input -->
+        <div class="input-row">
+            <textarea id="textInput" placeholder="Type your post text here…&#10;Use Enter for line breaks." rows="6">I thought my love for her was
+a while(true) loop.
+
+I forgot that
+even the strongest loops...
+
+can face
+a break; statement
+if they consume
+too much memory.</textarea>
+            <button class="btn-generate" id="generateBtn">⟳ Generate</button>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-wrapper">
+            <div id="postCanvas">
+                <div id="postText"></div>
+                <!-- Static Rainbow Footer -->
+                <div id="postFooter">Happy Coding</div>
+            </div>
+        </div>
+
+        <!-- Export Bar -->
+        <div class="export-bar">
+            <button class="btn-download" id="downloadBtn">⬇ Download PNG</button>
+            <button class="btn-copy" id="copyBtn">📋 Copy Image</button>
+        </div>
+    </div>
+
+    <!-- ─── TOAST ─── -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ─── SCRIPT ─── -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ── DOM refs ──
+            const textInput = document.getElementById('textInput');
+            const generateBtn = document.getElementById('generateBtn');
+            const reshuffleBtn = document.getElementById('reshuffleBtn');
+            const postText = document.getElementById('postText');
+            const postCanvas = document.getElementById('postCanvas');
+            const sizeSlider = document.getElementById('sizeSlider');
+            const sizeDisplay = document.getElementById('sizeDisplay');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const toast = document.getElementById('toast');
+
+            let currentFontSize = 25;
+            let currentText = '';
+            let toastTimer = null;
+
+            // ── Helpers ──
+            function randomVibrantColor() {
+                const hue = Math.floor(Math.random() * 360);
+                const sat = 75 + Math.floor(Math.random() * 25);
+                const lig = 55 + Math.floor(Math.random() * 30);
+                return `hsl(${hue}, ${sat}%, ${lig}%)`;
+            }
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ── Core render: handles line breaks properly ──
+            function renderPost(text, fontSize) {
+                const trimmed = text.trim();
+                if (!trimmed || trimmed.length === 0) {
+                    postText.innerHTML =
+                        `<span style="color:#333;font-size:${Math.max(fontSize * 0.4, 14)}px;font-weight:400;opacity:0.5;">Enter text above</span>`;
+                    postText.style.fontSize = fontSize + 'px';
+                    return;
+                }
+
+                // Split by newlines to preserve line breaks
+                const lines = text.split('\n');
+                let html = '';
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    
+                    // Handle empty lines (preserve them as blank lines)
+                    if (line.trim() === '' && line === '') {
+                        html += `<div class="line"><br></div>`;
+                        continue;
+                    }
+
+                    // Split line by spaces, but keep multiple spaces
+                    // We'll split by /(\s+)/ to preserve spaces
+                    const tokens = line.split(/(\s+)/);
+                    let lineHtml = '';
+
+                    for (let j = 0; j < tokens.length; j++) {
+                        const token = tokens[j];
+                        if (token === '') continue;
+
+                        if (token.match(/^\s+$/)) {
+                            // Space token – preserve it
+                            lineHtml += ' ';
+                        } else {
+                            // Word token – color it
+                            const color = randomVibrantColor();
+                            lineHtml += `<span class="word" style="color:${color};">${escapeHTML(token)}</span>`;
+                        }
+                    }
+
+                    // Wrap the line in a block element for proper centering
+                    if (lineHtml) {
+                        html += `<div class="line">${lineHtml}</div>`;
+                    } else {
+                        // Empty line after trimming spaces? Keep as empty line.
+                        html += `<div class="line"><br></div>`;
+                    }
+                }
+
+                // If no content was rendered, show placeholder
+                if (!html.trim() || html === '<div class="line"><br></div>') {
+                    postText.innerHTML =
+                        `<span style="color:#333;font-size:${Math.max(fontSize * 0.4, 14)}px;font-weight:400;opacity:0.5;">Enter text above</span>`;
+                } else {
+                    postText.innerHTML = html;
+                }
+
+                postText.style.fontSize = fontSize + 'px';
+            }
+
+            // ── Reshuffle colors only ──
+            function reshuffleColors() {
+                const wordSpans = document.querySelectorAll('#postText .word');
+                if (wordSpans.length === 0) {
+                    const src = currentText || textInput.value || 'Enter text above';
+                    renderPost(src, currentFontSize);
+                    return;
+                }
+                wordSpans.forEach(el => {
+                    el.style.color = randomVibrantColor();
+                });
+            }
+
+            // ── Generate from input ──
+            function generate() {
+                const raw = textInput.value;
+                const src = (raw && raw.trim().length > 0) ? raw : 'Enter text above';
+                currentText = src;
+                renderPost(src, currentFontSize);
+            }
+
+            // ── Toast ──
+            function showToast(message, duration = 2200) {
+                if (toastTimer) {
+                    clearTimeout(toastTimer);
+                    toast.classList.remove('show');
+                }
+                void toast.offsetWidth;
+                toast.textContent = message;
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                    toastTimer = null;
+                }, duration);
+            }
+
+            // ── Export: download PNG ──
+            async function exportPNG() {
+                const el = document.getElementById('postCanvas');
+                try {
+                    const canvas = await html2canvas(el, {
+                        backgroundColor: '#000000',
+                        scale: 2.0,
+                        useCORS: true,
+                        logging: false,
+                        width: el.scrollWidth,
+                        height: el.scrollHeight,
+                    });
+                    const link = document.createElement('a');
+                    link.download = `postforge-${Date.now()}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    showToast('✅ Image downloaded!');
+                } catch (err) {
+                    console.error(err);
+                    showToast('❌ Export failed. See console.');
+                }
+            }
+
+            // ── Export: copy to clipboard ──
+            async function copyImage() {
+                const el = document.getElementById('postCanvas');
+                try {
+                    const canvas = await html2canvas(el, {
+                        backgroundColor: '#000000',
+                        scale: 2.0,
+                        useCORS: true,
+                        logging: false,
+                        width: el.scrollWidth,
+                        height: el.scrollHeight,
+                    });
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    if (!blob) throw new Error('Blob creation failed');
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            [blob.type]: blob
+                        })
+                    ]);
+                    showToast('📋 Image copied to clipboard!');
+                } catch (err) {
+                    console.error(err);
+                    if (err.name === 'NotAllowedError' || err.message?.includes('clipboard')) {
+                        showToast('⚠️ Clipboard access denied — downloading instead.', 2800);
+                        exportPNG();
+                    } else {
+                        showToast('❌ Copy failed. Try download.');
+                    }
+                }
+            }
+
+            // ── Size change ──
+            function handleSizeChange() {
+                const val = parseInt(sizeSlider.value, 10);
+                currentFontSize = val;
+                sizeDisplay.textContent = val;
+                const src = currentText || textInput.value || 'Enter text above';
+                renderPost(src, val);
+            }
+
+            // ── Init ──
+            function init() {
+                const initialText = textInput.value || 'Create something amazing';
+                currentText = initialText;
+                currentFontSize = parseInt(sizeSlider.value, 10);
+                renderPost(initialText, currentFontSize);
+                sizeDisplay.textContent = currentFontSize;
+
+                // ── Events ──
+                generateBtn.addEventListener('click', generate);
+                reshuffleBtn.addEventListener('click', reshuffleColors);
+                sizeSlider.addEventListener('input', handleSizeChange);
+                downloadBtn.addEventListener('click', exportPNG);
+                copyBtn.addEventListener('click', copyImage);
+
+                textInput.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        generate();
+                    }
+                });
+
+                let lastInput = textInput.value;
+                textInput.addEventListener('blur', () => {
+                    const val = textInput.value;
+                    if (val !== lastInput) {
+                        lastInput = val;
+                        if (val.trim().length > 0) {
+                            generate();
+                        }
+                    }
+                });
+
+                postCanvas.addEventListener('dblclick', () => {
+                    reshuffleColors();
+                    showToast('🎲 Colors reshuffled');
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'r' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
+                        e.preventDefault();
+                        reshuffleColors();
+                        showToast('🎲 Colors reshuffled');
+                    }
+                });
+
+                reshuffleBtn.addEventListener('click', () => {
+                    reshuffleColors();
+                    showToast('🎲 Colors reshuffled');
+                });
+            }
+
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                init();
+            } else {
+                document.addEventListener('DOMContentLoaded', init);
+            }
+
+        })();
+    </script>
+
+</body>
+</html>
