@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StoryCast – Fixed‑Margin Film Credits</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>StoryCast – Responsive Film Credits</title>
     <style>
         /* ── Reset & base ── */
         * {
@@ -19,8 +19,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 12px;
             background: radial-gradient(ellipse at 20% 50%, #1a0a2e, #0a0a0f 70%);
+            overflow-x: hidden;
         }
 
         /* ── Main app container ── */
@@ -31,7 +32,7 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-radius: 32px;
-            padding: 30px;
+            padding: 24px 28px;
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
@@ -41,19 +42,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 8px;
         }
 
         .header h1 {
             color: #f0f0f0;
             font-weight: 600;
-            font-size: 20px;
+            font-size: 18px;
             letter-spacing: -0.3px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-family: 'Segoe UI', sans-serif;
         }
 
@@ -67,21 +68,22 @@
         .badge {
             background: rgba(255, 255, 255, 0.06);
             color: #aaa;
-            font-size: 11px;
-            padding: 4px 14px;
+            font-size: 10px;
+            padding: 4px 12px;
             border-radius: 40px;
             letter-spacing: 0.5px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             font-family: 'Segoe UI', sans-serif;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         /* ── Input area ── */
         .input-area {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            margin-bottom: 28px;
+            gap: 12px;
+            margin-bottom: 22px;
         }
 
         .input-area textarea {
@@ -89,15 +91,15 @@
             background: #0e0e14;
             border: 1px solid #2a2a3a;
             border-radius: 16px;
-            padding: 18px 20px;
+            padding: 14px 18px;
             color: #e0e0e0;
-            font-size: 15px;
+            font-size: 14px;
             font-family: 'Segoe UI', monospace;
             resize: vertical;
-            min-height: 120px;
-            max-height: 260px;
+            min-height: 100px;
+            max-height: 200px;
             transition: border-color 0.3s, box-shadow 0.3s;
-            line-height: 1.7;
+            line-height: 1.6;
             outline: none;
         }
 
@@ -112,7 +114,7 @@
 
         .input-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: flex-end;
             flex-wrap: wrap;
         }
@@ -121,17 +123,19 @@
             background: #28283a;
             border: 1px solid #3a3a4e;
             border-radius: 40px;
-            padding: 12px 32px;
+            padding: 10px 22px;
             color: #eee;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: background 0.2s, transform 0.1s, border-color 0.2s;
             font-family: 'Segoe UI', sans-serif;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             letter-spacing: 0.3px;
+            flex: 1 1 auto;
+            justify-content: center;
         }
 
         .input-actions button:hover {
@@ -177,7 +181,7 @@
             border-color: #2a2a3a;
             color: #888;
             font-size: 12px;
-            padding: 12px 18px;
+            padding: 10px 14px;
         }
 
         .input-actions .btn-speed:hover {
@@ -186,12 +190,7 @@
             color: #ccc;
         }
 
-        .input-actions .btn-speed.active {
-            border-color: #6c5ce7;
-            color: #a29bfe;
-        }
-
-        /* ── Cinema Screen ── */
+        /* ── Cinema Screen (the "motion div") ── */
         .cinema-screen {
             position: relative;
             width: 100%;
@@ -200,7 +199,7 @@
             border-radius: 20px;
             overflow: hidden;
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 20px 60px rgba(0, 0, 0, 0.7);
-            min-height: 400px;
+            min-height: 320px;
         }
 
         /* ── Animated background orbs ── */
@@ -213,24 +212,24 @@
             animation: orbFloat 14s ease-in-out infinite alternate;
         }
         .bg-orb-1 {
-            width: 400px;
-            height: 400px;
+            width: 350px;
+            height: 350px;
             background: #6c2bd9;
-            top: -150px;
-            left: -100px;
+            top: -120px;
+            left: -80px;
             animation-delay: 0s;
         }
         .bg-orb-2 {
-            width: 350px;
-            height: 350px;
+            width: 300px;
+            height: 300px;
             background: #d94b8c;
-            bottom: -150px;
-            right: -100px;
+            bottom: -120px;
+            right: -80px;
             animation-delay: 5s;
         }
         .bg-orb-3 {
-            width: 200px;
-            height: 200px;
+            width: 180px;
+            height: 180px;
             background: #2b9bd9;
             top: 50%;
             left: 50%;
@@ -244,17 +243,19 @@
                 transform: translate(0, 0) scale(1);
             }
             100% {
-                transform: translate(40px, 30px) scale(1.4);
+                transform: translate(30px, 20px) scale(1.3);
             }
         }
 
-        /* ── Screen content ── */
+        /* ── Screen content (scrolling container) ── */
         .screen-content {
             position: relative;
             width: 100%;
             height: 100%;
             overflow: hidden;
             z-index: 2;
+            padding: 40px clamp(16px, 5vw, 50px);
+            /* 👈 50px margin around text on large screens, scales on mobile */
         }
 
         /* ── Individual line ── */
@@ -263,12 +264,12 @@
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: clamp(22px, 4.5vw, 48px);
+            font-size: clamp(20px, 4.5vw, 46px);
             font-weight: 700;
             text-align: center;
             letter-spacing: -0.02em;
             line-height: 1.3;
-            padding: 6px 16px;
+            padding: 4px 10px;
             border-radius: 6px;
             text-shadow: 0 2px 40px rgba(0, 0, 0, 0.7);
             white-space: nowrap;
@@ -303,16 +304,19 @@
             pointer-events: none;
             gap: 8px;
             transition: opacity 0.6s;
+            padding: 20px;
+            text-align: center;
         }
 
         .empty-state .icon {
-            font-size: 48px;
+            font-size: 42px;
             opacity: 0.3;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .empty-state p {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.5;
+            max-width: 280px;
         }
 
         .empty-state.hidden {
@@ -325,7 +329,7 @@
             inset: 0;
             pointer-events: none;
             z-index: 10;
-            opacity: 0.05;
+            opacity: 0.04;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
             background-repeat: repeat;
             background-size: 256px 256px;
@@ -334,22 +338,23 @@
         /* ── Status bar ── */
         .status-bar {
             position: absolute;
-            bottom: 12px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 20;
-            color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.12);
             font-family: 'Segoe UI', sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             letter-spacing: 1px;
             text-transform: uppercase;
             pointer-events: none;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 4px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px 14px;
             border-radius: 20px;
             backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             transition: opacity 0.6s;
+            white-space: nowrap;
         }
 
         .status-bar.hidden {
@@ -359,14 +364,14 @@
         /* ── Toast ── */
         .toast {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(80px);
             background: #1a1a2a;
             color: #eee;
-            padding: 10px 28px;
+            padding: 8px 22px;
             border-radius: 40px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             border: 1px solid #3a3a4e;
             opacity: 0;
@@ -376,6 +381,7 @@
             font-family: 'Segoe UI', sans-serif;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px);
+            white-space: nowrap;
         }
 
         .toast.show {
@@ -383,63 +389,139 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* ── Responsive ── */
+        /* ── Responsive (Mobile First) ── */
         @media (max-width: 700px) {
             .app {
-                padding: 20px;
-                border-radius: 24px;
-            }
-            .line-item {
-                font-size: clamp(18px, 4.5vw, 30px);
-                padding: 4px 12px;
-                max-width: 95%;
+                padding: 18px 16px;
             }
             .cinema-screen {
                 aspect-ratio: 4 / 3;
-                min-height: 300px;
+                min-height: 260px;
+                border-radius: 16px;
+            }
+            .screen-content {
+                padding: 30px clamp(14px, 4vw, 30px);
+            }
+            .line-item {
+                font-size: clamp(18px, 4.5vw, 28px);
+                max-width: 92%;
+                padding: 3px 8px;
             }
             .input-actions button {
-                padding: 10px 18px;
-                font-size: 13px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+            .badge {
+                font-size: 9px;
+            }
+            .header h1 {
+                font-size: 16px;
             }
             .bg-orb-1 {
-                width: 250px;
-                height: 250px;
+                width: 220px;
+                height: 220px;
                 top: -80px;
                 left: -60px;
             }
             .bg-orb-2 {
-                width: 200px;
-                height: 200px;
-                bottom: -60px;
-                right: -40px;
+                width: 180px;
+                height: 180px;
+                bottom: -80px;
+                right: -60px;
             }
         }
 
-        @media (max-width: 420px) {
-            .app {
-                padding: 14px;
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
             }
-            .line-item {
-                font-size: clamp(14px, 4vw, 22px);
-                padding: 3px 8px;
-                max-width: 98%;
+            .app {
+                padding: 14px 12px;
+                border-radius: 24px;
             }
             .cinema-screen {
                 aspect-ratio: 1 / 1;
-                min-height: 250px;
+                min-height: 220px;
+                border-radius: 14px;
+            }
+            .screen-content {
+                padding: 30px clamp(12px, 3.5vw, 20px);
+            }
+            .line-item {
+                font-size: clamp(15px, 4.5vw, 22px);
+                max-width: 94%;
+                padding: 2px 6px;
+            }
+            .input-area textarea {
+                font-size: 13px;
+                padding: 12px 14px;
+                min-height: 80px;
             }
             .input-actions {
-                flex-direction: column;
+                gap: 8px;
             }
             .input-actions button {
-                justify-content: center;
-                width: 100%;
+                padding: 8px 12px;
+                font-size: 11px;
+                flex: 1 1 40%;
+            }
+            .empty-state .icon {
+                font-size: 32px;
+            }
+            .empty-state p {
+                font-size: 12px;
             }
             .status-bar {
-                font-size: 9px;
-                padding: 3px 12px;
-                bottom: 8px;
+                font-size: 8px;
+                padding: 2px 10px;
+                bottom: 6px;
+				display: none;
+				
+            }
+            .header h1 {
+                font-size: 15px;
+            }
+            .badge {
+                font-size: 8px;
+                padding: 3px 10px;
+            }
+            .bg-orb-1 {
+                width: 150px;
+                height: 150px;
+                top: -50px;
+                left: -40px;
+            }
+            .bg-orb-2 {
+                width: 120px;
+                height: 120px;
+                bottom: -50px;
+                right: -40px;
+            }
+            .bg-orb-3 {
+                width: 100px;
+                height: 100px;
+            }
+            .toast {
+                font-size: 11px;
+                padding: 6px 16px;
+                bottom: 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .app {
+                padding: 10px 8px;
+            }
+            .screen-content {
+                padding: 20px clamp(8px, 2vw, 12px);
+            }
+            .line-item {
+                font-size: clamp(13px, 4vw, 18px);
+                max-width: 96%;
+            }
+            .input-actions button {
+                font-size: 10px;
+                padding: 6px 10px;
             }
         }
     </style>
@@ -450,17 +532,15 @@
         <!-- Header -->
         <div class="header">
             <h1>✦ <span>StoryCast</span></h1>
-            <span class="badge">fixed margin · film credits</span>
+            <span class="badge">responsive · film credits</span>
         </div>
 
         <!-- Input Area -->
         <div class="input-area">
-            <textarea id="textInput" placeholder="Paste your story here…&#10;Each line keeps a fixed 75px gap." rows="5">I thought my love for her was
+            <textarea id="textInput" placeholder="Paste your story here…&#10;Lines scroll upward with fixed spacing." rows="5">I thought my love for her was
 a while(true) loop.
-
 I forgot that
 even the strongest loops...
-
 can face
 a break; statement
 if they consume
@@ -472,7 +552,7 @@ too much memory.</textarea>
             </div>
         </div>
 
-        <!-- Cinema Screen -->
+        <!-- Cinema Screen (Motion Div) -->
         <div class="cinema-screen" id="cinemaScreen">
             <!-- Background Orbs -->
             <div class="bg-orb bg-orb-1"></div>
@@ -519,7 +599,7 @@ too much memory.</textarea>
             let speedMultiplier = 1;
             const speedOptions = [0.5, 1, 1.5, 2];
 
-            // ── Fixed spacing between lines (in pixels) ──
+            // ── Fixed spacing between lines ──
             const LINE_SPACING = 75;
 
             // ── Beautiful color palette ──
@@ -609,9 +689,9 @@ too much memory.</textarea>
                 const container = screenContent;
                 const containerHeight = container.clientHeight || 600;
 
-                const baseSpeed = 0.8; // pixels per frame at 1×
+                const baseSpeed = 0.8;
                 const speed = baseSpeed * speedMultiplier;
-                const fadeZone = 80;
+                const fadeZone = 70;
 
                 let activeLines = [];
                 let lineIndex = 0;
@@ -681,7 +761,7 @@ too much memory.</textarea>
                         const el = line.element;
                         const top = line.y;
 
-                        // Fade in/out based on position
+                        // Fade in/out
                         const bottomFade = Math.min(1, (containerHeight - top) / fadeZone);
                         const topFade = Math.min(1, (top + 30) / fadeZone);
                         let opacity = Math.min(bottomFade, topFade);
@@ -694,13 +774,11 @@ too much memory.</textarea>
                         el.style.top = top + 'px';
                         el.style.opacity = opacity;
 
-                        // Mark for removal if past the top
                         if (top < -60) {
                             toRemove.push(i);
                         }
                     }
 
-                    // Remove lines that are gone
                     for (const idx of toRemove) {
                         const line = activeLines[idx];
                         if (line.element.parentNode) {
@@ -709,19 +787,17 @@ too much memory.</textarea>
                         activeLines.splice(idx, 1);
                     }
 
-                    // ── SPAWN LOGIC: fixed margin between lines ──
-                    // Check if we need to spawn a new line to maintain the fixed gap
+                    // ── Maintain fixed spacing ──
                     if (lineIndex < lines.length) {
                         const lastLine = activeLines.length > 0 ? activeLines[activeLines.length - 1] : null;
                         const lastY = lastLine ? lastLine.y : containerHeight + 100;
 
-                        // Spawn when the last line has moved up by exactly LINE_SPACING pixels
                         if (lastY < containerHeight - LINE_SPACING) {
                             spawnLine();
                         }
                     }
 
-                    // Check if animation is complete
+                    // Check completion
                     const allSpawned = lineIndex >= lines.length;
                     const noLinesLeft = activeLines.length === 0;
 
@@ -734,7 +810,6 @@ too much memory.</textarea>
                         return;
                     }
 
-                    // Update status
                     if (activeLines.length > 0) {
                         statusBar.textContent = `● ${activeLines.length} lines · ${lineIndex}/${lines.length}`;
                     }
@@ -782,7 +857,7 @@ too much memory.</textarea>
             const resizeObserver = new ResizeObserver(() => {});
             resizeObserver.observe(document.getElementById('cinemaScreen'));
 
-            console.log('🎬 StoryCast ready! Fixed margin between lines: 75px.');
+            console.log('🎬 StoryCast ready! Fixed margin: 75px. Fully responsive.');
         })();
     </script>
 
