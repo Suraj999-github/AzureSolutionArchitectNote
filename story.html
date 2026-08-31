@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>StoryCast – Responsive Film Credits</title>
+    <title>StoryCast – Full‑Screen Cinema</title>
     <style>
         /* ── Reset & base ── */
         * {
@@ -190,7 +190,7 @@
             color: #ccc;
         }
 
-        /* ── Cinema Screen (the "motion div") ── */
+        /* ── Cinema Screen (preview) ── */
         .cinema-screen {
             position: relative;
             width: 100%;
@@ -202,7 +202,6 @@
             min-height: 320px;
         }
 
-        /* ── Animated background orbs ── */
         .bg-orb {
             position: absolute;
             border-radius: 50%;
@@ -247,7 +246,6 @@
             }
         }
 
-        /* ── Screen content (scrolling container) ── */
         .screen-content {
             position: relative;
             width: 100%;
@@ -255,10 +253,9 @@
             overflow: hidden;
             z-index: 2;
             padding: 40px clamp(16px, 5vw, 50px);
-            /* 👈 50px margin around text on large screens, scales on mobile */
+			display:none;
         }
 
-        /* ── Individual line ── */
         .line-item {
             position: absolute;
             left: 50%;
@@ -288,7 +285,6 @@
             text-shadow: none !important;
         }
 
-        /* ── Empty state ── */
         .empty-state {
             position: absolute;
             inset: 0;
@@ -318,12 +314,10 @@
             opacity: 0.5;
             max-width: 280px;
         }
-
         .empty-state.hidden {
             opacity: 0;
         }
 
-        /* ── Film grain ── */
         .film-grain {
             position: absolute;
             inset: 0;
@@ -335,7 +329,6 @@
             background-size: 256px 256px;
         }
 
-        /* ── Status bar ── */
         .status-bar {
             position: absolute;
             bottom: 10px;
@@ -356,9 +349,90 @@
             transition: opacity 0.6s;
             white-space: nowrap;
         }
-
         .status-bar.hidden {
             opacity: 0;
+        }
+
+        /* ── FULL‑SCREEN MODAL ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: #060608;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+            padding: 0;
+            /* the modal fills the whole screen */;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-overlay .modal-screen {
+            width: 100%;
+            height: 100%;
+            background: #060608;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay .modal-screen .screen-content {
+            width: 100%;
+            height: 100%;
+            padding: 60px clamp(20px, 8vw, 100px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-overlay .modal-screen .line-item {
+            font-size: clamp(32px, 6vw, 72px);
+            max-width: 85%;
+            padding: 8px 20px;
+        }
+
+        .modal-overlay .modal-screen .bg-orb-1 {
+            width: 600px;
+            height: 600px;
+            top: -200px;
+            left: -150px;
+        }
+        .modal-overlay .modal-screen .bg-orb-2 {
+            width: 500px;
+            height: 500px;
+            bottom: -200px;
+            right: -150px;
+        }
+        .modal-overlay .modal-screen .bg-orb-3 {
+            width: 300px;
+            height: 300px;
+        }
+
+        .modal-overlay .modal-close-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            color: rgba(255, 255, 255, 0.08);
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s 2s;
+        }
+        .modal-overlay.open .modal-close-hint {
+            opacity: 1;
         }
 
         /* ── Toast ── */
@@ -383,13 +457,12 @@
             backdrop-filter: blur(8px);
             white-space: nowrap;
         }
-
         .toast.show {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
 
-        /* ── Responsive (Mobile First) ── */
+        /* ── Responsive ── */
         @media (max-width: 700px) {
             .app {
                 padding: 18px 16px;
@@ -406,6 +479,14 @@
                 font-size: clamp(18px, 4.5vw, 28px);
                 max-width: 92%;
                 padding: 3px 8px;
+            }
+            .modal-overlay .modal-screen .line-item {
+                font-size: clamp(24px, 5vw, 40px);
+                max-width: 90%;
+                padding: 6px 14px;
+            }
+            .modal-overlay .modal-screen .screen-content {
+                padding: 40px clamp(16px, 5vw, 40px);
             }
             .input-actions button {
                 padding: 8px 16px;
@@ -428,6 +509,22 @@
                 height: 180px;
                 bottom: -80px;
                 right: -60px;
+            }
+            .modal-overlay .modal-screen .bg-orb-1 {
+                width: 300px;
+                height: 300px;
+                top: -120px;
+                left: -100px;
+            }
+            .modal-overlay .modal-screen .bg-orb-2 {
+                width: 250px;
+                height: 250px;
+                bottom: -120px;
+                right: -100px;
+            }
+            .modal-overlay .modal-screen .bg-orb-3 {
+                width: 150px;
+                height: 150px;
             }
         }
 
@@ -452,6 +549,14 @@
                 max-width: 94%;
                 padding: 2px 6px;
             }
+            .modal-overlay .modal-screen .line-item {
+                font-size: clamp(18px, 4.5vw, 28px);
+                max-width: 92%;
+                padding: 4px 10px;
+            }
+            .modal-overlay .modal-screen .screen-content {
+                padding: 30px clamp(12px, 4vw, 24px);
+            }
             .input-area textarea {
                 font-size: 13px;
                 padding: 12px 14px;
@@ -475,8 +580,6 @@
                 font-size: 8px;
                 padding: 2px 10px;
                 bottom: 6px;
-				display: none;
-				
             }
             .header h1 {
                 font-size: 15px;
@@ -501,9 +604,29 @@
                 width: 100px;
                 height: 100px;
             }
+            .modal-overlay .modal-screen .bg-orb-1 {
+                width: 200px;
+                height: 200px;
+                top: -80px;
+                left: -60px;
+            }
+            .modal-overlay .modal-screen .bg-orb-2 {
+                width: 160px;
+                height: 160px;
+                bottom: -80px;
+                right: -60px;
+            }
+            .modal-overlay .modal-screen .bg-orb-3 {
+                width: 100px;
+                height: 100px;
+            }
             .toast {
                 font-size: 11px;
                 padding: 6px 16px;
+                bottom: 16px;
+            }
+            .modal-overlay .modal-close-hint {
+                font-size: 9px;
                 bottom: 16px;
             }
         }
@@ -519,6 +642,11 @@
                 font-size: clamp(13px, 4vw, 18px);
                 max-width: 96%;
             }
+            .modal-overlay .modal-screen .line-item {
+                font-size: clamp(15px, 4vw, 20px);
+                max-width: 95%;
+                padding: 3px 6px;
+            }
             .input-actions button {
                 font-size: 10px;
                 padding: 6px 10px;
@@ -532,7 +660,7 @@
         <!-- Header -->
         <div class="header">
             <h1>✦ <span>StoryCast</span></h1>
-            <span class="badge">responsive · film credits</span>
+            <span class="badge">cinema · replay modal</span>
         </div>
 
         <!-- Input Area -->
@@ -552,27 +680,30 @@ too much memory.</textarea>
             </div>
         </div>
 
-        <!-- Cinema Screen (Motion Div) -->
+        <!-- Cinema Screen (Preview) -->
         <div class="cinema-screen" id="cinemaScreen">
-            <!-- Background Orbs -->
             <div class="bg-orb bg-orb-1"></div>
             <div class="bg-orb bg-orb-2"></div>
             <div class="bg-orb bg-orb-3"></div>
-
-            <!-- Film Grain -->
             <div class="film-grain"></div>
-
-            <!-- Empty State -->
             <div class="empty-state" id="emptyState">
                 <div class="icon">🎬</div>
                 <p>Enter your story &amp; hit "Play Credits"</p>
             </div>
-
-            <!-- Screen Content -->
             <div class="screen-content" id="screenContent"></div>
-
-            <!-- Status Bar -->
             <div class="status-bar" id="statusBar">● ready</div>
+        </div>
+    </div>
+
+    <!-- ─── FULL‑SCREEN MODAL ─── -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-screen" id="modalScreen">
+            <div class="bg-orb bg-orb-1"></div>
+            <div class="bg-orb bg-orb-2"></div>
+            <div class="bg-orb bg-orb-3"></div>
+            <div class="film-grain"></div>
+            <div class="screen-content" id="modalContent"></div>
+            <div class="modal-close-hint">✦ credits · auto‑close</div>
         </div>
     </div>
 
@@ -593,16 +724,22 @@ too much memory.</textarea>
             const statusBar = document.getElementById('statusBar');
             const toast = document.getElementById('toast');
 
+            // Modal
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalContent = document.getElementById('modalContent');
+
             let toastTimer = null;
             let isPlaying = false;
             let animationId = null;
+            let modalAnimationId = null;
             let speedMultiplier = 1;
             const speedOptions = [0.5, 1, 1.5, 2];
 
-            // ── Fixed spacing between lines ──
+            // Fixed spacing
             const LINE_SPACING = 75;
+            const MODAL_LINE_SPACING = 85;
 
-            // ── Beautiful color palette ──
+            // Colors
             const palette = [
                 '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#FF9FF3',
                 '#54A0FF', '#5F27CD', '#00D2D3', '#A29BFE', '#FD79A8',
@@ -610,7 +747,7 @@ too much memory.</textarea>
                 '#F368E0', '#4BC0C0', '#FFC048', '#FF6B81', '#7C5CFC'
             ];
 
-            // ── Toast helper ──
+            // ── Toast ──
             function showToast(message, duration = 2200) {
                 if (toastTimer) {
                     clearTimeout(toastTimer);
@@ -625,14 +762,14 @@ too much memory.</textarea>
                 }, duration);
             }
 
-            // ── Get lines from input ──
+            // ── Get lines ──
             function getLines() {
                 const raw = textInput.value;
                 if (!raw || raw.trim().length === 0) return [];
                 return raw.split('\n');
             }
 
-            // ── Reset / Clear ──
+            // ── Reset preview ──
             function resetScreen(keepText = false) {
                 if (animationId) {
                     cancelAnimationFrame(animationId);
@@ -661,14 +798,145 @@ too much memory.</textarea>
                 }
             }
 
-            // ── Play the credits ──
-            function playCredits() {
+            // ── Shared animation runner ──
+            function runCredits(container, lines, speed, spacing, onComplete) {
+                if (!container) return null;
+                const containerHeight = container.clientHeight || 600;
+                const fadeZone = 70;
+                let activeLines = [];
+                let lineIndex = 0;
+                let lastFrameTime = 0;
+                let cancelled = false;
+
+                // Create line
+                function createLineElement(text, index) {
+                    const div = document.createElement('div');
+                    div.className = 'line-item';
+                    const isEmpty = text.trim() === '' && text === '';
+                    if (isEmpty) {
+                        div.textContent = '\u00A0';
+                        div.classList.add('empty-line');
+                    } else {
+                        div.textContent = text;
+                        const colorIdx = index % palette.length;
+                        const color = palette[colorIdx];
+                        div.style.color = color;
+                        div.style.textShadow =
+                            `0 0 60px ${color}33, 0 0 120px ${color}11, 0 2px 30px rgba(0,0,0,0.6)`;
+                    }
+                    div.style.top = containerHeight + 'px';
+                    div.style.opacity = '0';
+                    container.appendChild(div);
+                    return div;
+                }
+
+                function spawnLine() {
+                    if (lineIndex >= lines.length || cancelled) return;
+                    const text = lines[lineIndex];
+                    const el = createLineElement(text, lineIndex);
+                    activeLines.push({
+                        element: el,
+                        y: containerHeight,
+                        text: text,
+                        index: lineIndex,
+                        isEmpty: text.trim() === '' && text === ''
+                    });
+                    lineIndex++;
+                }
+
+                // Spawn first line
+                spawnLine();
+
+                function animate(timestamp) {
+                    if (cancelled) {
+                        // Clean up
+                        activeLines.forEach(l => {
+                            if (l.element.parentNode) l.element.remove();
+                        });
+                        activeLines = [];
+                        return;
+                    }
+
+                    if (lastFrameTime === 0) lastFrameTime = timestamp;
+                    const delta = Math.min((timestamp - lastFrameTime) / 16, 3);
+                    lastFrameTime = timestamp;
+
+                    const moveDistance = speed * delta;
+
+                    const toRemove = [];
+                    for (let i = activeLines.length - 1; i >= 0; i--) {
+                        const line = activeLines[i];
+                        line.y -= moveDistance;
+                        const el = line.element;
+                        const top = line.y;
+
+                        const bottomFade = Math.min(1, (containerHeight - top) / fadeZone);
+                        const topFade = Math.min(1, (top + 30) / fadeZone);
+                        let opacity = Math.min(bottomFade, topFade);
+                        opacity = Math.max(0, Math.min(1, opacity));
+                        if (line.isEmpty) opacity = Math.min(opacity, 0.12);
+
+                        el.style.top = top + 'px';
+                        el.style.opacity = opacity;
+
+                        if (top < -60) toRemove.push(i);
+                    }
+
+                    for (const idx of toRemove) {
+                        const line = activeLines[idx];
+                        if (line.element.parentNode) line.element.remove();
+                        activeLines.splice(idx, 1);
+                    }
+
+                    // Maintain spacing
+                    if (lineIndex < lines.length) {
+                        const lastLine = activeLines.length > 0 ? activeLines[activeLines.length - 1] : null;
+                        const lastY = lastLine ? lastLine.y : containerHeight + 100;
+                        if (lastY < containerHeight - spacing) {
+                            spawnLine();
+                        }
+                    }
+
+                    const allSpawned = lineIndex >= lines.length;
+                    const noLinesLeft = activeLines.length === 0;
+
+                    if (allSpawned && noLinesLeft) {
+                        // Complete
+                        if (onComplete) onComplete();
+                        return;
+                    }
+
+                    if (!cancelled) {
+                        const id = requestAnimationFrame(animate);
+                        // store the id on the container for cleanup
+                        container._animId = id;
+                    }
+                }
+
+                const animId = requestAnimationFrame(animate);
+                container._animId = animId;
+
+                // Return a cleanup function
+                return function cleanup() {
+                    cancelled = true;
+                    if (container._animId) {
+                        cancelAnimationFrame(container._animId);
+                        container._animId = null;
+                    }
+                    activeLines.forEach(l => {
+                        if (l.element.parentNode) l.element.remove();
+                    });
+                    activeLines = [];
+                };
+            }
+
+            // ── Play in preview ──
+            function playPreview() {
                 const lines = getLines();
                 if (lines.length === 0) {
                     showToast('Please enter some text first.', 2000);
                     return;
                 }
-
                 const hasContent = lines.some(l => l.trim().length > 0);
                 if (!hasContent) {
                     showToast('Please enter some text.', 2000);
@@ -687,179 +955,140 @@ too much memory.</textarea>
                 statusBar.textContent = '● playing';
 
                 const container = screenContent;
-                const containerHeight = container.clientHeight || 600;
+                const speed = 0.8 * speedMultiplier;
 
-                const baseSpeed = 0.8;
-                const speed = baseSpeed * speedMultiplier;
-                const fadeZone = 70;
+                let cleanup = runCredits(container, lines, speed, LINE_SPACING, () => {
+                    // Preview complete
+                    isPlaying = false;
+                    playBtn.textContent = '↻ Replay';
+                    playBtn.disabled = false;
+                    statusBar.textContent = '● done — click Replay for cinema';
+                    showToast('Preview done! Click Replay for full‑screen.', 2000);
+                });
 
-                let activeLines = [];
-                let lineIndex = 0;
-                let lastFrameTime = 0;
+                // Store cleanup
+                playBtn._previewCleanup = cleanup;
+            }
 
-                // ── Create a line element ──
-                function createLineElement(text, index) {
-                    const div = document.createElement('div');
-                    div.className = 'line-item';
-
-                    const isEmpty = text.trim() === '' && text === '';
-                    if (isEmpty) {
-                        div.textContent = '\u00A0';
-                        div.classList.add('empty-line');
-                    } else {
-                        div.textContent = text;
-                        const colorIdx = index % palette.length;
-                        const color = palette[colorIdx];
-                        div.style.color = color;
-                        div.style.textShadow =
-                            `0 0 60px ${color}33, 0 0 120px ${color}11, 0 2px 30px rgba(0,0,0,0.6)`;
-                    }
-
-                    div.style.top = containerHeight + 'px';
-                    div.style.opacity = '0';
-                    container.appendChild(div);
-                    return div;
+            // ── Play in modal (slower, cinematic) ──
+            function playModal() {
+                const lines = getLines();
+                if (lines.length === 0) {
+                    showToast('Please enter some text first.', 2000);
+                    return;
+                }
+                const hasContent = lines.some(l => l.trim().length > 0);
+                if (!hasContent) {
+                    showToast('Please enter some text.', 2000);
+                    return;
                 }
 
-                // ── Spawn a new line ──
-                function spawnLine() {
-                    if (lineIndex >= lines.length) return;
-                    const text = lines[lineIndex];
-                    const el = createLineElement(text, lineIndex);
-                    const lineData = {
-                        element: el,
-                        y: containerHeight,
-                        text: text,
-                        index: lineIndex,
-                        isEmpty: text.trim() === '' && text === ''
-                    };
-                    activeLines.push(lineData);
-                    lineIndex++;
+                // Clear modal content
+                modalContent.innerHTML = '';
+
+                // Open modal
+                modalOverlay.classList.add('open');
+
+                // Use a much slower speed for cinema feel
+                const modalSpeed = 0.35; // very slow, cinematic
+                const container = modalContent;
+                const spacing = MODAL_LINE_SPACING;
+
+                // Run the modal animation
+                let modalCleanup = runCredits(container, lines, modalSpeed, spacing, () => {
+                    // Modal complete → close it
+                    setTimeout(() => {
+                        modalOverlay.classList.remove('open');
+                        // Clean up lines
+                        if (modalContent._animId) {
+                            cancelAnimationFrame(modalContent._animId);
+                            modalContent._animId = null;
+                        }
+                        modalContent.innerHTML = '';
+                        showToast('🎬 Cinema complete!', 1500);
+                    }, 600);
+                });
+
+                // Store cleanup
+                modalContent._cleanup = modalCleanup;
+            }
+
+            // ── Main Play/Replay logic ──
+            function handlePlay() {
+                const btnText = playBtn.textContent;
+                if (btnText.includes('Replay') || btnText.includes('↻')) {
+                    // Replay → open modal
+                    // First, stop any preview animation
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                    if (playBtn._previewCleanup) {
+                        playBtn._previewCleanup();
+                        playBtn._previewCleanup = null;
+                    }
+                    screenContent.innerHTML = '';
+                    emptyState.classList.add('hidden');
+                    statusBar.textContent = '● cinema mode';
+
+                    // Open modal
+                    playModal();
+                } else {
+                    // First play → preview
+                    playPreview();
                 }
+            }
 
-                // Spawn the first line immediately
-                spawnLine();
-
-                // ── Animation loop ──
-                function animate(timestamp) {
-                    if (!isPlaying) {
-                        return;
-                    }
-
-                    if (lastFrameTime === 0) lastFrameTime = timestamp;
-                    const delta = Math.min((timestamp - lastFrameTime) / 16, 3);
-                    lastFrameTime = timestamp;
-
-                    const moveDistance = speed * delta;
-
-                    // Move all lines up
-                    const toRemove = [];
-                    for (let i = activeLines.length - 1; i >= 0; i--) {
-                        const line = activeLines[i];
-                        line.y -= moveDistance;
-
-                        const el = line.element;
-                        const top = line.y;
-
-                        // Fade in/out
-                        const bottomFade = Math.min(1, (containerHeight - top) / fadeZone);
-                        const topFade = Math.min(1, (top + 30) / fadeZone);
-                        let opacity = Math.min(bottomFade, topFade);
-                        opacity = Math.max(0, Math.min(1, opacity));
-
-                        if (line.isEmpty) {
-                            opacity = Math.min(opacity, 0.12);
-                        }
-
-                        el.style.top = top + 'px';
-                        el.style.opacity = opacity;
-
-                        if (top < -60) {
-                            toRemove.push(i);
-                        }
-                    }
-
-                    for (const idx of toRemove) {
-                        const line = activeLines[idx];
-                        if (line.element.parentNode) {
-                            line.element.remove();
-                        }
-                        activeLines.splice(idx, 1);
-                    }
-
-                    // ── Maintain fixed spacing ──
-                    if (lineIndex < lines.length) {
-                        const lastLine = activeLines.length > 0 ? activeLines[activeLines.length - 1] : null;
-                        const lastY = lastLine ? lastLine.y : containerHeight + 100;
-
-                        if (lastY < containerHeight - LINE_SPACING) {
-                            spawnLine();
-                        }
-                    }
-
-                    // Check completion
-                    const allSpawned = lineIndex >= lines.length;
-                    const noLinesLeft = activeLines.length === 0;
-
-                    if (allSpawned && noLinesLeft) {
-                        isPlaying = false;
-                        playBtn.textContent = '↻ Replay';
-                        playBtn.disabled = false;
-                        statusBar.textContent = '● complete';
-                        showToast('🎬 Credits finished!', 2000);
-                        return;
-                    }
-
-                    if (activeLines.length > 0) {
-                        statusBar.textContent = `● ${activeLines.length} lines · ${lineIndex}/${lines.length}`;
-                    }
-
-                    animationId = requestAnimationFrame(animate);
+            // ── Reset ──
+            function handleReset() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
                 }
-
-                lastFrameTime = 0;
-                animationId = requestAnimationFrame(animate);
+                if (playBtn._previewCleanup) {
+                    playBtn._previewCleanup();
+                    playBtn._previewCleanup = null;
+                }
+                // Close modal if open
+                if (modalOverlay.classList.contains('open')) {
+                    modalOverlay.classList.remove('open');
+                    if (modalContent._cleanup) {
+                        modalContent._cleanup();
+                        modalContent._cleanup = null;
+                    }
+                    if (modalContent._animId) {
+                        cancelAnimationFrame(modalContent._animId);
+                        modalContent._animId = null;
+                    }
+                    modalContent.innerHTML = '';
+                }
+                resetScreen(false);
+                showToast('Cleared', 1200);
             }
 
             // ── Event Listeners ──
-            playBtn.addEventListener('click', () => {
-                if (isPlaying) {
-                    resetScreen(true);
-                    setTimeout(() => playCredits(), 200);
-                } else {
-                    playCredits();
-                }
-            });
+            playBtn.addEventListener('click', handlePlay);
 
-            resetBtn.addEventListener('click', () => {
-                resetScreen(false);
-                showToast('Cleared', 1200);
-            });
+            resetBtn.addEventListener('click', handleReset);
 
             speedBtn.addEventListener('click', cycleSpeed);
 
             textInput.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                     e.preventDefault();
-                    if (isPlaying) {
-                        resetScreen(true);
-                        setTimeout(() => playCredits(), 200);
-                    } else {
-                        playCredits();
-                    }
+                    handlePlay();
                 }
             });
 
             // ── Init ──
             resetScreen(true);
 
-            // Handle resize to update container dimensions
+            // Handle resize for modal
             const resizeObserver = new ResizeObserver(() => {});
             resizeObserver.observe(document.getElementById('cinemaScreen'));
 
-            console.log('🎬 StoryCast ready! Fixed margin: 75px. Fully responsive.');
+            console.log('🎬 StoryCast ready! Click Play for preview, Replay for full‑screen cinema.');
         })();
     </script>
-
 </body>
 </html>
